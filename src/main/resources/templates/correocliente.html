@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Solicitud de productos</title>
+</head>
+
+<body>
+    <div>
+        <img src="../../../logo.jpg" th:src="|cid:${logo}|" />
+    </div>
+    <div class="container">
+        <h4>
+            Bienvenido <b th:text="${nombre}"></b>
+        </h4>
+        <table cellpadding="0" cellspacing="0" border="0" width="80%" class="wrapper" bgcolor="#FFFFFF">
+            <tr>
+                <th style="background-color: #ecf0f1">Producto</th>
+                <th style="background-color: #ecf0f1">Cantidad</th>
+                <th style="background-color: #ecf0f1">Empresa</th>
+                <th style="background-color: #ecf0f1">Enlace</th>
+            </tr>
+            <tr th:each="item : ${datoscat}">
+                <td style="background-color: #dde4e6" th:text="${item.producto.producto}"> </td>
+                <td style="background-color: #dde4e6; text-align: center" th:text="${item.cantidad}"> </td>
+                <td style="background-color: #dde4e6; text-align: left" th:text="${item.producto.empresa.empresa}">
+                </td>
+                <td style="background-color: #dde4e6; text-align: left">
+                    <a th:href="@{'https://api.whatsapp.com/send?phone=591'+${item.producto.empresa.celular}+'&text=Hola Me gustaria comunicarme contigo'}">Whastapp</a>
+                </td>
+            </tr>
+        </table>
+        <p>La Empresa productora se va a poner en contacto con su persona lo mas pronto posible, gracias</p>
+    </div>
+</body>
+
+</html>

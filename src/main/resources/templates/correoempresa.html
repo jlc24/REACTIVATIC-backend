@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Solicitud de productos</title>
+</head>
+
+<body>
+    <div>
+        <img src="../../../logo.jpg" th:src="|cid:${logo}|" />
+    </div>
+    <div class="container">
+        <h4>
+            Bienvenido <b th:text="${empresa}"></b>
+        </h4>
+        <p>Tiene una solicitud de productos que debe ser respondida ingrese al sistema para ponerse en contacto con el cliente <b th:text="${nombre}"></b></p>
+        <p><a th:href="@{https://desarrolla.oruro.gob.bo/mipymesapp}">MiPyMEs</p>
+    </div>
+</body>
+
+</html>
