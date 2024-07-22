@@ -16,10 +16,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-
 
 @RestController
 @RequestMapping("/apirest/categorias")

@@ -44,8 +44,6 @@ import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
 @PreAuthorize("isAuthenticated()")
 public class PersonasCtrl {
 
-
-
     @Autowired
     IPersonasAod iPersonasAod;
 

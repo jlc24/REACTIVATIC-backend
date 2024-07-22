@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/apirest/tiposgeneros")
@@ -19,6 +18,7 @@ public class TiposgenerosCtrl {
     
     @Autowired
     private ITiposgenerosAod itiposgenerosAod;
+    
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         Tiposgeneros tipoGenero = null;
@@ -36,6 +36,7 @@ public class TiposgenerosCtrl {
         }
         return new ResponseEntity<>(tipoGenero, HttpStatus.OK);
     }
+
     @GetMapping
     public ResponseEntity<?> listar() {
         List<Tiposgeneros> tiposGeneros;
