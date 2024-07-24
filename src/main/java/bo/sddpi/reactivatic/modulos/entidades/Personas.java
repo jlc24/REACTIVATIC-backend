@@ -1,6 +1,7 @@
 package bo.sddpi.reactivatic.modulos.entidades;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import lombok.Data;
@@ -35,4 +36,6 @@ public class Personas implements Serializable {
     private Tiposdocumentos tipodocumento;
     private Tiposextensiones tipoextension;
 
+    private Usuarios usuario;
+    private Roles rol;
 }

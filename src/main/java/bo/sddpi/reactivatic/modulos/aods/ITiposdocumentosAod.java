@@ -13,7 +13,7 @@ public interface ITiposdocumentosAod {
     @Select("SELECT idtipodocumento, tipodocumento, documento FROM tiposdocumentos where idtipodocumento=#{id} ")
     Tiposdocumentos dato(Long id);
 
-    @Select("SELECT idtipodocumento, tipodocumento, documento FROM tiposdocumentos")
+    @Select("SELECT * FROM tiposdocumentos WHERE estado=true ORDER BY created_at DESC")
     List<Tiposdocumentos> listar();
 
     @Insert("INSERT INTO tiposdocumentos (tipodocumento, documento) VALUES (#{tipodocumento}, #{documento})")

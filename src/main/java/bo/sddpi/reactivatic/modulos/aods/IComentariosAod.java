@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 
 import bo.sddpi.reactivatic.modulos.entidades.Comentarios;
 
+@Mapper
 public interface IComentariosAod {
     
     @Select("SELECT * FROM comentarios WHERE idproducto=#{idproducto} ORDER BY created_at DESC LIMTT #{cantidad} OFFSET #{pagina}")

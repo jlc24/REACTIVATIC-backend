@@ -33,7 +33,7 @@ public class ClientesCtrl {
             }else{
                 nropagina = (pagina-1) * cantidad;
             }
-            clientes = iClientesAod.buscar(buscar, pagina, cantidad);
+            clientes = iClientesAod.buscar(buscar, nropagina, cantidad);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en al base de datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

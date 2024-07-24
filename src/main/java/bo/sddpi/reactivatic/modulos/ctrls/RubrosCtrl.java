@@ -134,7 +134,7 @@ public class RubrosCtrl {
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<List<Rubros>>(datos, HttpStatus.OK);
+        return new ResponseEntity<List<Rubros>>(datos, HttpStatus.OK);  
     }
 
 }

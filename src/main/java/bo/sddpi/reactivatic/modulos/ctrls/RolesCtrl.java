@@ -51,6 +51,48 @@ public class RolesCtrl {
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 
+    @GetMapping("/admin")
+    ResponseEntity<?> listaradmin() {
+        List<Roles> roles = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            roles = irolesAod.listaradmin();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Roles>>(roles, HttpStatus.OK);
+    }
+
+    @GetMapping("/sddpi")
+    public ResponseEntity<?> listarsddpi() {
+        List<Roles> roles;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            roles = irolesAod.listarsddpi();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(roles, HttpStatus.OK);
+    }
+
+    @GetMapping("/reactivatic")
+    public ResponseEntity<?> listarreactivatic() {
+        List<Roles> roles;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            roles = irolesAod.listarreactivatic();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(roles, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody Roles roles) {
         Map<String, Object> mensajes = new HashMap<>();

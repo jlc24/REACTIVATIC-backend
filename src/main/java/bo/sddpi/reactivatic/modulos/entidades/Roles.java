@@ -12,6 +12,7 @@ public class Roles implements Serializable{
 
     private Long idrol;
     private String rol;
+    private String nombrerol;
     private LocalDateTime created_at;
 
 }

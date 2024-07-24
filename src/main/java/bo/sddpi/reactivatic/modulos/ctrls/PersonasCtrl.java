@@ -77,6 +77,24 @@ public class PersonasCtrl {
         return new ResponseEntity<Personas>(dato, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/ver/{id}")
+    ResponseEntity<?> persona(@PathVariable Long id) {
+        Personas dato = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            dato = iPersonasAod.persona(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (dato==null) {
+            mensajes.put("mensaje", "El id: ".concat(id.toString()).concat(" no existe en la Base de Datos"));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<Personas>(dato, HttpStatus.OK);
+    }
+
     @PostMapping
     ResponseEntity<?> adicionar4(@Valid @RequestBody Personas dato, BindingResult resultado) {
         Map<String, Object> mensajes = new HashMap<>();
@@ -85,29 +103,40 @@ public class PersonasCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
+        Long verificarpersona = iPersonasAod.verificarpersonaregistro(dato.getPrimerapellido(), dato.getSegundoapellido(), dato.getPrimernombre(), dato.getDip());
+        if (verificarpersona != null) {
+            mensajes.put("mensaje", "La persona ya se encuentra registrada en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }
+        Long verificarusuario = iUsuariosAod.verificausuarioregistro(dato.getUsuario().getUsuario());
+        if (verificarusuario != null) {
+            mensajes.put("mensaje", "El usuario ya existe.");
+        }
         try {
             Usuarios usuarionuevo = new Usuarios();
             Personas personanuevo = new Personas();
             Usuariosroles usuariorolnuevo = new Usuariosroles();
+            personanuevo.setIdtipogenero(dato.getIdtipogenero());
             personanuevo.setPrimerapellido(dato.getPrimerapellido());
             personanuevo.setSegundoapellido(dato.getSegundoapellido());
             personanuevo.setPrimernombre(dato.getPrimernombre());
-            //personanuevo.setSegundonombre(dato.getSegundonombre());
-            //personanuevo.setFechanacimiento(dato.getFechanacimiento());
             personanuevo.setDip(dato.getDip());
+            personanuevo.setComplementario(dato.getComplementario());
+            personanuevo.setIdtipodocumento(dato.getIdtipodocumento());
+            personanuevo.setIdtipoextension(dato.getIdtipoextension());
             personanuevo.setDireccion(dato.getDireccion());
-            personanuevo.setTelefono(dato.getTelefono());
+            personanuevo.setTelefono(dato.getCelular());
             personanuevo.setCelular(dato.getCelular());
             personanuevo.setCorreo(dato.getCorreo());
-            personanuevo.setEstado(true);
             iPersonasAod.adicionar(personanuevo);
-            usuarionuevo.setUsuario(dato.getDip());
-            usuarionuevo.setClave(dato.getDip());
-            usuarionuevo.setEstado(true);
+            
+            usuarionuevo.setUsuario(dato.getUsuario().getUsuario());
+            usuarionuevo.setClave(dato.getUsuario().getClave());
             usuarionuevo.setIdpersona(personanuevo.getIdpersona());
             iUsuariosAod.adicionar(usuarionuevo);
+            
             usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
-            usuariorolnuevo.setIdrol(4L);
+            usuariorolnuevo.setIdrol(dato.getRol().getIdrol());
             iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");

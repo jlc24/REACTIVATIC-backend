@@ -15,14 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import bo.sddpi.reactivatic.modulos.aods.IPersonasAod;
 import bo.sddpi.reactivatic.modulos.aods.IRepresentantesAod;
@@ -72,6 +65,48 @@ public class UsuariosCtrl {
         }
         return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
     }
+    @GetMapping("/sddpi")
+    ResponseEntity<?> datossddpi(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        List<Usuarios> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        int nropagina = 0;
+        try {
+            if ((pagina-1)*cantidad<0) {
+                nropagina = 0;
+            } else {
+                nropagina = (pagina-1)*cantidad;
+            }
+            datos = iUsuariosAod.datossddpi(buscar, nropagina, cantidad);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
+    }
+    @GetMapping("/reactivatic")
+    ResponseEntity<?> datosreactivatic(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        List<Usuarios> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        int nropagina = 0;
+        try {
+            if ((pagina-1)*cantidad<0) {
+                nropagina = 0;
+            } else {
+                nropagina = (pagina-1)*cantidad;
+            }
+            datos = iUsuariosAod.datosreactivatic(buscar, nropagina, cantidad);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/cantidad")
     ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
@@ -79,6 +114,33 @@ public class UsuariosCtrl {
         Map<String, Object> mensajes = new HashMap<>();
         try {
             cantidad = iUsuariosAod.cantidad(buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/cantidad/sddpi")
+    ResponseEntity<?> cantidadsddpi(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            cantidad = iUsuariosAod.cantidadsddpi(buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+    @GetMapping(value = "/cantidad/reactivatic")
+    ResponseEntity<?> cantidadreactivatic(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            cantidad = iUsuariosAod.cantidadreactivatic(buscar);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

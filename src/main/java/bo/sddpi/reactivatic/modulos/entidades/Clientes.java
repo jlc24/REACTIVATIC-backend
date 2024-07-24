@@ -13,4 +13,6 @@ public class Clientes implements Serializable{
     private Long idpersona;
 
     private Personas persona;
+    private Usuarios usuario;
+    private Roles rol;
 }

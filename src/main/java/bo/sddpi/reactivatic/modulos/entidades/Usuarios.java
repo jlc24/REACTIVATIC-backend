@@ -18,6 +18,7 @@ public class Usuarios implements Serializable{
     private LocalDateTime created_at;
     
     private Personas persona;
-    private Personas personas;
+    //private Personas personas;
+    private Roles rol;
 
 }

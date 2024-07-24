@@ -13,7 +13,7 @@ public interface ITiposextensionesAod {
     @Select("SELECT idtipoextension, tipoextension, sigla FROM tiposextensiones where idtipoextension=#{id} ")
     Tiposextensiones dato(Long id);
 
-    @Select("SELECT idtipoextension, tipoextension, sigla FROM tiposextensiones")
+    @Select("SELECT * FROM tiposextensiones WHERE estado=true ORDER BY created_at DESC")
     List<Tiposextensiones> listar();
 
     @Insert("INSERT INTO tiposextensiones (tipoextension, sigla) VALUES (#{tipoextension}, #{sigla})")

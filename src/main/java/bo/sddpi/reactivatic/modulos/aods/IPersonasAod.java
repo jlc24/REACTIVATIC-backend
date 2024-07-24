@@ -20,19 +20,39 @@ public interface IPersonasAod {
         @Result(property = "tipogenero", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato"))
     })
     Personas dato(Long id);
+    
+    @Select("SELECT p.idpersona, p.idtipogenero, p.idtipogenero as ifore1, p.primerapellido, p.segundoapellido, p.primernombre, p.segundonombre, p.fechanacimiento, p.dip, p.direccion, p.telefono, p.celular, p.correo, p.estado, " +
+        "td.idtipodocumento as ifore2, te.idtipoextension as ifore3, u.idusuario as ifore4, ur.idrol as ifore5 " +
+        "FROM personas p " +
+        "LEFT JOIN tiposdocumentos td ON td.idtipodocumento = p.idtipodocumento " +
+        "LEFT JOIN tiposextensiones te ON te.idtipoextension = p.idtipoextension " +
+        "LEFT JOIN usuarios u ON u.idpersona = p.idpersona " +
+        "LEFT JOIN usuariosroles ur ON ur.idusuario = u.idusuario " +
+        "WHERE p.idpersona = #{id}")
+    @Results({
+        @Result(property = "tipogenero", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato")),
+        @Result(property = "tipodocumento", column = "ifore2", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposdocumentosAod.dato")),
+        @Result(property = "tipoextension", column = "ifore3", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposextensionesAod.dato")),
+        @Result(property = "usuario", column = "ifore4", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IUsuariosAod.datousuario")),
+        @Result(property = "rol", column = "ifore5", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
+    })
+    Personas persona(Long id);
 
     @Options(useGeneratedKeys = true, keyProperty = "idpersona", keyColumn = "idpersona")
-    @Insert("insert into personas(idtipogenero, primerapellido, segundoapellido, primernombre, segundonombre, fechanacimiento, dip, direccion, telefono, celular, correo, estado) values (#{idtipogenero}, #{primerapellido}, #{segundoapellido}, #{primernombre}, #{segundonombre}, #{fechanacimiento}, #{dip}, #{direccion}, #{telefono}, #{celular}, #{correo}, true) returning idpersona")
+    @Insert("INSERT INTO personas(idtipogenero, primerapellido, segundoapellido, primernombre, dip, complementario, idtipodocumento, idtipoextension, direccion, telefono, celular, correo) VALUES (#{idtipogenero}, #{primerapellido}, #{segundoapellido}, #{primernombre}, #{dip}, #{complementario}, #{idtipodocumento}, #{idtipoextension}, #{direccion}, #{telefono}, #{celular}, #{correo}) returning idpersona")
     void adicionar(Personas dato);
 
-    @Update("update personas set idtipogenero=#{idtipogenero}, primerapellido=#{primerapellido}, segundoapellido=#{segundoapellido}, primernombre=#{primernombre}, segundonombre=#{segundonombre}, fechanacimiento=#{fechanacimiento}, dip=#{dip}, direccion=#{direccion}, telefono=#{telefono}, celular=#{celular}, correo=#{correo}, estado=#{estado} where idpersona=#{idpersona} ")
+    @Update("UPDATE personas SET idtipogenero=#{idtipogenero}, primerapellido=#{primerapellido}, segundoapellido=#{segundoapellido}, primernombre=#{primernombre}, dip=#{dip}, complementario=#{complementario}, idtipodocumento=#{idtipodocumento}, idtipoextension=#{idtipoextension}, direccion=#{direccion}, telefono=#{telefono}, celular=#{celular}, correo=#{correo} WHERE idpersona=#{idpersona} ")
     void modificar(Personas dato);
 
-    @Select("select idpersona, idtipogenero, primerapellido, segundoapellido, primernombre, segundonombre, fechanacimiento, dip, numerocomplementario, direccion, telefono, celular, correo from usuarios join personas using(idpersona) where idusuario=#{idusuario}")
+    @Select("select idpersona, idtipogenero, primerapellido, segundoapellido, primernombre, segundonombre, fechanacimiento, dip, complementario, direccion, telefono, celular, correo from usuarios join personas using(idpersona) where idusuario=#{idusuario}")
     @Results({
         @Result(property = "tipogenero", column = "idtipogenero", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato"))
     })
     Personas infoadicional(Long idusuario);
+
+    @Select("SELECT idpersona FROM personas WHERE primerapellido=#{primerapellido} AND segundoapellido=#{segundoapellido} AND primernombre=#{primernombre} AND dip=#{dip}")
+    Long verificarpersonaregistro(String primerapellido, String segundoapellido, String primernombre, String dip);
 
     @Delete("delete from personas where idpersona=#{id}")
     void eliminar(Long id);

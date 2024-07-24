@@ -10,11 +10,20 @@ import java.util.List;
 @Mapper
 public interface IRolesAod {
 
-    @Select("select idrol, rol from roles where idrol=#{id}")
+    @Select("select * from roles where idrol=#{id}")
     Roles dato(Long id);
 
-    @Select("SELECT idrol, rol FROM roles")
+    @Select("SELECT * FROM roles")
     List<Roles> listar();
+
+    @Select("SELECT * FROM roles WHERE idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6")
+    List<Roles> listaradmin();
+
+    @Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 5 OR idrol = 6")
+    List<Roles> listarsddpi();
+
+    @Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 6")
+    List<Roles> listarreactivatic();
 
     @Insert("INSERT INTO roles (rol) VALUES (#{rol})")
     @Options(useGeneratedKeys = true, keyProperty = "idrol")

@@ -13,7 +13,7 @@ public interface ITiposgenerosAod {
     @Select("SELECT idtipogenero, tipogenero FROM tiposgeneros where idtipogenero=#{id} ")
     Tiposgeneros dato(Long id);
 
-    @Select("SELECT idtipogenero, tipogenero FROM tiposgeneros")
+    @Select("SELECT * FROM tiposgeneros WHERE estado=true ORDER BY created_at")
     List<Tiposgeneros> listar();
 
     @Insert("INSERT INTO tiposgeneros (tipogenero) VALUES (#{tipogenero})")

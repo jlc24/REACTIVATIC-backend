@@ -23,7 +23,7 @@ import bo.sddpi.reactivatic.modulos.entidades.Comentarios;
 public class ComentariosCtrl {
     
     @Autowired
-    private IComentariosAod iComentariosAod;
+    IComentariosAod iComentariosAod;
 
     //BUSCAR COMENTARIOS DE PRODUCTO->PAGINACION->CANTIDAD
     @GetMapping("/productos/{id}")
@@ -39,7 +39,7 @@ public class ComentariosCtrl {
             }else{
                 nropagina = (pagina-1) * cantidad;
             }
-            comentarios = iComentariosAod.buscarp(idproducto, pagina, cantidad);
+            comentarios = iComentariosAod.buscarp(idproducto, nropagina, cantidad);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en al base de datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
