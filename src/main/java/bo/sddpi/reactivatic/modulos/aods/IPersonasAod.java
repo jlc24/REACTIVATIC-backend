@@ -15,13 +15,13 @@ import bo.sddpi.reactivatic.modulos.entidades.Personas;
 @Mapper
 public interface IPersonasAod {
 
-    @Select("SELECT idpersona, idtipogenero, idtipogenero as ifore1, primerapellido, segundoapellido, primernombre, segundonombre, fechanacimiento, dip, direccion, telefono, celular, correo, estado FROM personas where idpersona=#{id} ")
+    @Select("SELECT idpersona, idtipogenero, idtipogenero as ifore1, primerapellido, segundoapellido, primernombre, dip, complementario, idtipodocumento, idtipoextension, direccion, telefono, celular, correo, estado FROM personas where idpersona=#{id} ")
     @Results({
         @Result(property = "tipogenero", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato"))
     })
     Personas dato(Long id);
     
-    @Select("SELECT p.idpersona, p.idtipogenero, p.idtipogenero as ifore1, p.primerapellido, p.segundoapellido, p.primernombre, p.segundonombre, p.fechanacimiento, p.dip, p.direccion, p.telefono, p.celular, p.correo, p.estado, " +
+    @Select("SELECT p.idpersona, p.idtipogenero, p.idtipogenero as ifore1, p.primerapellido, p.segundoapellido, p.primernombre, p.dip, p.complementario, p.idtipodocumento, p.idtipoextension, p.direccion, p.telefono, p.celular, p.correo, p.estado, " +
         "td.idtipodocumento as ifore2, te.idtipoextension as ifore3, u.idusuario as ifore4, ur.idrol as ifore5 " +
         "FROM personas p " +
         "LEFT JOIN tiposdocumentos td ON td.idtipodocumento = p.idtipodocumento " +

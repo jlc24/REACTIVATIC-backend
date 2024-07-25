@@ -1,7 +1,6 @@
 package bo.sddpi.reactivatic.modulos.entidades;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import lombok.Data;
@@ -16,8 +15,6 @@ public class Personas implements Serializable {
     private String primerapellido;
     private String segundoapellido;
     private String primernombre;
-    //private String segundonombre;
-    //private LocalDate fechanacimiento;
     private String dip;
     private String complementario;
     private Long idtipodocumento;

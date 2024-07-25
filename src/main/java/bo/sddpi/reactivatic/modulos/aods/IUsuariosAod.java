@@ -22,7 +22,7 @@ public interface IUsuariosAod {
     // @Results({
     //     @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato"))
     // })
-    @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore2, r.rol " +
+    @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore5, r.rol " +
         "FROM usuarios u " +
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
@@ -33,11 +33,11 @@ public interface IUsuariosAod {
         "LIMIT #{cantidad} OFFSET #{pagina}")
     @Results({
         @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
-        @Result(property = "rol", column = "ifore2", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
+        @Result(property = "rol", column = "ifore5", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
     })
     List<Usuarios> datos(String buscar, Integer pagina, Integer cantidad);
 
-    @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore2, r.rol " +
+    @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore5, r.rol " +
         "FROM usuarios u " +
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
@@ -48,22 +48,22 @@ public interface IUsuariosAod {
         "LIMIT #{cantidad} OFFSET #{pagina}")
     @Results({
         @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
-        @Result(property = "rol", column = "ifore2", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
+        @Result(property = "rol", column = "ifore5", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
     })
     List<Usuarios> datossddpi(String buscar, Integer pagina, Integer cantidad);
 
-    @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore2, r.rol " +
+    @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore5, r.rol " +
         "FROM usuarios u " +
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE ur.idrol = 4 OR ur.idrol = 6 " +
+        "WHERE ur.idrol = 6 " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
     @Results({
         @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
-        @Result(property = "rol", column = "ifore2", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
+        @Result(property = "rol", column = "ifore5", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
     })
     List<Usuarios> datosreactivatic(String buscar, Integer pagina, Integer cantidad);
 
@@ -73,7 +73,7 @@ public interface IUsuariosAod {
     @Select("SELECT count(idusuario) FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) where idrol = 4 OR idrol = 5 OR idrol = 6 and concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadsddpi(String buscar);
 
-    @Select("SELECT count(idusuario) FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) where idrol = 4 OR idrol = 6 and concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
+    @Select("SELECT count(idusuario) FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) where idrol = 6 and concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadreactivatic(String buscar);
 
     // @Select("SELECT idusuario, idpersona, idpersona as ifore1, idrol as ifore2, usuario, clave, estado FROM usuarios WHERE estado and idusuario=#{id} ")
@@ -109,7 +109,7 @@ public interface IUsuariosAod {
     void cambiarclave(Usuarios usuario);
 
     @Update("UPDATE usuarios SET estado=#{estado} WHERE idusuario=#{idusuario}")
-    void cambiarestado(Usuarios usuario);
+    void cambiarestado(Long idusuario, boolean estado);
 
     @Select("SELECT idusuario, clave FROM usuarios WHERE estado AND usuario=#{usuario}")
     Usuarios verificausuario(String usuario);
