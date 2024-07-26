@@ -86,6 +86,22 @@ public class ProductosCtrl {
         }
         return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
     }
+    
+    @GetMapping(value = "/cantidadtotal")
+    ResponseEntity<?> cantidadtotal(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            // Long idempresa = iEmpresasAod.idempresa(Long.parseLong(auth.getName()));
+            cantidad = iProductosAod.cantidadTotal(buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/{id}")
     ResponseEntity<?> dato(@PathVariable Long id) {

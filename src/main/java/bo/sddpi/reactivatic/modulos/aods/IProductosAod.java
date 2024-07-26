@@ -22,6 +22,9 @@ public interface IProductosAod {
     @Select("SELECT count(idproducto) FROM productos where idempresa=#{idempresa} and concat(producto, descripcion) ilike '%'||#{buscar}||'%' ")
     Integer cantidad(Long idempresa, String buscar);
 
+    @Select("SELECT count(idproducto) FROM productos where concat(producto, descripcion) ilike '%'||#{buscar}||'%' ")
+    Integer cantidadTotal(String buscar);
+
     @Select("SELECT idproducto, idempresa, idempresa as ifore1, producto, descripcion, preciocompra, precioventa, cantidad FROM productos where idproducto=#{id} ")
     @Results({
         @Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
