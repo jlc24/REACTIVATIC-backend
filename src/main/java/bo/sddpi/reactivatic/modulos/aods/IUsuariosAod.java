@@ -96,7 +96,7 @@ public interface IUsuariosAod {
     Usuarios datousuario(Long id);
 
     @Options(useGeneratedKeys = true, keyProperty = "idusuario", keyColumn = "idusuario")
-    @Insert("INSERT INTO usuarios(idpersona, usuario, clave, estado) VALUES (#{idpersona}, #{usuario}, crypt(#{clave},gen_salt('bf', 8)), #{estado}) returning idusuario")
+    @Insert("INSERT INTO usuarios(idpersona, usuario, clave, estado) VALUES (#{idpersona}, #{usuario}, crypt(#{clave},gen_salt('bf', 8)), true) returning idusuario")
     void adicionar(Usuarios dato);
 
     @Update("UPDATE usuarios SET idpersona=#{idpersona}, usuario=#{usuario}, clave=#{clave} WHERE idusuario=#{idusuario} ")
@@ -109,7 +109,7 @@ public interface IUsuariosAod {
     void cambiarclave(Usuarios usuario);
 
     @Update("UPDATE usuarios SET estado=#{estado} WHERE idusuario=#{idusuario}")
-    void cambiarestado(Long idusuario, boolean estado);
+    void cambiarestado(Usuarios usuario);
 
     @Select("SELECT idusuario, clave FROM usuarios WHERE estado AND usuario=#{usuario}")
     Usuarios verificausuario(String usuario);

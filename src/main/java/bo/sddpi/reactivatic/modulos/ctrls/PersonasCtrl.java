@@ -129,6 +129,9 @@ public class PersonasCtrl {
                 personanuevo.setTelefono(dato.getCelular());
                 personanuevo.setCelular(dato.getCelular());
                 personanuevo.setCorreo(dato.getCorreo());
+                personanuevo.setFormacion(dato.getFormacion());
+                personanuevo.setEstadocivil(dato.getEstadocivil());
+                personanuevo.setHijos(dato.getHijos());
                 iPersonasAod.adicionar(personanuevo);
                 
                 usuarionuevo.setUsuario(dato.getUsuario().getUsuario());

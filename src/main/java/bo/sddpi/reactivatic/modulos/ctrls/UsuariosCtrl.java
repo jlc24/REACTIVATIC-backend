@@ -241,7 +241,7 @@ public class UsuariosCtrl {
     ResponseEntity<?> cambiarestado(@RequestBody Usuarios usuario) {
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            iUsuariosAod.cambiarestado(usuario.getIdusuario(), !usuario.getEstado());
+            iUsuariosAod.cambiarestado(usuario);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
