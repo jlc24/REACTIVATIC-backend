@@ -27,9 +27,9 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 " +
+        "WHERE (ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
-        "ORDER BY u.usuario " +
+        "ORDER BY u.created_at DESC " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
     @Results({
         @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
@@ -42,7 +42,7 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 " +
+        "WHERE (ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -67,10 +67,10 @@ public interface IUsuariosAod {
     })
     List<Usuarios> datosreactivatic(String buscar, Integer pagina, Integer cantidad);
 
-    @Select("SELECT count(idusuario) FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) where idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 and concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
+    @Select("SELECT count(idusuario) FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) where (idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6) and concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidad(String buscar);
 
-    @Select("SELECT count(idusuario) FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) where idrol = 4 OR idrol = 5 OR idrol = 6 and concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
+    @Select("SELECT count(idusuario) FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) where (idrol = 4 OR idrol = 5 OR idrol = 6) and concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadsddpi(String buscar);
 
     @Select("SELECT count(idusuario) FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) where idrol = 6 and concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")

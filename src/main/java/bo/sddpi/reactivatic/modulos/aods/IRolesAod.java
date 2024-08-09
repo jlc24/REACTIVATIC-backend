@@ -16,6 +16,12 @@ public interface IRolesAod {
     @Select("SELECT * FROM roles")
     List<Roles> listar();
 
+    @Select("SELECT * FROM roles WHERE nombrerol ilike '%'||#{buscar}||'%' OR rol ilike '%'||#{buscar}||'%' LIMIT #{cantidad} OFFSET #{pagina}")
+    List<Roles> datos(String buscar, Integer pagina, Integer cantidad);
+
+    @Select("SELECT count(idrol) FROM roles WHERE nombrerol ilike '%'||#{buscar}||'%' OR rol ilike '%'||#{buscar}||'%'")
+    Integer cantidad(String buscar);
+
     @Select("SELECT * FROM roles WHERE idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6")
     List<Roles> listaradmin();
 

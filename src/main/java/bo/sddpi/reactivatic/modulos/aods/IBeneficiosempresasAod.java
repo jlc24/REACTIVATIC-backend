@@ -13,12 +13,18 @@ public interface IBeneficiosempresasAod {
             "INNER JOIN beneficiosempresas AS be ON be.idempresa=e.idempresa" +
             "INNER JOIN beneficios AS b ON b.idbeneficio=be.idbeneficio" +
             "WHERE b.idbeneficio=#{idbeneficio} ORDER BY e.empresa")
-    List<Beneficiosempresas> buscarbeneficio(Beneficiosempresas beneficioempresa);
+    List<String> buscarbeneficio(Long idbeneficio);
 
     @Select("SELECT b.beneficio FROM beneficios AS b " + 
             "INNER JOIN beneficiosempresas AS be ON be.idebeneficio=b.idebeneficio" +
             "WHERE be.idempresa=#{idempresa} ORDER BY b.beneficio")
-    List<Beneficiosempresas> buscarempresa(Beneficiosempresas beneficioempresa);
+    List<String> buscarempresa(Long idempresa);
 
+    @Insert("INSERT INTO beneficiosempresas (idbeneficio, idempresa) VALUES (#{idbeneficio}, #{idempresa})")
+    @Options(useGeneratedKeys = true, keyProperty = "idbeneficioempresa")
+    void asignarbeneficio(Long idbeneficio, Long idempresa);
+
+    @Delete("DELETE FROM beneficiosempresas Where idbeneficio=#{idbeneficio} AND idempresa=#{idempresa}")
+    void eliminarempresabeneficio(Long idbeneficio, Long idempresa);
 
 }

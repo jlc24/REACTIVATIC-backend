@@ -38,6 +38,42 @@ public class RolesCtrl {
     }
 
     @GetMapping
+    ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        List<Roles> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        int nropagina = 0;
+        try {
+            if((pagina-1) * cantidad < 0){
+                nropagina = 0;
+            }else {
+                nropagina = (pagina - 1) * cantidad;
+            }
+            datos = irolesAod.datos(buscar, nropagina, cantidad);
+        }catch(DataAccessException e){   
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Roles>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/cantidad")
+    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar){
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try{
+            cantidad = irolesAod.cantidad(buscar);
+        }catch(DataAccessException e){
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
+    @GetMapping("/l")
     public ResponseEntity<?> listar() {
         List<Roles> roles;
         Map<String, Object> mensajes = new HashMap<>();

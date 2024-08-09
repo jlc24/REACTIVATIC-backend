@@ -47,6 +47,20 @@ public class CategoriasCtrl {
         return new ResponseEntity<List<Categorias>>(categorias, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/cantidad")
+    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar){
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try{
+            cantidad = icategoriasAod.cantidad(buscar);
+        }catch(DataAccessException e){
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
     //LISTA DE CATEGORIAS
     @GetMapping("/l")
     public ResponseEntity<?> listar() {
@@ -104,7 +118,7 @@ public class CategoriasCtrl {
 
     //MODIFICAR
     @PutMapping
-    public ResponseEntity<?> actualizar(@Valid @RequestBody Categorias categorias, BindingResult resultado) {
+    ResponseEntity<?> actualizar(@Valid @RequestBody Categorias categorias, BindingResult resultado) {
         Map<String, Object> mensajes = new HashMap<>();
         if (resultado.hasErrors()) {
             List<String> errores = resultado.getFieldErrors().stream().map(err -> "El campo '" + err.getField() + "' " + err.getDefaultMessage()).collect(Collectors.toList());

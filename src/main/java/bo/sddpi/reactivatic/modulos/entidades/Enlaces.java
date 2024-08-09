@@ -1,6 +1,7 @@
 package bo.sddpi.reactivatic.modulos.entidades;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import lombok.Data;
 
@@ -15,6 +16,8 @@ public class Enlaces implements Serializable{
     private String ruta;
     private String iconoenlace;
     private Long orden;
+    private Boolean estado;
+    private LocalDateTime created_at;
     
     private Categorias categoria;
 }

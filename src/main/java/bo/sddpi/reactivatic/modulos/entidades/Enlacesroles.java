@@ -12,6 +12,7 @@ public class Enlacesroles implements Serializable {
     private Long idenlacerol;
     private Long idenlace;
     private Long idrol;
+    private Boolean estado;
     
     private Enlaces enlace;
     private Roles rol;

@@ -3,7 +3,6 @@ package bo.sddpi.reactivatic.modulos.ctrls;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -23,7 +22,7 @@ import bo.sddpi.reactivatic.modulos.entidades.Beneficios;
 public class BeneficiosCtrl {
     
     @Autowired
-    private IBeneficiosAod iBeneficiosAod;
+    private IBeneficiosAod ibeneficiosAod;
 
     //BUSCAR BENEFICIOS->PAGINACION->CANTIDAD
     @GetMapping
@@ -39,7 +38,7 @@ public class BeneficiosCtrl {
             }else{
                 nropagina = (pagina-1) * cantidad;
             }
-            datos = iBeneficiosAod.buscar(buscar, cantidad, nropagina);
+            datos = ibeneficiosAod.buscar(buscar, cantidad, nropagina);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en al base de datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -48,13 +47,27 @@ public class BeneficiosCtrl {
         return new ResponseEntity<List<Beneficios>>(datos, HttpStatus.OK);
     }
 
+    @GetMapping(value = ("/cantidad"))
+    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar){
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try{
+            cantidad = ibeneficiosAod.cantidad(buscar);
+        }catch(DataAccessException e){
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
     //LISTA DE BENEFICIOS
     @GetMapping("/l")
     ResponseEntity<?> listar() {
         List<Beneficios> beneficios;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            beneficios = iBeneficiosAod.listar();
+            beneficios = ibeneficiosAod.listar();
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -69,7 +82,7 @@ public class BeneficiosCtrl {
         Beneficios beneficio = null;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            beneficio = iBeneficiosAod.dato(id);
+            beneficio = ibeneficiosAod.dato(id);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -88,7 +101,7 @@ public class BeneficiosCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
-            iBeneficiosAod.insertar(beneficio);
+            ibeneficiosAod.insertar(beneficio);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -109,7 +122,7 @@ public class BeneficiosCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
-            iBeneficiosAod.actualizar(beneficio);
+            ibeneficiosAod.actualizar(beneficio);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -130,7 +143,7 @@ public class BeneficiosCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
-            iBeneficiosAod.cambiarestado(beneficio);
+            ibeneficiosAod.cambiarestado(beneficio);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Vase de datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -151,7 +164,7 @@ public class BeneficiosCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
-            
+            ibeneficiosAod.eliminar(beneficio);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Vase de datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

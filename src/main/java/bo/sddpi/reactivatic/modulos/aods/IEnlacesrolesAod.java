@@ -2,6 +2,7 @@ package bo.sddpi.reactivatic.modulos.aods;
 
 import org.apache.ibatis.annotations.*;
 
+import bo.sddpi.reactivatic.modulos.entidades.Enlaces;
 import bo.sddpi.reactivatic.modulos.entidades.Enlacesroles;
 
 import java.util.List;
@@ -10,17 +11,29 @@ import java.util.List;
 public interface IEnlacesrolesAod {
     
     @Select("SELECT * FROM enlacesroles WHERE idenlacerol = #{id}")
-    Enlacesroles dato(Long id);
+    Enlacesroles dato(long id);
 
     @Select("SELECT * FROM enlacesroles")
     List<Enlacesroles> listar();
 
-    @Insert("INSERT INTO enlacesroles (idenlace, idrol) VALUES (#{enlace.idenlace}, #{rol.idrol})")
+    @Select("SELECT er.*, r.* FROM enlacesroles er " +
+        "JOIN roles r ON er.idrol = r.idrol " +
+        "WHERE er.idenlace = #{idenlace}")
+        @Results({
+            @Result(property = "rol", column = "idrol", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
+        })
+    List<Enlacesroles> listarRoles(long idenlace);
+
+    @Select("SELECT count(*) FROM enlacesroles WHERE idrol = #{idrol} AND idenlace=#{idenlace}")
+    Boolean verificar(long idrol, long idenlace);
+
+    @Insert("INSERT INTO enlacesroles (idenlace, idrol) VALUES (#{idenlace}, #{idrol})")
+    @Options(useGeneratedKeys = true, keyProperty = "idenlacerol")
     void insertar(Enlacesroles enlaceRol);
 
     @Update("UPDATE enlacesroles SET idenlace = #{enlace.idenlace}, idrol = #{rol.idrol} WHERE idenlacerol = #{idenlacerol}")
     void actualizar(Enlacesroles enlaceRol);
 
     @Delete("DELETE FROM enlacesroles WHERE idenlacerol = #{id}")
-    void eliminar(Long id);
+    void eliminar(Enlacesroles enlacesroles);
 }

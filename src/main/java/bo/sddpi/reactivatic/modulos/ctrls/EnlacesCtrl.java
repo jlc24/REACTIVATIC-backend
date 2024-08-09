@@ -1,30 +1,35 @@
 package bo.sddpi.reactivatic.modulos.ctrls;
 
-import bo.sddpi.reactivatic.modulos.aods.IEnlacesAod;
-import bo.sddpi.reactivatic.modulos.entidades.Enlaces;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import bo.sddpi.reactivatic.modulos.aods.IEnlacesAod;
+import bo.sddpi.reactivatic.modulos.entidades.Enlaces;
 
 @RestController
 @RequestMapping("/apirest/enlaces")
 public class EnlacesCtrl {
     
     @Autowired
-    private IEnlacesAod iEnlacesAod;
+    private IEnlacesAod ienlacesAod;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
+    ResponseEntity<?> getById(@PathVariable Long id) {
         Enlaces enlace = null;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            enlace = iEnlacesAod.dato(id);
+            enlace = ienlacesAod.dato(id);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -38,11 +43,47 @@ public class EnlacesCtrl {
     }
 
     @GetMapping
-    public ResponseEntity<?> listar() {
+    ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad){
+        List<Enlaces> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        int nropagina = 0;
+        try{
+            if((pagina-1)*cantidad < 0){
+                nropagina = 0;
+            }else{
+                nropagina = (pagina-1) * cantidad;
+            }
+            datos = ienlacesAod.datos(buscar, nropagina, cantidad);
+        }catch(DataAccessException e){
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Enlaces>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/cantidad")
+    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar){
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            cantidad = ienlacesAod.cantidad(buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/categoria/{id}")
+    ResponseEntity<?> listar(@PathVariable Long id) {
         List<Enlaces> enlaces;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            enlaces = iEnlacesAod.listar();
+            enlaces = ienlacesAod.listar(id);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(e.getMostSpecificCause().getMessage()));
@@ -51,11 +92,30 @@ public class EnlacesCtrl {
         return new ResponseEntity<>(enlaces, HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<?> crear(@RequestBody Enlaces enlace) {
+    @GetMapping(value = "/enlacesroles/{id}")
+    public ResponseEntity<?> listarEnlaces(@PathVariable Long id) {
+        List<Enlaces> enlacesRoles;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            iEnlacesAod.insertar(enlace);
+            enlacesRoles = ienlacesAod.listarEnlaces(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(enlacesRoles, HttpStatus.OK);
+    }
+
+    @PostMapping
+    ResponseEntity<?> crear(@Valid @RequestBody Enlaces enlace, BindingResult resultado) {
+        Map<String, Object> mensajes = new HashMap<>();
+        if (resultado.hasErrors()) {
+            List<String> errores = resultado.getFieldErrors().stream().map(err -> "El campo '" + err.getField() + "' " + err.getDefaultMessage()).collect(Collectors.toList());
+            mensajes.put("errores", errores);
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            ienlacesAod.insertar(enlace);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");
             mensajes.put("error",e.getMessage().concat(e.getMostSpecificCause().getMessage()));
@@ -65,36 +125,30 @@ public class EnlacesCtrl {
         return new ResponseEntity<>(mensajes, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody Enlaces enlace) {
-        Enlaces enlaceActual = iEnlacesAod.dato(id);
+    @PutMapping
+    ResponseEntity<?> actualizar(@Valid @RequestBody Enlaces enlace, BindingResult resultado) {
         Map<String, Object> mensajes = new HashMap<>();
-        if (enlaceActual == null) {
-            mensajes.put("mensaje", "El id: ".concat(id.toString()).concat(" no existe en la Base de Datos"));
-            return new ResponseEntity<>(mensajes, HttpStatus.NOT_FOUND);
+        if (resultado.hasErrors()) {
+            List<String> errores = resultado.getFieldErrors().stream().map(err -> "El campo '"+err.getField()+"' "+err.getDefaultMessage()).collect(Collectors.toList());
+            mensajes.put("errores", errores);
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
-            enlaceActual.setIdcategoria(enlace.getIdcategoria());
-            enlaceActual.setEnlace(enlace.getEnlace());
-            enlaceActual.setRuta(enlace.getRuta());
-            enlaceActual.setIconoenlace(enlace.getIconoenlace());
-            enlaceActual.setOrden(enlace.getOrden());
-            iEnlacesAod.actualizar(enlaceActual);
+            ienlacesAod.actualizar(enlace);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al actualizar en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         mensajes.put("mensaje", "Enlace actualizado exitosamente");
-        mensajes.put("enlace", enlaceActual);
         return new ResponseEntity<>(mensajes, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+    ResponseEntity<?> eliminar(@PathVariable Long id) {
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            iEnlacesAod.eliminar(id);
+            ienlacesAod.eliminar(id);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la eliminación en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(e.getMostSpecificCause().getMessage()));

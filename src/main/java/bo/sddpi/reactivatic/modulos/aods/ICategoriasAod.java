@@ -12,10 +12,10 @@ public interface ICategoriasAod {
     @Select("SELECT * FROM categorias WHERE idcategoria = #{id}")
     Categorias dato(Long id);
 
-    @Select("SELECT * FROM categorias WHERE categoria ilike '%'||#{buscar}||'%' ORDER BY orden LIMIT #{cantidad} OFFSET #{pagina}")
+    @Select("SELECT * FROM categorias WHERE categoria ilike '%'||#{buscar}||'%' OR CAST(orden AS TEXT) ilike '%'||#{buscar}||'%' ORDER BY orden LIMIT #{cantidad} OFFSET #{pagina}")
     List<Categorias> buscar(String buscar, Integer pagina, Integer cantidad);
 
-    @Select("SELECT count(idcategoria) FROM categorias WHERE categoria ilike '%'||#{buscar}||'%' ")
+    @Select("SELECT count(idcategoria) FROM categorias WHERE categoria ilike '%'||#{buscar}||'%' OR CAST(orden AS TEXT) ilike '%'||#{buscar}||'%'")
     Integer cantidad(String buscar);
 
     @Select("SELECT idcategoria, categoria FROM categorias WHERE estado = true ORDER BY orden")
