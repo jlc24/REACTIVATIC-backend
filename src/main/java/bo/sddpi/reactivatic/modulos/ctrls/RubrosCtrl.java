@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import bo.sddpi.reactivatic.modulos.aods.IRubrosAod;
@@ -137,4 +138,17 @@ public class RubrosCtrl {
         return new ResponseEntity<List<Rubros>>(datos, HttpStatus.OK);  
     }
 
+    @PutMapping("/cambiarestado")
+    ResponseEntity<?> cambiarestado(@RequestBody Rubros rubro){
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            iRubrosAod.cambiarestado(rubro);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Se ha modificaco el estado del rubro");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
 }

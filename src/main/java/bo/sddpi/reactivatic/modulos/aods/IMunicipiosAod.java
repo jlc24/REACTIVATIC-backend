@@ -12,7 +12,7 @@ import bo.sddpi.reactivatic.modulos.entidades.Municipios;
 @Mapper
 public interface IMunicipiosAod {
 
-    @Select("SELECT idmunicipio, municipio FROM municipios WHERE municipio ilike '%'||#{buscar}||'%' ORDER BY municipio LIMIT #{cantidad} OFFSET #{pagina} ")
+    @Select("SELECT * FROM municipios WHERE municipio ilike '%'||#{buscar}||'%' ORDER BY municipio LIMIT #{cantidad} OFFSET #{pagina} ")
     List<Municipios> datos(String buscar, Integer pagina, Integer cantidad);
 
     @Select("SELECT count(idmunicipio) FROM municipios where municipio ilike '%'||#{buscar}||'%' ")

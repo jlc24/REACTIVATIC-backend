@@ -115,5 +115,19 @@ public class SubrubrosCtrl {
         return new ResponseEntity<List<Subrubros>>(datos, HttpStatus.OK);
     }
 
+    @GetMapping("/rubro/{id}")
+    ResponseEntity<?> subrubros(@PathVariable Long id){
+        List<Subrubros> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iSubrubrosAod.subrubros(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Subrubros>>(datos, HttpStatus.OK);
+    }
+    
 }
 

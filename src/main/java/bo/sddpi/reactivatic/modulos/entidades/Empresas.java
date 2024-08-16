@@ -27,7 +27,7 @@ public class Empresas implements Serializable {
     private String twitter;
     private String instagram;
     private String paginaweb;
-    private String otro;
+    private String nform;
     private Integer registrosenasag;
     private BigDecimal latitud;
     private BigDecimal longitud;
@@ -38,8 +38,8 @@ public class Empresas implements Serializable {
     private String servicios;
     private Integer capacidad;
     private String unidadmedida;
-    private Integer razon;
-    private String otrarazon;
+    private Integer motivo;
+    private String otromotivo;
     private Boolean familiar;
     private Integer involucrados;
     private String otrosinvolucrados;
@@ -50,6 +50,8 @@ public class Empresas implements Serializable {
     private String referencia;
     private String transporte;
     private Long idusuario;
+    private Date fechareg;
+    private String razonsocial;
     private Boolean estado;
     private LocalDateTime created_at;
 

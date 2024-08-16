@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 
+import bo.sddpi.reactivatic.modulos.entidades.Personas;
 import bo.sddpi.reactivatic.modulos.entidades.Usuariosroles;
 
 @Mapper
@@ -26,5 +27,7 @@ public interface IUsuariosrolesAod {
 
     @Delete("delete from usuariosroles where idusuario=#{id}")
     void eliminar(Long id);
+
+    
 
 }

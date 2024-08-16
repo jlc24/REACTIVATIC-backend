@@ -18,15 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import bo.sddpi.reactivatic.modulos.aods.IPersonasAod;
@@ -132,10 +124,12 @@ public class PersonasCtrl {
                 personanuevo.setFormacion(dato.getFormacion());
                 personanuevo.setEstadocivil(dato.getEstadocivil());
                 personanuevo.setHijos(dato.getHijos());
+                personanuevo.setEstado(true);
                 iPersonasAod.adicionar(personanuevo);
                 
                 usuarionuevo.setUsuario(dato.getUsuario().getUsuario());
                 usuarionuevo.setClave(dato.getUsuario().getClave());
+                usuarionuevo.setEstado(true);
                 usuarionuevo.setIdpersona(personanuevo.getIdpersona());
                 iUsuariosAod.adicionar(usuarionuevo);
                 
@@ -226,41 +220,72 @@ public class PersonasCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            Usuarios usuarionuevo = new Usuarios();
-            Personas personanuevo = new Personas();
-            Representantes representantenuevo = new Representantes();
-            Usuariosroles usuariorolnuevo = new Usuariosroles();
-            personanuevo.setPrimerapellido(dato.getPrimerapellido());
-            personanuevo.setSegundoapellido(dato.getSegundoapellido());
-            personanuevo.setPrimernombre(dato.getPrimernombre());
-            //personanuevo.setSegundonombre(dato.getSegundonombre());
-            //personanuevo.setFechanacimiento(dato.getFechanacimiento());
-            personanuevo.setDip(dato.getDip());
-            personanuevo.setDireccion(dato.getDireccion());
-            personanuevo.setTelefono(dato.getTelefono());
-            personanuevo.setCelular(dato.getCelular());
-            personanuevo.setCorreo(dato.getCorreo());
-            personanuevo.setEstado(true);
-            iPersonasAod.adicionar(personanuevo);
-            usuarionuevo.setUsuario(dato.getDip());
-            usuarionuevo.setClave(dato.getDip());
-            usuarionuevo.setEstado(true);
-            usuarionuevo.setIdpersona(personanuevo.getIdpersona());
-            iUsuariosAod.adicionar(usuarionuevo);
-            usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
-            usuariorolnuevo.setIdrol(2L);
-            iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
-            representantenuevo.setIdpersona(personanuevo.getIdpersona());
-            iRepresentantesAod.adicionar(representantenuevo);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarpersona = iPersonasAod.verificarpersonaregistro(dato.getPrimerapellido(), dato.getSegundoapellido(), dato.getPrimernombre(), dato.getDip());
+        Long verificarusuario = iUsuariosAod.verificausuarioregistro(dato.getUsuario().getUsuario());
+        if (verificarpersona != null) {
+            mensajes.put("mensaje", "La persona ya se encuentra registrada en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else if (verificarusuario != null) {
+            mensajes.put("mensaje", "El usuario ya existe.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                Usuarios usuarionuevo = new Usuarios();
+                Personas personanuevo = new Personas();
+                Representantes representantenuevo = new Representantes();
+                Usuariosroles usuariorolnuevo = new Usuariosroles();
+
+                personanuevo.setIdtipogenero(dato.getIdtipogenero());
+                personanuevo.setPrimerapellido(dato.getPrimerapellido());
+                personanuevo.setSegundoapellido(dato.getSegundoapellido());
+                personanuevo.setPrimernombre(dato.getPrimernombre());
+                personanuevo.setDip(dato.getDip());
+                personanuevo.setComplementario(dato.getComplementario());
+                personanuevo.setIdtipodocumento(dato.getIdtipodocumento());
+                personanuevo.setIdtipoextension(dato.getIdtipoextension());
+                personanuevo.setTelefono(dato.getCelular());
+                personanuevo.setCelular(dato.getCelular());
+                personanuevo.setFormacion(dato.getFormacion());
+                personanuevo.setEstadocivil(dato.getEstadocivil());
+                personanuevo.setHijos(dato.getHijos());
+                personanuevo.setEstado(true);
+                iPersonasAod.adicionar(personanuevo);
+
+                usuarionuevo.setUsuario(dato.getUsuario().getUsuario());
+                usuarionuevo.setClave(dato.getUsuario().getClave());
+                usuarionuevo.setEstado(true);
+                usuarionuevo.setIdpersona(personanuevo.getIdpersona());
+                iUsuariosAod.adicionar(usuarionuevo);
+
+                usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
+                usuariorolnuevo.setIdrol(2L);
+                iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
+
+                representantenuevo.setIdpersona(personanuevo.getIdpersona());
+                iRepresentantesAod.adicionar(representantenuevo);
+
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         }
         mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
-
+    @GetMapping("/roles/{id}")
+    ResponseEntity<?> usuariosrol(@PathVariable Long id){
+        List<Personas> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iPersonasAod.obtenerPersonasPorRol(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Personas>>(datos, HttpStatus.OK);
+    }
+    
 }

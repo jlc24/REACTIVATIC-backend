@@ -14,8 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import bo.sddpi.reactivatic.modulos.aods.ILocalidadesAod;
 import bo.sddpi.reactivatic.modulos.aods.IMunicipiosAod;
+import bo.sddpi.reactivatic.modulos.entidades.Localidades;
 import bo.sddpi.reactivatic.modulos.entidades.Municipios;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/apirest/municipios")
@@ -23,6 +28,9 @@ public class MunicipiosCtrl {
 
     @Autowired
     IMunicipiosAod iMunicipiosAod;
+
+    @Autowired
+    ILocalidadesAod ilocalidadesAod;
 
     @GetMapping
     ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
@@ -77,6 +85,9 @@ public class MunicipiosCtrl {
         }
         return new ResponseEntity<Municipios>(dato, HttpStatus.OK);
     }
+
+    
+    
 
     @PostMapping
     ResponseEntity<?> adicionar(@Valid @RequestBody Municipios dato, BindingResult resultado) {

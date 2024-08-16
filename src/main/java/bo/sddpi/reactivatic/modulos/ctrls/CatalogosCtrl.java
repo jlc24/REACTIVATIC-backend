@@ -29,6 +29,7 @@ import bo.sddpi.reactivatic.modulos.aods.IPersonasAod;
 import bo.sddpi.reactivatic.modulos.aods.IProductosAod;
 import bo.sddpi.reactivatic.modulos.aods.IRubrosAod;
 import bo.sddpi.reactivatic.modulos.aods.ISolicitudesAod;
+import bo.sddpi.reactivatic.modulos.aods.ISubrubrosAod;
 import bo.sddpi.reactivatic.modulos.aods.IUsuariosAod;
 import bo.sddpi.reactivatic.modulos.aods.IUsuariosrolesAod;
 import bo.sddpi.reactivatic.modulos.entidades.Carritos;
@@ -39,6 +40,7 @@ import bo.sddpi.reactivatic.modulos.entidades.Personas;
 import bo.sddpi.reactivatic.modulos.entidades.Procesar;
 import bo.sddpi.reactivatic.modulos.entidades.Productos;
 import bo.sddpi.reactivatic.modulos.entidades.Rubros;
+import bo.sddpi.reactivatic.modulos.entidades.Subrubros;
 import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 import bo.sddpi.reactivatic.modulos.entidades.Usuariosroles;
 import bo.sddpi.reactivatic.modulos.servicios.ICorreosServ;
@@ -53,6 +55,9 @@ public class CatalogosCtrl {
 
     @Autowired
     IRubrosAod iRubrosAod;
+
+    @Autowired
+    ISubrubrosAod iSubrubrosAod;
 
     @Autowired
     IPersonasAod iPersonasAod;
@@ -180,6 +185,49 @@ public class CatalogosCtrl {
         }
         return new ResponseEntity<List<Rubros>>(datos, HttpStatus.OK);
     }
+
+    @GetMapping("/rubros")
+    ResponseEntity<?> rubros(){
+        List<Rubros> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iRubrosAod.datosl();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Rubros>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping("/subrubros/{id}")
+    ResponseEntity<?> subrubros(@PathVariable Long id){
+        List<Subrubros> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iSubrubrosAod.subrubros(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Subrubros>>(datos, HttpStatus.OK);
+    }
+    
+    @GetMapping("/listasubrubros")
+    ResponseEntity<?> listasubrubros(){
+        List<Subrubros> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iSubrubrosAod.listaSubrubros();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Subrubros>>(datos, HttpStatus.OK);
+    }
+    
 
     @PostMapping
     ResponseEntity<?> fprocesar(@RequestBody Procesar dato) {

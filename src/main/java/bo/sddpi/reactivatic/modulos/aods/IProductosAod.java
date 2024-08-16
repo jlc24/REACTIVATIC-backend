@@ -38,7 +38,22 @@ public interface IProductosAod {
     @Update("update productos set idempresa=#{idempresa}, producto=#{producto}, descripcion=#{descripcion}, preciocompra=#{preciocompra}, precioventa=#{precioventa}, cantidad=#{cantidad} where idproducto=#{idproducto} ")
     void modificar(Productos dato);
 
-    @Select("SELECT idproducto, idempresa, idempresa as ifore1, producto, productos.descripcion, preciocompra, precioventa, cantidad FROM productos join empresas using(idempresa) join subrubros using(idsubrubro) join rubros using(idrubro) WHERE cantidad>0 and concat(rubro,empresa,producto) ilike '%'||#{buscar}||'%' ORDER BY producto LIMIT #{cantidad} OFFSET #{pagina} ")
+    // @Select("SELECT idproducto, idempresa, idempresa as ifore1, producto, productos.descripcion, preciocompra, precioventa, cantidad FROM productos join empresas using(idempresa) join subrubros using(idsubrubro) join rubros using(idrubro) WHERE cantidad>0 and concat(rubro,empresa,producto) ilike '%'||#{buscar}||'%' ORDER BY producto LIMIT #{cantidad} OFFSET #{pagina} ")
+    // @Results({
+    //     @Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
+    // })
+    // List<Productos> datoscat(String buscar, Integer pagina, Integer cantidad);
+    @Select(" SELECT idproducto, idempresa, idempresa as ifore1, producto, productos.descripcion, preciocompra, precioventa, cantidad " +
+            " FROM productos " +
+            " JOIN empresas USING(idempresa) " +
+            " JOIN subrubros USING(idsubrubro) " +
+            " JOIN rubros USING(idrubro) " +
+            " WHERE  "+
+                    "producto ILIKE '%'||#{buscar}||'%' OR " +
+                    //"subrubros ILIKE '%'||#{buscar}||'%' OR " +
+                    "rubro ILIKE '%'||#{buscar}||'%' OR " +
+                    "empresa ILIKE '%'||#{buscar}||'%' " +
+            " ORDER BY producto LIMIT #{cantidad} OFFSET #{pagina} ")
     @Results({
         @Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
     })

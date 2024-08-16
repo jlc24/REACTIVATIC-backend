@@ -63,6 +63,20 @@ public class LocalidadesCtrl {
         return new ResponseEntity<Localidades>(dato, HttpStatus.OK);
     }
 
+    @GetMapping("/municipio/{id}")
+    ResponseEntity<?> localidades(@PathVariable Long id){
+        List<Localidades> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iLocalidadesAod.listaLocalidades(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Localidades>>(datos, HttpStatus.OK);
+    }
+
     @PostMapping
     ResponseEntity<?> adicionar(@Valid @RequestBody Localidades dato, BindingResult resultado) {
         Map<String, Object> mensajes = new HashMap<>();

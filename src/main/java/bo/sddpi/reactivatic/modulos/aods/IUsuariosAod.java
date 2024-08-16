@@ -33,7 +33,8 @@ public interface IUsuariosAod {
         "LIMIT #{cantidad} OFFSET #{pagina}")
     @Results({
         @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
-        @Result(property = "rol", column = "ifore5", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
+        @Result(property = "rol", column = "ifore5", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato")),
+        @Result(property = "tipogenero", column = "idtipogenero", one = @One(select = "bo.sddpi.rectivatic.modulos.aods.ITiposgenerosAod.dato"))
     })
     List<Usuarios> datos(String buscar, Integer pagina, Integer cantidad);
 
@@ -115,9 +116,21 @@ public interface IUsuariosAod {
     Usuarios verificausuario(String usuario);
 
     //ANALIZANDO...
-    @Select("SELECT idusuario, usuarios.idpersona, usuarios.idpersona as ifore1, usuario, clave, usuarios.estado FROM usuarios join usuariosroles using(idusuario) join personas using(idpersona) WHERE idrol=2 and usuarios.estado and concat(usuario, primerapellido, segundoapellido, primernombre) ilike '%'||#{buscar}||'%' ORDER BY usuario LIMIT #{cantidad} OFFSET #{pagina} ")
+    @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore5, r.rol " +
+        "FROM usuarios u " +
+        "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
+        "JOIN personas p ON u.idpersona = p.idpersona " +
+        "JOIN roles r ON ur.idrol = r.idrol " +
+        "WHERE ur.idrol = 2 " +
+        "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
+        "ORDER BY u.created_at DESC " +
+        "LIMIT #{cantidad} OFFSET #{pagina}")
     @Results({
-        @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato"))
+        @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
+        @Result(property = "rol", column = "ifore5", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato")),
+        @Result(property = "tipogenero", column = "idtipogenero", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato")),
+        @Result(property = "tipodocumento", column = "idtipodocumento", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposdocumentosAod.dato")),
+        @Result(property = "tipoextension", column = "idtipoextension", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposextensionesAod.dato"))
     })
     List<Usuarios> datosrep(String buscar, Integer pagina, Integer cantidad);
 

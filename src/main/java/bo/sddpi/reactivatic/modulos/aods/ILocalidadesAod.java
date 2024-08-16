@@ -24,6 +24,9 @@ public interface ILocalidadesAod {
     })
     Localidades dato(Long id);
 
+    @Select("SELECT * FROM localidades WHERE idmunicipio=#{idmunicipio}")
+    List<Localidades> listaLocalidades(long idmunicipio);
+
     @Insert("insert into localidades(idmunicipio, localidad) values (#{idmunicipio}, #{localidad})")
     void adicionar(Localidades dato);
 

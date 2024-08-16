@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +33,39 @@ public class RepresentantesCtrl {
 
     @Autowired
     IRepresentantesAod iRepresentantesAod;
+
+    @GetMapping("/buscar")
+    ResponseEntity<?> search(@RequestParam(value = "buscar", defaultValue = "") String buscar){
+        List<Representantes> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iRepresentantesAod.buscar(buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Representantes>>(datos, HttpStatus.OK);
+    }
+    
+    @GetMapping("/{id}")
+    ResponseEntity<?> dato(@PathVariable Long id){
+        Representantes representante = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            representante = iRepresentantesAod.dato(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (representante == null) {
+            mensajes.put("mensaje", "El id: ".concat(id.toString()).concat(" no existe en la Base de Datos"));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<Representantes>(representante, HttpStatus.OK);
+    }
+    
 
     @GetMapping("/l")
     ResponseEntity<?> datosl() {

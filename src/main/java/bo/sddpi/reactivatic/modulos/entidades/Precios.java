@@ -7,20 +7,18 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class Productos implements Serializable{
+public class Precios implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Long idprecio;
     private Long idproducto;
-    private Long idempresa;
-    private String producto;
-    private String descripcion;
-    private BigDecimal preciocompra;
-    private BigDecimal precioventa;
-    private Long cantidad;
+    private BigDecimal precio;
+    private Long idtamano;
+    private BigDecimal cantidad;
     private Boolean estado;
     private LocalDateTime created_at;
 
-    private Empresas empresa;
-    
+    private Productos producto;
+    private Tamanos tamano;
 }

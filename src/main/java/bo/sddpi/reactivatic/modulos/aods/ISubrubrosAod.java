@@ -33,4 +33,10 @@ public interface ISubrubrosAod {
     @Select("select idsubrubro, rubro||'-'||subrubro as subrubro from subrubros join rubros using(idrubro) order by rubro, subrubro")
     List<Subrubros> datosl();
 
+    @Select("SELECT * FROM subrubros WHERE idrubro=#{idrubro} AND estado=true")
+    List<Subrubros> subrubros(long idrubro);
+
+    @Select("SELECT idsubrubro, subrubro FROM subrubros WHERE estado=true")
+    List<Subrubros> listaSubrubros();
+
 }
