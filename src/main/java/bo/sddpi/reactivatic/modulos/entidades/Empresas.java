@@ -13,7 +13,9 @@ public class Empresas implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long idempresa;
+    private Long idrubro;
     private Long idsubrubro;
+    private Long idmunicipio;
     private Long idlocalidad;
     private Long idrepresentante;
     private Long idasociacion;

@@ -31,10 +31,15 @@ public interface IRubrosAod {
     @Select("SELECT idrubro, rubro FROM rubros WHERE estado=true ORDER BY rubro")
     List<Rubros> datosl();
 
+    @Select("SELECT idrubro, rubro FROM rubros WHERE estado=true AND rubro=#{rubro} ORDER BY rubro")
+    List<Rubros> datoslrubro(String rubro);
+
     @Select("select rubro, count(idproducto) as cantidad from rubros join subrubros using(idrubro) join empresas using(idsubrubro) left join productos using(idempresa) where cantidad>0 group by rubro order by rubro")
     List<Rubros> cantidadporrubro();
 
     @Update("UPDATE rubros SET estado=#{estado} WHERE idrubro=#{idrubro}")
     void cambiarestado(Rubros rubro);
 
+    @Select("SELECT idrubro FROM rubros WHERE rubro=#{rubro}")
+    Long verificarrubro(String rubro);
 }

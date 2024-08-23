@@ -17,9 +17,11 @@ import bo.sddpi.reactivatic.modulos.entidades.Personas;
 @Mapper
 public interface IPersonasAod {
 
-    @Select("SELECT idpersona, idtipogenero, idtipogenero as ifore1, primerapellido, segundoapellido, primernombre, dip, complementario, idtipodocumento, idtipoextension, direccion, telefono, celular, correo, formacion, estadocivil, hijos, estado, created_at FROM personas where idpersona=#{id} ")
+    @Select("SELECT * FROM personas where idpersona=#{id} ")
     @Results({
-        @Result(property = "tipogenero", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato"))
+        @Result(property = "tipogenero", column = "idtipogenero", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato")),
+        @Result(property = "tipodocumento", column = "idtipodocumento", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposdocumentosAod.dato")),
+        @Result(property = "tipoextension", column = "idtipoextension", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposextensionesAod.dato"))
     })
     Personas dato(Long id);
     
@@ -47,9 +49,12 @@ public interface IPersonasAod {
     @Update("UPDATE personas SET idtipogenero=#{idtipogenero}, primerapellido=#{primerapellido}, segundoapellido=#{segundoapellido}, primernombre=#{primernombre}, dip=#{dip}, complementario=#{complementario}, idtipodocumento=#{idtipodocumento}, idtipoextension=#{idtipoextension}, direccion=#{direccion}, telefono=#{telefono}, celular=#{celular}, correo=#{correo}, formacion=#{formacion}, estadocivil=#{estadocivil}, hijos=#{hijos} WHERE idpersona=#{idpersona} ")
     void modificar(Personas dato);
 
-    @Select("select idpersona, idtipogenero, primerapellido, segundoapellido, primernombre, segundonombre, fechanacimiento, dip, complementario, direccion, telefono, celular, correo from usuarios join personas using(idpersona) where idusuario=#{idusuario}")
+    @Select("SELECT * FROM usuarios u join personas p ON p.idpersona=u.idpersona WHERE u.idusuario=#{idusuario}")
     @Results({
-        @Result(property = "tipogenero", column = "idtipogenero", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato"))
+        @Result(property = "tipogenero", column = "idtipogenero", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato")),
+        @Result(property = "tipodocumento", column = "idtipodocumento", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposdocumentosAod.dato")),
+        @Result(property = "tipoextension", column = "idtipoextension", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposextensionesAod.dato")),
+        @Result(property = "usuario", column = "idusuario", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IUsuariosAod.dato"))
     })
     Personas infoadicional(Long idusuario);
 

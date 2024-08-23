@@ -85,15 +85,21 @@ public class LocalidadesCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            iLocalidadesAod.adicionar(dato);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarlocalidad = iLocalidadesAod.verificarlocalidad(dato.getLocalidad());
+        if (verificarlocalidad != null) {
+            mensajes.put("mensaje", "La localidad ya se encuentra registrada en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                iLocalidadesAod.adicionar(dato);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Localidad registrada exitosamente en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
     @PutMapping
@@ -104,29 +110,49 @@ public class LocalidadesCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            iLocalidadesAod.modificar(dato);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarlocalidad = iLocalidadesAod.verificarlocalidad(dato.getLocalidad());
+        if (verificarlocalidad != null) {
+            mensajes.put("mensaje", "La localidad ya se encuentra registrada en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                iLocalidadesAod.modificar(dato);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
-    @GetMapping("/l")
-    ResponseEntity<?> datosl() {
+    @GetMapping("/l/{id}")
+    ResponseEntity<?> datosl(@PathVariable Long id) {
         List<Localidades> datos = null;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            datos = iLocalidadesAod.datosl();
+            datos = iLocalidadesAod.datosl(id);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<List<Localidades>>(datos, HttpStatus.OK);
+    }
+
+    @PutMapping("/cambiarestado")
+    ResponseEntity<?> cambiarestado(@RequestBody Localidades localidad){
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            iLocalidadesAod.cambiarestado(localidad);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Se ha modificaco el estado del rubro");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
 }

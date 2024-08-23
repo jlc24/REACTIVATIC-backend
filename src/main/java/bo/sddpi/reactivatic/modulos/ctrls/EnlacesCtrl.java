@@ -114,15 +114,25 @@ public class EnlacesCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            ienlacesAod.insertar(enlace);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");
-            mensajes.put("error",e.getMessage().concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarenlace = ienlacesAod.verificarenlace(enlace.getEnlace());
+        Long verificarruta = ienlacesAod.verificarenlaceruta(enlace.getRuta());
+        if (verificarenlace != null) {
+            mensajes.put("mensaje", "El enlace ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else if (verificarruta != null) {
+            mensajes.put("mensaje", "La ruta del enlace ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else {
+            try {
+                ienlacesAod.insertar(enlace);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");
+                mensajes.put("error",e.getMessage().concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Enlace creado exitosamente");
+            return new ResponseEntity<>(mensajes, HttpStatus.CREATED);
         }
-        mensajes.put("mensaje", "Enlace creado exitosamente");
-        return new ResponseEntity<>(mensajes, HttpStatus.CREATED);
     }
 
     @PutMapping
@@ -133,15 +143,25 @@ public class EnlacesCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            ienlacesAod.actualizar(enlace);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al actualizar en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarenlace = ienlacesAod.verificarenlace(enlace.getEnlace());
+        Long verificarruta = ienlacesAod.verificarenlaceruta(enlace.getRuta());
+        if (verificarenlace != null) {
+            mensajes.put("mensaje", "El enlace ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else if (verificarruta != null) {
+            mensajes.put("mensaje", "La ruta del enlace ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else {
+            try {
+                ienlacesAod.actualizar(enlace);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al actualizar en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Enlace actualizado exitosamente");
+            return new ResponseEntity<>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "Enlace actualizado exitosamente");
-        return new ResponseEntity<>(mensajes, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

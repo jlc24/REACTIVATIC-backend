@@ -118,7 +118,7 @@ public class PersonasCtrl {
                 personanuevo.setIdtipodocumento(dato.getIdtipodocumento());
                 personanuevo.setIdtipoextension(dato.getIdtipoextension());
                 personanuevo.setDireccion(dato.getDireccion());
-                personanuevo.setTelefono(dato.getCelular());
+                personanuevo.setTelefono(dato.getTelefono());
                 personanuevo.setCelular(dato.getCelular());
                 personanuevo.setCorreo(dato.getCorreo());
                 personanuevo.setFormacion(dato.getFormacion());
@@ -131,6 +131,7 @@ public class PersonasCtrl {
                 usuarionuevo.setClave(dato.getUsuario().getClave());
                 usuarionuevo.setEstado(true);
                 usuarionuevo.setIdpersona(personanuevo.getIdpersona());
+                usuarionuevo.setCargo(dato.getUsuario().getCargo());
                 iUsuariosAod.adicionar(usuarionuevo);
                 
                 usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
@@ -154,15 +155,21 @@ public class PersonasCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            iPersonasAod.modificar(dato);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarpersona = iPersonasAod.verificarpersonaregistro(dato.getPrimerapellido(), dato.getSegundoapellido(), dato.getPrimernombre(), dato.getDip());
+        if (verificarpersona != null) {
+            mensajes.put("mensaje", "La persona ya se encuentra registrada en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                iPersonasAod.modificar(dato);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
 
@@ -269,9 +276,9 @@ public class PersonasCtrl {
                 mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
                 return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
             }
+            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
     @GetMapping("/roles/{id}")

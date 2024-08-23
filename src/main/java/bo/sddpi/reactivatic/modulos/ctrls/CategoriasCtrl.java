@@ -104,16 +104,22 @@ public class CategoriasCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            icategoriasAod.insertar(categorias);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarcategoria = icategoriasAod.verificarcategoria(categorias.getCategoria());
+        if (verificarcategoria != null) {
+            mensajes.put("mensaje", "La categoría ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                icategoriasAod.insertar(categorias);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "La categoría ha sido creada con éxito");
+            mensajes.put("categoria", categorias);
+            return new ResponseEntity<>(mensajes, HttpStatus.CREATED);
         }
-        mensajes.put("mensaje", "La categoría ha sido creada con éxito");
-        mensajes.put("categoria", categorias);
-        return new ResponseEntity<>(mensajes, HttpStatus.CREATED);
     }
 
     //MODIFICAR
@@ -125,16 +131,22 @@ public class CategoriasCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            icategoriasAod.actualizar(categorias);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarcategoria = icategoriasAod.verificarcategoria(categorias.getCategoria());
+        if (verificarcategoria != null) {
+            mensajes.put("mensaje", "La categoría ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                icategoriasAod.actualizar(categorias);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "La categoría ha sido actualizada con éxito");
+            mensajes.put("categoria", categorias);
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "La categoría ha sido actualizada con éxito");
-        mensajes.put("categoria", categorias);
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
     //CAMBIAR ESTADO DE CATEGORIA

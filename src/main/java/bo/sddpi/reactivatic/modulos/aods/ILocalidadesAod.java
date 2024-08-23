@@ -24,7 +24,7 @@ public interface ILocalidadesAod {
     })
     Localidades dato(Long id);
 
-    @Select("SELECT * FROM localidades WHERE idmunicipio=#{idmunicipio}")
+    @Select("SELECT * FROM localidades WHERE idmunicipio=#{idmunicipio} ORDER BY localidad")
     List<Localidades> listaLocalidades(long idmunicipio);
 
     @Insert("insert into localidades(idmunicipio, localidad) values (#{idmunicipio}, #{localidad})")
@@ -33,6 +33,12 @@ public interface ILocalidadesAod {
     @Update("update localidades set idmunicipio=#{idmunicipio}, localidad=#{localidad} where idlocalidad=#{idlocalidad} ")
     void modificar(Localidades dato);
 
-    @Select("select idlocalidad, municipio||'-'||localidad as localidad from localidades join municipios using(idmunicipio) order by municipio, localidad")
-    List<Localidades> datosl();
+    @Select("SELECT idlocalidad, idmunicipio, localidad FROM localidades WHERE idmunicipio=#{id} AND estado=true ORDER BY localidad")
+    List<Localidades> datosl(Long id);
+
+    @Select("SELECT idlocalidad FROM localidades WHERE localidad=#{localidad}")
+    Long verificarlocalidad(String localidad);
+
+    @Update("UPDATE localidad SET estado=#{estado} WHERE idlocalidad=#{idlocalidad}")
+    void cambiarestado(Localidades localidad);
 }

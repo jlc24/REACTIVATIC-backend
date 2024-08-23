@@ -15,9 +15,11 @@ public class Usuarios implements Serializable{
     private String usuario;
     private String clave;
     private Boolean estado;
+    private Long idcargo;
     private LocalDateTime created_at;
     
     private Personas persona;
     private Roles rol;
+    private Cargos cargo;
 
 }

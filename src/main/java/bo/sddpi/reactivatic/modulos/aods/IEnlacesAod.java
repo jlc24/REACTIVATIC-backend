@@ -1,14 +1,6 @@
 package bo.sddpi.reactivatic.modulos.aods;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.One;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import bo.sddpi.reactivatic.modulos.entidades.Enlaces;
 import java.util.List;
@@ -46,4 +38,10 @@ public interface IEnlacesAod {
 
     @Delete("DELETE FROM enlaces WHERE idenlace = #{id}")
     void eliminar(Long id);
+
+    @Select("SELECT idenlace FROM enlaces WHERE enlace=#{enlace}")
+    Long verificarenlace(String enlace);
+
+    @Select("SELECT idenlace FROM enlaces WHERE ruta=#{ruta}")
+    Long verificarenlaceruta(String ruta);
 }

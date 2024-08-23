@@ -71,15 +71,21 @@ public class SubrubrosCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            iSubrubrosAod.adicionar(dato);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarsubrubro = iSubrubrosAod.verificarsubrubro(dato.getSubrubro());
+        if (verificarsubrubro != null) {
+            mensajes.put("mensaje", "El subrubro ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else {
+            try {
+                iSubrubrosAod.adicionar(dato);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
     @PutMapping
@@ -90,23 +96,29 @@ public class SubrubrosCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            iSubrubrosAod.modificar(dato);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarsubrubro = iSubrubrosAod.verificarsubrubro(dato.getSubrubro());
+        if (verificarsubrubro != null) {
+            mensajes.put("mensaje", "El subrubro ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else {
+            try {
+                iSubrubrosAod.modificar(dato);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
-    @GetMapping("/l")
-    ResponseEntity<?> datosl() {
+    @GetMapping("/l/{id}")
+    ResponseEntity<?> datosl(@PathVariable Long id) {
         List<Subrubros> datos = null;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            datos = iSubrubrosAod.datosl();
+            datos = iSubrubrosAod.datosl(id);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

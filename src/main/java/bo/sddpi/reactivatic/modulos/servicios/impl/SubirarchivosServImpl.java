@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +25,43 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
 
     @Value("${path.archivos}")
     private String rutaprincipal;
+
+    @Value("${path.archivos.windows}")
+    private String rutaWindows;
+
+    @Value("${path.archivos.linux}")
+    private String rutaLinux;
+
+    private Path rutaUsuarios;
+    private Path rutaRepresentantes;
+    private Path rutaEmpresas;
+
+    @PostConstruct
+    public void init() {
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("win")) {
+            // Si es Windows, usar la ruta de Windows
+            rutaprincipal = rutaWindows;
+        } else {
+            // Si es Linux o Unix, usar la ruta de Linux
+            rutaprincipal = rutaLinux;
+        }
+
+        // Inicializar las rutas de perfiles y empresas
+        rutaUsuarios = Paths.get(rutaprincipal, "/imagenes/usuarios");
+        rutaRepresentantes = Paths.get(rutaprincipal, "/imagenes/representantes");
+        rutaEmpresas = Paths.get(rutaprincipal, "/imagenes/empresas");
+
+        // Asegúrate de que los directorios existen
+        try {
+            Files.createDirectories(rutaUsuarios);
+            Files.createDirectories(rutaRepresentantes);
+            Files.createDirectories(rutaEmpresas);
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo crear los directorios de archivos. Error: " + e.getMessage());
+        }
+    }
 
     private Path rutaperfiles = Paths.get(rutaprincipal,"perfiles");
 

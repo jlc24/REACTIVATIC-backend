@@ -30,8 +30,8 @@ public interface ISubrubrosAod {
     @Update("update subrubros set idrubro=#{idrubro}, subrubro=#{subrubro} where idsubrubro=#{idsubrubro} ")
     void modificar(Subrubros dato);
 
-    @Select("select idsubrubro, rubro||'-'||subrubro as subrubro from subrubros join rubros using(idrubro) order by rubro, subrubro")
-    List<Subrubros> datosl();
+    @Select("SELECT idsubrubro, idrubro, subrubro FROM subrubros WHERE idrubro=#{id} AND estado=true ORDER BY subrubro")
+    List<Subrubros> datosl(Long id);
 
     @Select("SELECT * FROM subrubros WHERE idrubro=#{idrubro} AND estado=true")
     List<Subrubros> subrubros(long idrubro);
@@ -39,4 +39,6 @@ public interface ISubrubrosAod {
     @Select("SELECT idsubrubro, subrubro FROM subrubros WHERE estado=true")
     List<Subrubros> listaSubrubros();
 
+    @Select("SELECT idsubrubro FROM subrubros WHERE subrubro=#{subrubro}")
+    Long verificarsubrubro(String subrubro);
 }

@@ -56,12 +56,6 @@ public class EnlacesrolesCtrl {
         return new ResponseEntity<>(enlacesRoles, HttpStatus.OK);
     }
 
-    @GetMapping("/existe/{idrol}/{idenlace}")
-    ResponseEntity<Boolean> existeEnlaceRol(@PathVariable Long idrol, @PathVariable Long idenlace) {
-        boolean existe = ienlacesrolesAod.verificar(idrol, idenlace);
-        return new ResponseEntity<>(existe, HttpStatus.OK);
-    }
-
     @PostMapping
     public ResponseEntity<?> crearEnlaceRol(@Valid @RequestBody Enlacesroles enlaceRol, BindingResult resultado) {
         Map<String, Object> mensajes = new HashMap<>();
@@ -72,6 +66,11 @@ public class EnlacesrolesCtrl {
         }
         
         try {
+            Long existe = ienlacesrolesAod.verificar(enlaceRol.getIdrol(), enlaceRol.getIdenlace());
+            if (existe != null) {
+                mensajes.put("mensaje", "Error: El Enlace-Rol ya existe en la base de datos.");
+                return new ResponseEntity<>(mensajes, HttpStatus.NOT_FOUND);
+            }
             ienlacesrolesAod.insertar(enlaceRol);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");
@@ -91,6 +90,7 @@ public class EnlacesrolesCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
+            
             ienlacesrolesAod.actualizar(enlaceRol);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la actualización en la Base de Datos");
@@ -110,6 +110,13 @@ public class EnlacesrolesCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
+            Long existe = ienlacesrolesAod.verificar(enlacesroles.getIdrol(), enlacesroles.getIdenlace());
+            if (existe == null) {
+                mensajes.put("mensaje", "Error: El Enlace-Rol no existe en la base de datos.");
+                return new ResponseEntity<>(mensajes, HttpStatus.NOT_FOUND);
+            }
+            //Long existe = ienlacesrolesAod.verificar(enlacesroles.getIdrol(), enlacesroles.getIdenlace());
+            enlacesroles.setIdenlacerol(existe);
             ienlacesrolesAod.eliminar(enlacesroles);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la eliminación en la Base de Datos");

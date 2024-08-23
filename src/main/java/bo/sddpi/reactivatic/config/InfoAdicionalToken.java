@@ -27,9 +27,10 @@ public class InfoAdicionalToken implements TokenEnhancer{
 		Map<String, Object> info = new HashMap<String, Object>();
 		//Personas persona = iPersonasAod.infoadicional(Long.parseLong(authentication.getName()));
 		Usuarios usuario = iUsuariosAod.dato(Long.parseLong(authentication.getName()));
-		info.put("nombre", usuario.getPersona().getPrimerapellido()+ " "+ usuario.getPersona().getPrimernombre());
+		info.put("nombre", usuario.getPersona().getPrimerapellido() + " " + usuario.getPersona().getSegundoapellido());
 		info.put("nombrecliente", usuario.getPersona().getPrimernombre());
 		info.put("rol", usuario.getRol().getNombrerol());
+		info.put("cargo", usuario.getCargo().getCargo());
 		((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(info);
 		return accessToken;
 	}

@@ -33,4 +33,7 @@ public interface ICategoriasAod {
 
     @Delete("DELETE FROM categorias WHERE idcategoria = #{idcategoria}")
     void eliminar(Categorias categorias);
+
+    @Select("SELECT idcategoria FROM categorias WHERE categoria=#{categoria}")
+    Long verificarcategoria(String categoria);
 }

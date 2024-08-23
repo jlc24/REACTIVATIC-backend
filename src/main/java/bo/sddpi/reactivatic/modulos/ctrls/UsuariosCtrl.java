@@ -3,6 +3,7 @@ package bo.sddpi.reactivatic.modulos.ctrls;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -44,113 +45,89 @@ public class UsuariosCtrl {
     @Autowired
     IUsuariosRep iUsuariosRep;
 
-    @GetMapping
-    ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
-            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
-            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+    private ResponseEntity<?> obtenerDatos(Callable<List<Usuarios>> consultaDatos) {
         List<Usuarios> datos = null;
         Map<String, Object> mensajes = new HashMap<>();
-        int nropagina = 0;
         try {
-            if ((pagina-1)*cantidad<0) {
-                nropagina = 0;
-            } else {
-                nropagina = (pagina-1)*cantidad;
-            }
-            datos = iUsuariosAod.datos(buscar, nropagina, cantidad);
+            datos = consultaDatos.call();
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al ejecutar la consulta");
+            mensajes.put("error", e.getMessage());
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        int nropagina = Math.max((pagina - 1) * cantidad, 0);
+        return obtenerDatos(() -> iUsuariosAod.datos(buscar, nropagina, cantidad));
     }
     @GetMapping("/sddpi")
-    ResponseEntity<?> datossddpi(@RequestParam(value = "buscar", defaultValue = "") String buscar,
-            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
-            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
-        List<Usuarios> datos = null;
-        Map<String, Object> mensajes = new HashMap<>();
-        int nropagina = 0;
-        try {
-            if ((pagina-1)*cantidad<0) {
-                nropagina = 0;
-            } else {
-                nropagina = (pagina-1)*cantidad;
-            }
-            datos = iUsuariosAod.datossddpi(buscar, nropagina, cantidad);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
+    public ResponseEntity<?> datossddpi(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                                @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        int nropagina = Math.max((pagina - 1) * cantidad, 0);
+        return obtenerDatos(() -> iUsuariosAod.datossddpi(buscar, nropagina, cantidad));
+    }
+    @GetMapping("/dpeic")
+    public ResponseEntity<?> datosdpeic(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                                @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        int nropagina = Math.max((pagina - 1) * cantidad, 0);
+        return obtenerDatos(() -> iUsuariosAod.datosdpeic(buscar, nropagina, cantidad));
     }
     @GetMapping("/reactivatic")
-    ResponseEntity<?> datosreactivatic(@RequestParam(value = "buscar", defaultValue = "") String buscar,
-            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
-            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
-        List<Usuarios> datos = null;
+    public ResponseEntity<?> datosreactivatic(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                        @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                                        @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        int nropagina = Math.max((pagina - 1) * cantidad, 0);
+        return obtenerDatos(() -> iUsuariosAod.datosreactivatic(buscar, nropagina, cantidad));
+    }
+
+    private ResponseEntity<?> obtenerCantidad(Callable<Integer> consultaCantidad) {
+        Integer cantidad = null;
         Map<String, Object> mensajes = new HashMap<>();
-        int nropagina = 0;
         try {
-            if ((pagina-1)*cantidad<0) {
-                nropagina = 0;
-            } else {
-                nropagina = (pagina-1)*cantidad;
-            }
-            datos = iUsuariosAod.datosreactivatic(buscar, nropagina, cantidad);
+            cantidad = consultaCantidad.call();
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al ejecutar la consulta");
+            mensajes.put("error", e.getMessage());
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
     }
 
     @GetMapping(value = "/cantidad")
-    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
-        Integer cantidad = null;
-        Map<String, Object> mensajes = new HashMap<>();
-        try {
-            cantidad = iUsuariosAod.cantidad(buscar);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    public ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        return obtenerCantidad(() -> iUsuariosAod.cantidad(buscar));
     }
 
     @GetMapping(value = "/cantidad/sddpi")
-    ResponseEntity<?> cantidadsddpi(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
-        Integer cantidad = null;
-        Map<String, Object> mensajes = new HashMap<>();
-        try {
-            cantidad = iUsuariosAod.cantidadsddpi(buscar);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    public ResponseEntity<?> cantidadsddpi(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        return obtenerCantidad(() -> iUsuariosAod.cantidadsddpi(buscar));
+    }
+    @GetMapping(value = "/cantidad/dpeic")
+    public ResponseEntity<?> cantidaddpeic(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        return obtenerCantidad(() -> iUsuariosAod.cantidaddpeic(buscar));
     }
     @GetMapping(value = "/cantidad/reactivatic")
-    ResponseEntity<?> cantidadreactivatic(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
-        Integer cantidad = null;
-        Map<String, Object> mensajes = new HashMap<>();
-        try {
-            cantidad = iUsuariosAod.cantidadreactivatic(buscar);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    public ResponseEntity<?> cantidadreactivatic(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        return obtenerCantidad(() -> iUsuariosAod.cantidadreactivatic(buscar));
     }
 
     @GetMapping(value = "/{id}")
-    ResponseEntity<?> dato(@PathVariable Long id) {
+    public ResponseEntity<?> dato(@PathVariable Long id) {
         Usuarios dato = null;
         Map<String, Object> mensajes = new HashMap<>();
         try {
@@ -176,15 +153,21 @@ public class UsuariosCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        try {
-            iUsuariosAod.modificar(dato);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        Long verificarusuario = iUsuariosAod.verificausuarioregistro(dato.getUsuario());
+        if (verificarusuario != null) {
+            mensajes.put("mensaje", "El usuario ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                iUsuariosAod.modificar(dato);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         }
-        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
@@ -252,39 +235,48 @@ public class UsuariosCtrl {
     }
 
     @GetMapping("/datosrep")
-    ResponseEntity<?> datosrep(@RequestParam(value = "buscar", defaultValue = "") String buscar,
-            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
-            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
-        List<Usuarios> datos = null;
-        Map<String, Object> mensajes = new HashMap<>();
-        int nropagina = 0;
-        try {
-            if ((pagina-1)*cantidad<0) {
-                nropagina = 0;
-            } else {
-                nropagina = (pagina-1)*cantidad;
-            }
-            datos = iUsuariosAod.datosrep(buscar, nropagina, cantidad);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
+    // ResponseEntity<?> datosrep(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+    //         @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+    //         @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+    //     List<Usuarios> datos = null;
+    //     Map<String, Object> mensajes = new HashMap<>();
+    //     int nropagina = 0;
+    //     try {
+    //         if ((pagina-1)*cantidad<0) {
+    //             nropagina = 0;
+    //         } else {
+    //             nropagina = (pagina-1)*cantidad;
+    //         }
+    //         datos = iUsuariosAod.datosrep(buscar, nropagina, cantidad);
+    //     } catch (DataAccessException e) {
+    //         mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+    //         mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+    //         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    //     return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
+    // }
+    public ResponseEntity<?> datosrep(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        int nropagina = Math.max((pagina - 1) * cantidad, 0);
+        return obtenerDatos(() -> iUsuariosAod.datosrep(buscar, nropagina, cantidad));
     }
 
     @GetMapping(value = "/cantidadrep")
-    ResponseEntity<?> cantidadrep(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
-        Integer cantidad = null;
-        Map<String, Object> mensajes = new HashMap<>();
-        try {
-            cantidad = iUsuariosAod.cantidadrep(buscar);
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    // ResponseEntity<?> cantidadrep(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+    //     Integer cantidad = null;
+    //     Map<String, Object> mensajes = new HashMap<>();
+    //     try {
+    //         cantidad = iUsuariosAod.cantidadrep(buscar);
+    //     } catch (DataAccessException e) {
+    //         mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+    //         mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+    //         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+    //     }
+    //     return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    // }
+    public ResponseEntity<?> cantidadrep(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        return obtenerCantidad(() -> iUsuariosAod.cantidadrep(buscar));
     }
 
     @GetMapping(value = "/datosXLS", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

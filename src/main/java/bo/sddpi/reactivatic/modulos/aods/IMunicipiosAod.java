@@ -27,7 +27,12 @@ public interface IMunicipiosAod {
     @Update("update municipios set municipio=#{municipio} where idmunicipio=#{idmunicipio} ")
     void modificar(Municipios dato);
 
-    @Select("SELECT idmunicipio, municipio FROM municipios ORDER BY municipio")
+    @Select("SELECT idmunicipio, municipio FROM municipios WHERE estado=true ORDER BY municipio")
     List<Municipios> datosl();
 
+    @Select("SELECT idmunicipio FROM municipios WHERE municipio=#{municipio}")
+    Long verificarmunicipio(String municipio);
+
+    @Update("UPDATE municipios SET estado=#{estado} WHERE idmunicipio=#{idmunicipio}")
+    void cambiarestado(Municipios municipio);
 }

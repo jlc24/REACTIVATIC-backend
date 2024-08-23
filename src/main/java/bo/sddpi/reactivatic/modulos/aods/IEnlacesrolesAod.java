@@ -24,8 +24,8 @@ public interface IEnlacesrolesAod {
         })
     List<Enlacesroles> listarRoles(long idenlace);
 
-    @Select("SELECT count(*) FROM enlacesroles WHERE idrol = #{idrol} AND idenlace=#{idenlace}")
-    Boolean verificar(long idrol, long idenlace);
+    @Select("SELECT idenlacerol FROM enlacesroles WHERE idrol = #{idrol} AND idenlace=#{idenlace}")
+    Long verificar(long idrol, long idenlace);
 
     @Insert("INSERT INTO enlacesroles (idenlace, idrol) VALUES (#{idenlace}, #{idrol})")
     @Options(useGeneratedKeys = true, keyProperty = "idenlacerol")
@@ -34,6 +34,6 @@ public interface IEnlacesrolesAod {
     @Update("UPDATE enlacesroles SET idenlace = #{enlace.idenlace}, idrol = #{rol.idrol} WHERE idenlacerol = #{idenlacerol}")
     void actualizar(Enlacesroles enlaceRol);
 
-    @Delete("DELETE FROM enlacesroles WHERE idenlacerol = #{id}")
+    @Delete("DELETE FROM enlacesroles WHERE idenlacerol = #{idenlacerol}")
     void eliminar(Enlacesroles enlacesroles);
 }

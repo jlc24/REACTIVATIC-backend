@@ -40,8 +40,9 @@ public class EmpresasCtrl {
 
     @GetMapping
     ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
-            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
-            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+                            @RequestParam(value = "rubro", defaultValue = "") String rubro,
+                            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
         List<Empresas> datos = null;
         Map<String, Object> mensajes = new HashMap<>();
         int nropagina = 0;
@@ -51,7 +52,7 @@ public class EmpresasCtrl {
             } else {
                 nropagina = (pagina-1)*cantidad;
             }
-            datos = iEmpresasAod.datos(buscar, nropagina, cantidad);
+            datos = iEmpresasAod.datos(buscar, rubro, nropagina, cantidad);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -61,11 +62,12 @@ public class EmpresasCtrl {
     }
 
     @GetMapping(value = "/cantidad")
-    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                @RequestParam(value = "rubro", defaultValue = "") String rubro) {
         Integer cantidad = null;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            cantidad = iEmpresasAod.cantidad(buscar);
+            cantidad = iEmpresasAod.cantidad(buscar, rubro);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -101,6 +103,9 @@ public class EmpresasCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Long idusuario = Long.parseLong(auth.getName());
+            dato.setIdusuario(idusuario);
             iEmpresasAod.adicionar(dato);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
@@ -141,6 +146,20 @@ public class EmpresasCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         mensajes.put("mensaje", "Se ha borrado correctamente el dato en la Base de Datos");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
+
+    @PutMapping("/cambiarestado")
+    ResponseEntity<?> cambiarestado(@RequestBody Empresas empresa){
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            iEmpresasAod.cambiarestado(empresa);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Se ha modificaco el estado del rubro");
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
