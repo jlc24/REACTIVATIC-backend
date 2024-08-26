@@ -13,7 +13,7 @@ import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 @Mapper
 public interface IRubrosAod {
 
-    @Select("SELECT * FROM rubros WHERE rubro ilike '%'||#{buscar}||'%' ORDER BY rubro LIMIT #{cantidad} OFFSET #{pagina} ")
+    @Select("SELECT * FROM rubros WHERE rubro ilike '%'||#{buscar}||'%' ORDER BY idrubro LIMIT #{cantidad} OFFSET #{pagina} ")
     List<Rubros> datos(String buscar, Integer pagina, Integer cantidad);
 
     @Select("SELECT count(idrubro) FROM rubros where rubro ilike '%'||#{buscar}||'%' ")

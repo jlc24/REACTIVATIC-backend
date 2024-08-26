@@ -23,8 +23,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE (ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
-        //"WHERE (ur.idrol = 1 OR ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
+        //"WHERE (ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
+        "WHERE (ur.idrol = 1 OR ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.created_at DESC " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -40,8 +40,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE (ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
-        //"WHERE (ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
+        //"WHERE (ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
+        "WHERE (ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -56,8 +56,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE (ur.idrol = 4 OR ur.idrol = 6 OR ur.idrol = 7) " +
-        //"WHERE (OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
+        //"WHERE (ur.idrol = 4 OR ur.idrol = 6 OR ur.idrol = 7) " +
+        "WHERE (OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -72,8 +72,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE (ur.idrol = 4 OR ur.idrol = 6) " +
-        //"WHERE (OR ur.idrol = 4 OR ur.idrol = 5) " +
+        //"WHERE (ur.idrol = 4 OR ur.idrol = 6) " +
+        "WHERE (OR ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -87,8 +87,8 @@ public interface IUsuariosAod {
         "FROM usuarios " + 
         "JOIN usuariosroles using(idusuario) " + 
         "JOIN personas using(idpersona) " + 
-        "WHERE (idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
-        //"WHERE (idrol = 1 OR idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
+        //"WHERE (idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
+        "WHERE (idrol = 1 OR idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidad(String buscar);
 
@@ -96,8 +96,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN usuariosroles using(idusuario) " + 
         "JOIN personas using(idpersona) " +
-        "WHERE (idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
-        //"WHERE (idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
+        //"WHERE (idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
+        "WHERE (idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadsddpi(String buscar);
 
@@ -105,8 +105,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN usuariosroles using(idusuario) " + 
         "JOIN personas using(idpersona) " +
-        "WHERE (idrol = 4 OR idrol = 6 OR idrol = 7) " +
-        //"WHERE (idrol = 3 OR idrol = 4 OR idrol = 5) " +
+        //"WHERE (idrol = 4 OR idrol = 6 OR idrol = 7) " +
+        "WHERE (idrol = 3 OR idrol = 4 OR idrol = 5) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidaddpeic(String buscar);
 
@@ -114,8 +114,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN usuariosroles using(idusuario) " +
         "JOIN personas using(idpersona) " +
-        "WHERE (idrol = 4 OR idrol = 6) " +
-        //"WHERE (idrol = 4 OR idrol = 5) " +
+        //"WHERE (idrol = 4 OR idrol = 6) " +
+        "WHERE (idrol = 4 OR idrol = 5) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadreactivatic(String buscar);
 
@@ -157,8 +157,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE ur.idrol = 2 " +
-        //"WHERE ur.idrol = 6 " +
+        //"WHERE ur.idrol = 2 " +
+        "WHERE ur.idrol = 6 " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.created_at DESC " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -176,8 +176,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE ur.idrol=2 " +
-        //"WHERE ur.idrol = 6 " +
+        //"WHERE ur.idrol=2 " +
+        "WHERE ur.idrol = 6 " +
         "AND concat(usuario,primerapellido, segundoapellido, primernombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadrep(String buscar);
 
@@ -190,8 +190,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE (ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6) " +
-        //"WHERE (ur.idrol = 1 OR ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
+        //"WHERE (ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6) " +
+        "WHERE (ur.idrol = 1 OR ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.idusuario ASC ")
     @Results({
@@ -205,8 +205,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN personas using(idpersona) " +
         "JOIN usuariosroles using(idusuario) " +
-        "WHERE idrol = 3 " +
-        //"WHERE idrol = 7 " +
+        //"WHERE idrol = 3 " +
+        "WHERE idrol = 7 " +
         "AND celular::integer = #{celular} limit 1")
     Procesar usuariocatalogo(Procesar dato);
 
@@ -214,8 +214,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN usuariosroles using(idusuario) " +
         "JOIN personas using(idpersona) " +
-        "WHERE idrol=2 " +
-        //"WHERE idrol = 6 " +
+        //"WHERE idrol=2 " +
+        "WHERE idrol = 6 " +
         "AND usuarios.estado AND concat(usuario, primerapellido, segundoapellido, primernombre) ilike '%'||#{buscar}||'%' ")
     @Results({
         @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato"))

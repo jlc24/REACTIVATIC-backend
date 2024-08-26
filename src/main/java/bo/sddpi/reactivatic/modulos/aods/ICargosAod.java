@@ -12,7 +12,7 @@ public interface ICargosAod {
     @Select("SELECT * FROM cargos WHERE idcargo=#{idcargo}")
     Cargos dato(Long idcargo);
 
-    @Select("SELECT * FROM cargos WHERE cargo ilike '%'||#{buscar}||'%' ORDER BY idcargo DESC LIMIT #{cantidad} OFFSET #{pagina} ")
+    @Select("SELECT * FROM cargos WHERE cargo ilike '%'||#{buscar}||'%' ORDER BY idcargo LIMIT #{cantidad} OFFSET #{pagina} ")
     @Results({
         @Result(property = "rol", column = "idrol", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
     })
@@ -28,7 +28,7 @@ public interface ICargosAod {
     @Options(useGeneratedKeys = true, keyProperty = "idcargo")
     void insertar(Cargos cargo);
 
-    @Update("UPDATE cargos SET idrol=#{idrol}, cargo=#{cargo}")
+    @Update("UPDATE cargos SET idrol=#{idrol}, cargo=#{cargo} WHERE idcargo=#{idcargo}")
     void actualizar(Cargos cargo);
 
     @Delete("DELETE FROM cargos WHERE idcargo=#{idcargo}")
