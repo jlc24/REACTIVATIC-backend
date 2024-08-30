@@ -23,8 +23,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        //"WHERE (ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
-        "WHERE (ur.idrol = 1 OR ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
+        "WHERE (ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
+        // "WHERE (ur.idrol = 1 OR ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.created_at DESC " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -40,8 +40,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        //"WHERE (ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
-        "WHERE (ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
+        "WHERE (ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
+        // "WHERE (ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -56,8 +56,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        //"WHERE (ur.idrol = 4 OR ur.idrol = 6 OR ur.idrol = 7) " +
-        "WHERE (OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
+        "WHERE (ur.idrol = 4 OR ur.idrol = 6 OR ur.idrol = 7) " +
+        // "WHERE (ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -72,8 +72,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        //"WHERE (ur.idrol = 4 OR ur.idrol = 6) " +
-        "WHERE (OR ur.idrol = 4 OR ur.idrol = 5) " +
+        "WHERE (ur.idrol = 4 OR ur.idrol = 6) " +
+        // "WHERE (ur.idrol = 4 OR ur.idrol = 5) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -87,8 +87,8 @@ public interface IUsuariosAod {
         "FROM usuarios " + 
         "JOIN usuariosroles using(idusuario) " + 
         "JOIN personas using(idpersona) " + 
-        //"WHERE (idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
-        "WHERE (idrol = 1 OR idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
+        "WHERE (idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
+        // "WHERE (idrol = 1 OR idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidad(String buscar);
 
@@ -96,8 +96,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN usuariosroles using(idusuario) " + 
         "JOIN personas using(idpersona) " +
-        //"WHERE (idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
-        "WHERE (idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
+        "WHERE (idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
+        // "WHERE (idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadsddpi(String buscar);
 
@@ -105,8 +105,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN usuariosroles using(idusuario) " + 
         "JOIN personas using(idpersona) " +
-        //"WHERE (idrol = 4 OR idrol = 6 OR idrol = 7) " +
-        "WHERE (idrol = 3 OR idrol = 4 OR idrol = 5) " +
+        "WHERE (idrol = 4 OR idrol = 6 OR idrol = 7) " +
+        // "WHERE (idrol = 3 OR idrol = 4 OR idrol = 5) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidaddpeic(String buscar);
 
@@ -114,8 +114,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN usuariosroles using(idusuario) " +
         "JOIN personas using(idpersona) " +
-        //"WHERE (idrol = 4 OR idrol = 6) " +
-        "WHERE (idrol = 4 OR idrol = 5) " +
+        "WHERE (idrol = 4 OR idrol = 6) " +
+        // "WHERE (idrol = 4 OR idrol = 5) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadreactivatic(String buscar);
 
@@ -137,13 +137,13 @@ public interface IUsuariosAod {
     @Insert("INSERT INTO usuarios(idpersona, usuario, clave, estado, idcargo) VALUES (#{idpersona}, #{usuario}, crypt(#{clave},gen_salt('bf', 8)), true, #{idcargo}) returning idusuario")
     void adicionar(Usuarios dato);
 
-    @Update("UPDATE usuarios SET idpersona=#{idpersona}, usuario=#{usuario}, clave=#{clave}, idcargo=#{idcargo} WHERE idusuario=#{idusuario} ")
+    @Update("UPDATE usuarios SET idcargo=#{idcargo} WHERE idusuario=#{idusuario} ")
     void modificar(Usuarios dato);
 
     @Delete("DELETE FROM usuarios WHERE idusuario=#{id}")
     void eliminar(Long id);
 
-    @Update("UPDATE usuarios SET usuario=#{usuario}, clave=crypt(#{clave},gen_salt('bf', 8)) WHERE idusuario = #{idusuario}")
+    @Update("UPDATE usuarios SET clave=crypt(#{clave},gen_salt('bf', 8)) WHERE idusuario = #{idusuario}")
     void cambiarclave(Usuarios usuario);
 
     @Update("UPDATE usuarios SET estado=#{estado} WHERE idusuario=#{idusuario}")
@@ -157,8 +157,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        //"WHERE ur.idrol = 2 " +
-        "WHERE ur.idrol = 6 " +
+        "WHERE ur.idrol = 2 " +
+        // "WHERE ur.idrol = 6 " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.created_at DESC " +
         "LIMIT #{cantidad} OFFSET #{pagina}")

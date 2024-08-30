@@ -3,6 +3,7 @@ package bo.sddpi.reactivatic.modulos.ctrls;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -172,19 +173,46 @@ public class UsuariosCtrl {
 
     @DeleteMapping(value = "/{id}")
     ResponseEntity<?> eliminar(@PathVariable Long id) {
+        // Map<String, Object> mensajes = new HashMap<>();
+        // try {
+        //     Personas persona = iPersonasAod.infoadicional(id);
+        //     iUsuariosrolesAod.eliminar(id);
+        //     iUsuariosAod.eliminar(id);
+        //     iPersonasAod.eliminar(persona.getIdpersona());
+        // } catch (DataAccessException e) {
+        //     mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+        //     mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+        //     return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        // }
+        // mensajes.put("mensaje", "Se ha borrado correctamente el dato en la Base de Datos");
+        // return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
         Map<String, Object> mensajes = new HashMap<>();
-        try {
-            Personas persona = iPersonasAod.infoadicional(id);
-            iUsuariosrolesAod.eliminar(id);
-            iUsuariosAod.eliminar(id);
-            iPersonasAod.eliminar(persona.getIdpersona());
-        } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+    try {
+        // Verificar si la persona existe
+        Optional<Personas> personaOpt = Optional.ofNullable(iPersonasAod.infoadicional(id));
+        if (!personaOpt.isPresent()) {
+            mensajes.put("mensaje", "El registro con el ID " + id + " no existe en la Base de Datos.");
+            return new ResponseEntity<>(mensajes, HttpStatus.NOT_FOUND);
         }
-        mensajes.put("mensaje", "Se ha borrado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+
+        // Eliminar en el orden adecuado
+        iUsuariosrolesAod.eliminar(id);
+        iUsuariosAod.eliminar(id);
+        iPersonasAod.eliminar(personaOpt.get().getIdpersona());
+
+        mensajes.put("mensaje", "El registro se ha eliminado correctamente.");
+        return new ResponseEntity<>(mensajes, HttpStatus.OK);
+
+    } catch (DataAccessException e) {
+        mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos.");
+        mensajes.put("error", e.getMessage().concat(": ").concat(e.getMostSpecificCause().getMessage()));
+        return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+
+    } catch (Exception e) {
+        mensajes.put("mensaje", "Error inesperado al intentar eliminar el registro.");
+        mensajes.put("error", e.getMessage());
+        return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     }
 
     @DeleteMapping(value = "/rep/{id}")

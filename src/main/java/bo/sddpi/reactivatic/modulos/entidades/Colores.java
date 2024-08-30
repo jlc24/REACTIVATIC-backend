@@ -13,6 +13,7 @@ public class Colores implements Serializable {
     private Long idcolor;
     private Long idproducto;
     private String color;
+    private String codigo;
     private Boolean estado;
     private LocalDateTime created_at;
 

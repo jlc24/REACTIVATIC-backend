@@ -1,5 +1,7 @@
 package bo.sddpi.reactivatic.modulos.servicios;
 
+import java.util.List;
+
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,6 +10,10 @@ public interface ISubirarchivosServ {
     public void cargarimagen(Long id, MultipartFile archivo);
 
     public Resource descargarimagen(String archivo);
+
+    public void uploadimagen(Long id, MultipartFile archivo, String tipo);
+
+    public List<Resource> downloadimagen(Long id, String tipo);
 
     public void cargarimagenproducto(Long id, MultipartFile archivo);
 

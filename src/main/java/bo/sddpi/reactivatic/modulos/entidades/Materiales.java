@@ -11,7 +11,7 @@ public class Materiales implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long idmaterial;
-    private Long idporducto;
+    private Long idproducto;
     private String material;
     private boolean estado;
     private LocalDateTime created_at;

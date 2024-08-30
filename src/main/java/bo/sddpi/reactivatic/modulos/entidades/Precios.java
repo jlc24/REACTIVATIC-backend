@@ -15,7 +15,7 @@ public class Precios implements Serializable {
     private Long idproducto;
     private BigDecimal precio;
     private Long idtamano;
-    private BigDecimal cantidad;
+    private String cantidad;
     private Boolean estado;
     private LocalDateTime created_at;
 

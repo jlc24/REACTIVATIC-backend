@@ -16,6 +16,8 @@ import bo.sddpi.reactivatic.modulos.entidades.Empresas;
 @Mapper
 public interface IEmpresasAod {
 
+    //@Select("SELECT idempresa, empresa FROM")
+
     @Select("SELECT * FROM empresas e " +
         "JOIN subrubros ur ON e.idsubrubro = ur.idsubrubro " +
         "JOIN rubros r ON ur.idrubro = r.idrubro " +

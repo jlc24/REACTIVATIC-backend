@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.*;
 
-import bo.sddpi.reactivatic.modulos.entidades.Beneficiosempresas;
 
 @Mapper
 public interface IBeneficiosempresasAod {

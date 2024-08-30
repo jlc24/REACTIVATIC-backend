@@ -24,7 +24,7 @@ public interface ICarritosAod {
     @Insert("insert into carritos(idcliente, idproducto, cantidad) values (#{idcliente}, #{idproducto}, #{cantidad})")
     void adicionar(Carritos dato);
 
-    @Select("select count(*) as cantidad from carritos where idcliente=#{idcliente}")
+    @Select("select SUM(cantidad) as cantidad from carritos where idcliente=#{idcliente}")
     Carritos cantidadcarrito(Long idcliente);
 
     @Delete("delete from carritos where idcliente=#{idcliente} and idproducto=#{idproducto}")

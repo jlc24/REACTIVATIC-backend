@@ -1,5 +1,6 @@
 package bo.sddpi.reactivatic.modulos.ctrls;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +132,7 @@ public class PersonasCtrl {
                 usuarionuevo.setClave(dato.getUsuario().getClave());
                 usuarionuevo.setEstado(true);
                 usuarionuevo.setIdpersona(personanuevo.getIdpersona());
-                usuarionuevo.setCargo(dato.getUsuario().getCargo());
+                usuarionuevo.setIdcargo(dato.getUsuario().getIdcargo());
                 iUsuariosAod.adicionar(usuarionuevo);
                 
                 usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
@@ -155,21 +156,16 @@ public class PersonasCtrl {
             mensajes.put("errores", errores);
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
-        Long verificarpersona = iPersonasAod.verificarpersonaregistro(dato.getPrimerapellido(), dato.getSegundoapellido(), dato.getPrimernombre(), dato.getDip());
-        if (verificarpersona != null) {
-            mensajes.put("mensaje", "La persona ya se encuentra registrada en el sistema.");
-            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
-        }else{
-            try {
-                iPersonasAod.modificar(dato);
-            } catch (DataAccessException e) {
-                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+        try {
+            iPersonasAod.modificar(dato);
+            iUsuariosAod.modificar(dato.getUsuario());
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
 
@@ -201,6 +197,62 @@ public class PersonasCtrl {
         mensajes.put("mensaje", "Se cargo el archivo con éxito: "+archivo.getOriginalFilename());
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
+
+    @PostMapping(value="/uploadperfil")
+    public ResponseEntity<Map<String, Object>> uploadPerfil(@RequestParam("tipo") String tipo, @RequestParam("archivo") MultipartFile archivo) {
+        Map<String, Object> mensajes = new HashMap<>();
+
+        if (archivo.isEmpty()) {
+            mensajes.put("mensaje", "No se ha seleccionado ningún archivo.");
+            return new ResponseEntity<>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Long id = Long.parseLong(auth.getName());
+            iSubirarchivosServ.uploadimagen(id, archivo, tipo);
+        } catch (NumberFormatException e) {
+            mensajes.put("mensaje", "El ID de usuario no es válido.");
+            return new ResponseEntity<>(mensajes, HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException  e) {
+            mensajes.put("mensaje", "Error al procesar el archivo: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "No se pudo cargar el archivo: " + archivo.getOriginalFilename() + ". Error: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        mensajes.put("mensaje", "Se cargó el archivo con éxito: " + archivo.getOriginalFilename());
+        mensajes.put("mensaje", archivo);
+        return new ResponseEntity<>(mensajes, HttpStatus.OK);
+    }
+
+    @PostMapping(value="/upload")
+    public ResponseEntity<Map<String, Object>> upload(
+            @RequestParam("id") Long id,
+            @RequestParam("tipo") String tipo,
+            @RequestParam("archivo") MultipartFile archivo) {
+
+        Map<String, Object> mensajes = new HashMap<>();
+
+        if (archivo.isEmpty()) {
+            mensajes.put("mensaje", "No se ha seleccionado ningún archivo.");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            iSubirarchivosServ.uploadimagen(id, archivo, tipo);
+        } catch (RuntimeException  e) {
+            mensajes.put("mensaje", "Error al procesar el archivo: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "No se pudo cargar el archivo: " + archivo.getOriginalFilename() + ". Error: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Imagen subida con éxito");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
+
 
     @GetMapping(value="/descargar/{idusuario}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
@@ -250,8 +302,10 @@ public class PersonasCtrl {
                 personanuevo.setComplementario(dato.getComplementario());
                 personanuevo.setIdtipodocumento(dato.getIdtipodocumento());
                 personanuevo.setIdtipoextension(dato.getIdtipoextension());
-                personanuevo.setTelefono(dato.getCelular());
+                personanuevo.setDireccion(dato.getDireccion());
+                personanuevo.setTelefono(dato.getTelefono());
                 personanuevo.setCelular(dato.getCelular());
+                personanuevo.setCorreo(dato.getCorreo());
                 personanuevo.setFormacion(dato.getFormacion());
                 personanuevo.setEstadocivil(dato.getEstadocivil());
                 personanuevo.setHijos(dato.getHijos());
@@ -265,7 +319,7 @@ public class PersonasCtrl {
                 iUsuariosAod.adicionar(usuarionuevo);
 
                 usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
-                usuariorolnuevo.setIdrol(2L);
+                usuariorolnuevo.setIdrol(6L);
                 iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
 
                 representantenuevo.setIdpersona(personanuevo.getIdpersona());

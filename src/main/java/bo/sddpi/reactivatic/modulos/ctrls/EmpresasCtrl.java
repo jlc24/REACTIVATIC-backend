@@ -212,6 +212,32 @@ public class EmpresasCtrl {
         return new ResponseEntity<Empresas>(dato, HttpStatus.OK);
     }
 
+    @PostMapping(value="/upload")
+    public ResponseEntity<Map<String, Object>> upload(
+            @RequestParam("id") Long id,
+            @RequestParam("tipo") String tipo,
+            @RequestParam("archivo") MultipartFile archivo) {
+
+        Map<String, Object> mensajes = new HashMap<>();
+
+        if (archivo.isEmpty()) {
+            mensajes.put("mensaje", "No se ha seleccionado ningún archivo.");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            iSubirarchivosServ.uploadimagen(id, archivo, tipo);
+        } catch (RuntimeException  e) {
+            mensajes.put("mensaje", "Error al procesar el archivo: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "No se pudo cargar el archivo: " + archivo.getOriginalFilename() + ". Error: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Imagen subida con éxito");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
+
     @PostMapping(value = "/cargare/{id}")
     ResponseEntity<?> cargar(@RequestParam("archivo") MultipartFile archivo, @PathVariable Long id) {
         Map<String, Object> mensajes = new HashMap<>();

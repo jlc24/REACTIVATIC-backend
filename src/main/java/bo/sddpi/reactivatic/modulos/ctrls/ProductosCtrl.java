@@ -71,6 +71,29 @@ public class ProductosCtrl {
         return new ResponseEntity<List<Productos>>(datos, HttpStatus.OK);
     }
 
+    @GetMapping("/admin")
+    ResponseEntity<?> datosAdmin(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                                @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad,
+                                @RequestParam(value = "rubro", defaultValue = "") String rubro) {
+        List<Productos> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        int nropagina = 0;
+        try {
+            if ((pagina - 1) * cantidad < 0) {
+                nropagina = 0;
+            } else {
+                nropagina = (pagina - 1) * cantidad;
+            }
+            datos = iProductosAod.datosAdmin(buscar, nropagina, cantidad, rubro);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Productos>>(datos, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/cantidad")
     ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
         Integer cantidad = null;
@@ -79,6 +102,21 @@ public class ProductosCtrl {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Long idempresa = iEmpresasAod.idempresa(Long.parseLong(auth.getName()));
             cantidad = iProductosAod.cantidad(idempresa, buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/admin/cantidad")
+    ResponseEntity<?> cantidadAdmin(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                    @RequestParam(value = "rubro", defaultValue = "") String rubro) {
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            cantidad = iProductosAod.cantidadAdmin(buscar, rubro);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
