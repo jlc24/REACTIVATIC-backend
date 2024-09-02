@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import bo.sddpi.reactivatic.modulos.entidades.Personas;
+import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 
 @Mapper
 public interface IPersonasAod {
@@ -48,6 +49,9 @@ public interface IPersonasAod {
 
     @Update("UPDATE personas SET idtipogenero=#{idtipogenero}, primerapellido=#{primerapellido}, segundoapellido=#{segundoapellido}, primernombre=#{primernombre}, dip=#{dip}, complementario=#{complementario}, idtipodocumento=#{idtipodocumento}, idtipoextension=#{idtipoextension}, direccion=#{direccion}, telefono=#{telefono}, celular=#{celular}, correo=#{correo}, formacion=#{formacion}, estadocivil=#{estadocivil}, hijos=#{hijos} WHERE idpersona=#{idpersona} ")
     void modificar(Personas dato);
+
+    @Update("UPDATE personas SET estado=#{estado} WHERE idpersona=#{idpersona}")
+    void cambiarestado(Personas persona);
 
     @Select("SELECT * FROM usuarios u join personas p ON p.idpersona=u.idpersona WHERE u.idusuario=#{idusuario}")
     @Results({

@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import bo.sddpi.reactivatic.modulos.entidades.Rubros;
-import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 
 @Mapper
 public interface IRubrosAod {

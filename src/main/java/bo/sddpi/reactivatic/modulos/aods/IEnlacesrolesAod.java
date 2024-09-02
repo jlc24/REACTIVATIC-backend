@@ -2,7 +2,6 @@ package bo.sddpi.reactivatic.modulos.aods;
 
 import org.apache.ibatis.annotations.*;
 
-import bo.sddpi.reactivatic.modulos.entidades.Enlaces;
 import bo.sddpi.reactivatic.modulos.entidades.Enlacesroles;
 
 import java.util.List;

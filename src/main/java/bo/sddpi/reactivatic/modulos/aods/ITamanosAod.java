@@ -7,7 +7,6 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
-import bo.sddpi.reactivatic.modulos.entidades.Colores;
 import bo.sddpi.reactivatic.modulos.entidades.Tamanos;
 
 @Mapper

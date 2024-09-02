@@ -82,12 +82,19 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
 
         try {
             Resource recursoArchivo = new ClassPathResource("fondologo.png");
+            Resource recursoArchivoSin = new ClassPathResource("sin.png");
             File archivoFondologo = recursoArchivo.getFile();
+            File archivoSin = recursoArchivoSin.getFile();
             
             Files.copy(archivoFondologo.toPath(), rutaUsuarios.resolve("usuarios.png"), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(archivoFondologo.toPath(), rutaRepresentantes.resolve("representantes.png"), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(archivoFondologo.toPath(), rutaEmpresas.resolve("empresas.png"), StandardCopyOption.REPLACE_EXISTING);
             Files.copy(archivoFondologo.toPath(), rutaProductos.resolve("productos.png"), StandardCopyOption.REPLACE_EXISTING);
+
+            Files.copy(archivoSin.toPath(), rutaUsuarios.resolve("sinusuario.png"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(archivoSin.toPath(), rutaRepresentantes.resolve("sinrepresentante.png"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(archivoSin.toPath(), rutaEmpresas.resolve("sinempresa.png"), StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(archivoSin.toPath(), rutaProductos.resolve("sinproducto.png"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException("No se pudo copiar el archivo de logo. Error: " + e.getMessage());
         }

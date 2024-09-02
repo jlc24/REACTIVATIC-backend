@@ -168,6 +168,19 @@ public class PersonasCtrl {
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
+    @PutMapping(value = "/cambiarestado")
+    ResponseEntity<?> cambiarestado(@RequestBody Personas persona) {
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            iPersonasAod.cambiarestado(persona);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Se ha modificado el estado del usuario");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/perfil")
     ResponseEntity<?> perfil() {

@@ -22,20 +22,20 @@ public interface IRolesAod {
     @Select("SELECT count(idrol) FROM roles WHERE nombrerol ilike '%'||#{buscar}||'%' OR rol ilike '%'||#{buscar}||'%'")
     Integer cantidad(String buscar);
 
-    @Select("SELECT * FROM roles WHERE idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
-    // @Select("SELECT * FROM roles WHERE idrol = 1 OR idrol = 2 OR idrol = 3 OR idrol = 4 or idrol = 5")
+    //@Select("SELECT * FROM roles WHERE idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
+    @Select("SELECT * FROM roles WHERE idrol = 1 OR idrol = 2 OR idrol = 3 OR idrol = 4 or idrol = 5")
     List<Roles> listaradmin();
 
-    @Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
-    // @Select("SELECT * FROM roles WHERE idrol = 2 OR idrol = 3 OR idrol = 4 or idrol = 5")
+    //@Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
+    @Select("SELECT * FROM roles WHERE idrol = 2 OR idrol = 3 OR idrol = 4 or idrol = 5")
     List<Roles> listarsddpi();
 
-    @Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
-    // @Select("SELECT * FROM roles WHERE idrol = 3 OR idrol = 4 or idrol = 5")
+    //@Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
+    @Select("SELECT * FROM roles WHERE idrol = 3 OR idrol = 4 or idrol = 5")
     List<Roles> listardpeic();
 
-    @Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 6")
-    // @Select("SELECT * FROM roles WHERE idrol = 4 or idrol = 5")
+    //@Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 6")
+    @Select("SELECT * FROM roles WHERE idrol = 4 or idrol = 5")
     List<Roles> listarreactivatic();
 
     @Insert("INSERT INTO roles (rol, nombrerol) VALUES (#{rol}, #{nombrerol})")

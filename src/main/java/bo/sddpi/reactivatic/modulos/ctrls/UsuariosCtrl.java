@@ -27,6 +27,7 @@ import bo.sddpi.reactivatic.modulos.entidades.Personas;
 import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 import bo.sddpi.reactivatic.modulos.reportes.IUsuariosRep;
 
+
 @RestController
 @RequestMapping("/apirest/usuarios")
 public class UsuariosCtrl {
@@ -145,6 +146,24 @@ public class UsuariosCtrl {
         return new ResponseEntity<Usuarios>(dato, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/representante/{id}")
+    public ResponseEntity<?> datorep(@PathVariable Long id) {
+        Usuarios dato = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            dato = iUsuariosAod.datorep(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (dato==null) {
+            mensajes.put("mensaje", "El id: ".concat(id.toString()).concat(" no existe en la Base de Datos"));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<Usuarios>(dato, HttpStatus.OK);
+    }
+
 
     @PutMapping
     ResponseEntity<?> modificar(@Valid @RequestBody Usuarios dato, BindingResult resultado) {
@@ -248,6 +267,31 @@ public class UsuariosCtrl {
         mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
+
+    @PostMapping("/verificar")
+    ResponseEntity<?> verificar(@RequestBody Usuarios usuario) {
+        Boolean esClaveCorrecta;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Long idusuario = Long.parseLong(auth.getName());
+            String user = iUsuariosAod.verificaruser(idusuario);
+            usuario.setIdusuario(idusuario);
+            usuario.setUsuario(user);
+            esClaveCorrecta = iUsuariosAod.verificaclave(usuario);
+            if (!esClaveCorrecta) {
+                mensajes.put("mensaje", "Clave incorrecta");
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.UNAUTHORIZED);
+            }
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Clave verificada correctamente");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
+    
     @PutMapping(value = "/cambiarestado")
     ResponseEntity<?> cambiarestado(@RequestBody Usuarios usuario) {
         Map<String, Object> mensajes = new HashMap<>();
