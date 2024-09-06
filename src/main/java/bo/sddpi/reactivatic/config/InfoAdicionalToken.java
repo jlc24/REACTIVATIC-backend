@@ -30,7 +30,8 @@ public class InfoAdicionalToken implements TokenEnhancer{
 		info.put("nombre", usuario.getPersona().getPrimerapellido() + " " + usuario.getPersona().getSegundoapellido());
 		info.put("nombrecliente", usuario.getPersona().getPrimernombre());
 		info.put("rol", usuario.getRol().getNombrerol());
-		info.put("cargo", usuario.getCargo().getCargo());
+		String cargo = usuario.getCargo() != null ? usuario.getCargo().getCargo() : "Desconocido";
+    	info.put("cargo", cargo);
 		((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(info);
 		return accessToken;
 	}

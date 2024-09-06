@@ -18,6 +18,9 @@ public interface IEmpresasAod {
 
     //@Select("SELECT idempresa, empresa FROM")
 
+    @Select("SELECT idempresa, empresa FROM empresas ORDER BY idempresa")
+    List<Empresas> lista();
+    
     @Select("SELECT * FROM empresas e " +
         "JOIN subrubros ur ON e.idsubrubro = ur.idsubrubro " +
         "JOIN rubros r ON ur.idrubro = r.idrubro " +
@@ -26,7 +29,7 @@ public interface IEmpresasAod {
         "LEFT JOIN asociaciones a ON e.idasociacion = a.idasociacion " +
         "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
         "LEFT JOIN personas p ON rep.idpersona = p.idpersona " +
-        "WHERE CONCAT(COALESCE(a.asociacion, ''), ' ', e.empresa, ' ', ur.subrubro, ' ', r.rubro, ' ', l.localidad, ' ', m.municipio, ' ', p.primerNombre, ' ', p.primerApellido, ' ', p.segundoApellido) " +
+        "WHERE CONCAT(COALESCE(a.asociacion, ''), ' ', e.empresa, ' ', ur.subrubro, ' ', r.rubro, ' ', l.localidad, ' ', m.municipio, ' ', p.primerNombre, ' ', p.primerApellido, ' ', p.segundoApellido, ' ', p.dip) " +
         "ILIKE '%' || #{buscar} || '%' " +
         "AND r.rubro ILIKE '%'||#{rubro}||'%' " +
         "ORDER BY e.idempresa DESC " +
@@ -47,7 +50,7 @@ public interface IEmpresasAod {
         "LEFT JOIN asociaciones a ON e.idasociacion = a.idasociacion " +
         "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
         "LEFT JOIN personas p ON rep.idpersona = p.idpersona " +
-        "WHERE CONCAT(COALESCE(a.asociacion, ''), ' ', e.empresa, ' ', ur.subrubro, ' ', r.rubro, ' ', l.localidad, ' ', m.municipio, ' ', p.primerNombre, ' ', p.primerApellido, ' ', p.segundoApellido) " +
+        "WHERE CONCAT(COALESCE(a.asociacion, ''), ' ', e.empresa, ' ', ur.subrubro, ' ', r.rubro, ' ', l.localidad, ' ', m.municipio, ' ', p.primerNombre, ' ', p.primerApellido, ' ', p.segundoApellido, ' ', p.dip) " +
         "ILIKE '%' || #{buscar} || '%' "+
         "AND r.rubro ILIKE '%'||#{rubro}||'%' ")
     Integer cantidad(String buscar, String rubro);
@@ -57,6 +60,7 @@ public interface IEmpresasAod {
         @Result(property = "subrubro", column = "idsubrubro", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ISubrubrosAod.dato")),
         @Result(property = "localidad", column = "idlocalidad", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ILocalidadesAod.dato")),
         @Result(property = "asociacion", column = "idasociacion", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IAsociacionesAod.dato")),
+        @Result(property = "representante", column = "idrepresentante", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRepresentantesAod.dato"))
     })
     Empresas dato(Long id);
 
@@ -69,8 +73,12 @@ public interface IEmpresasAod {
     @Update("UPDATE empresas SET estado=#{estado} WHERE idempresa=#{idempresa}")
     void cambiarestado(Empresas empresa);
 
-    //ANALIZANDO...
-    @Select("select idempresa from empresas join representantes using(idrepresentante) join personas using(idpersona) join usuarios using(idpersona) where idusuario=#{idusuario}")
+    @Select("SELECT e.idempresa " +
+            "FROM empresas e " +
+            "JOIN representantes r ON r.idrepresentante=e.idrepresentante " +
+            "JOIN personas p ON p.idpersona=r.idpersona " +
+            "JOIN usuarios u ON u.idpersona=p.idpersona " +
+            "WHERE u.idusuario=#{idusuario}")
     Long idempresa(Long idusuario);
 
     @Delete("delete from empresas where idempresa=#{id}")
@@ -94,6 +102,12 @@ public interface IEmpresasAod {
         @Result(property = "asociacion", column = "idasociacion", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IAsociacionesAod.dato")),
     })
     Empresas perfilempresa(Long id);
+
+    @Select("SELECT COUNT(e.idempresa) " +
+        "FROM empresas e " +
+        "JOIN representantes r ON r.idrepresentante=e.idrepresentante " +
+        "WHERE r.idrepresentante=#{idrepresentante}")
+    Integer total(Long idrepresentante);
 
 }
 

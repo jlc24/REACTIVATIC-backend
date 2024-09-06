@@ -140,6 +140,29 @@ public class CatalogosCtrl {
         return new ResponseEntity<Productos>(dato, HttpStatus.OK);
     }
 
+    @GetMapping("/imagen/download")
+    public ResponseEntity<?> download(@RequestParam("id") Long id, @RequestParam("tipo") String tipo){
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Map<String, String>> imagenes = iSubirarchivosServ.downloadimagen(id, tipo);
+
+            if (imagenes.isEmpty()) {
+                // Si no se encontraron imágenes, devolver un mensaje informativo
+                response.put("mensaje", "No se encontraron imágenes.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            return ResponseEntity.ok(imagenes);
+        } catch (RuntimeException e) {
+            // Si hay un error en el proceso, capturarlo y devolver un mensaje adecuado
+            response.put("error", "Error al obtener las imágenes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (Exception e) {
+            // Manejar otros errores no controlados
+            response.put("error", "Error inesperado al obtener las imágenes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
     @GetMapping(value="/descargarproducto/{idproducto}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
     ResponseEntity<?> descargas(@PathVariable Long idproducto) {
@@ -253,7 +276,7 @@ public class CatalogosCtrl {
                 iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
                 clientenuevo.setIdpersona(personanuevo.getIdpersona());
                 iClientesAod.adicionar(clientenuevo);
-                int resultado = iSolicitudesAod.procesasolicitud(dato.getIdcliente(), usuarionuevo.getIdusuario());
+                iSolicitudesAod.procesasolicitud(dato.getIdcliente(), usuarionuevo.getIdusuario());
                 List<Carritos> datoscat = null;
                 try {
                     List<Empresas> enviar = iSolicitudesAod.buscarporempresas(dato.getIdcliente());
@@ -296,7 +319,7 @@ public class CatalogosCtrl {
                     }
                 }
             } else {
-                int resultado = iSolicitudesAod.procesasolicitud(dato.getIdcliente(), idusuario);
+                iSolicitudesAod.procesasolicitud(dato.getIdcliente(), idusuario);
                 List<Carritos> datoscat = null;
                 try {
                     List<Empresas> enviar = iSolicitudesAod.buscarporempresas(dato.getIdcliente());

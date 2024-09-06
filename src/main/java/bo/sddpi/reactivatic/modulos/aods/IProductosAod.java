@@ -2,6 +2,7 @@ package bo.sddpi.reactivatic.modulos.aods;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.One;
@@ -16,10 +17,10 @@ import bo.sddpi.reactivatic.modulos.entidades.Productos;
 @Mapper
 public interface IProductosAod {
 
-    @Select("SELECT idproducto, idempresa, producto, descripcion, preciocompra, precioventa, cantidad " +
+    @Select("SELECT * " +
             "FROM productos " +
             "WHERE idempresa=#{idempresa} " +
-            "and concat(producto, descripcion) ilike '%'||#{buscar}||'%' ORDER BY idproducto " +
+            "and concat(producto, descripcion) ilike '%'||#{buscar}||'%' ORDER BY idproducto DESC " +
             "LIMIT #{cantidad} OFFSET #{pagina} ")
     List<Productos> datos(Long idempresa, String buscar, Integer pagina, Integer cantidad);
 
@@ -33,7 +34,7 @@ public interface IProductosAod {
             "WHERE concat(p.producto, ' ', e.empresa, ' ', ur.subrubro, ' ', r.rubro, ' ', l.localidad, ' ', m.municipio, ' ') " +
             "ILIKE '%'||#{buscar}||'%' " +
             "AND r.rubro ILIKE '%'||#{rubro}||'%' " +
-            "ORDER BY idproducto " +
+            "ORDER BY idproducto DESC " +
             "LIMIT #{cantidad} OFFSET #{pagina} ")
     @Results({
         @Result(property = "empresa", column = "idempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
@@ -65,11 +66,17 @@ public interface IProductosAod {
     Productos dato(Long id);
 
     @Options(useGeneratedKeys = true, keyProperty = "idproducto", keyColumn = "idproducto")
-    @Insert("insert into productos(idempresa, producto, descripcion, preciocompra, precioventa, cantidad) values (#{idempresa}, #{producto}, #{descripcion}, #{preciocompra}, #{precioventa}, #{cantidad}) returning idproducto")
+    @Insert("insert into productos(idempresa, producto, descripcion) values (#{idempresa}, #{producto}, #{descripcion}) returning idproducto")
     void adicionar(Productos dato);
 
-    @Update("update productos set idempresa=#{idempresa}, producto=#{producto}, descripcion=#{descripcion}, preciocompra=#{preciocompra}, precioventa=#{precioventa}, cantidad=#{cantidad} where idproducto=#{idproducto} ")
+    @Update("update productos set idempresa=#{idempresa}, producto=#{producto}, descripcion=#{descripcion} where idproducto=#{idproducto} ")
     void modificar(Productos dato);
+
+    @Delete("DELETE FROM productos WHERE idproducto=#{idproducto}")
+    void eliminar(Long idproducto);
+
+    @Update("UPDATE personas SET estado=#{estado} WHERE idpersona=#{idpersona}")
+    void cambiarestado(Productos producto);
 
     // @Select("SELECT idproducto, idempresa, idempresa as ifore1, producto, productos.descripcion, preciocompra, precioventa, cantidad FROM productos join empresas using(idempresa) join subrubros using(idsubrubro) join rubros using(idrubro) WHERE cantidad>0 and concat(rubro,empresa,producto) ilike '%'||#{buscar}||'%' ORDER BY producto LIMIT #{cantidad} OFFSET #{pagina} ")
     // @Results({

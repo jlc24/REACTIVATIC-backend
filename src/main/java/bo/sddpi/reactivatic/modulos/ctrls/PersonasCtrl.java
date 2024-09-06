@@ -1,6 +1,5 @@
 package bo.sddpi.reactivatic.modulos.ctrls;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +30,7 @@ import bo.sddpi.reactivatic.modulos.entidades.Representantes;
 import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 import bo.sddpi.reactivatic.modulos.entidades.Usuariosroles;
 import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
+
 
 @RestController
 @RequestMapping("/apirest/personas")
@@ -236,8 +236,24 @@ public class PersonasCtrl {
         }
 
         mensajes.put("mensaje", "Se cargó el archivo con éxito: " + archivo.getOriginalFilename());
-        mensajes.put("mensaje", archivo);
+        //mensajes.put("mensaje", archivo);
         return new ResponseEntity<>(mensajes, HttpStatus.OK);
+    }
+
+    @GetMapping("/downloadimage")
+    public ResponseEntity<?> downloadImage(@RequestParam("tipo") String tipo){
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Long id = Long.parseLong(auth.getName());
+
+            List<Map<String, String>> imagenes = iSubirarchivosServ.downloadimagen(id, tipo);
+
+            return ResponseEntity.ok(imagenes);
+        } catch (Exception e) {
+            response.put("error", "Error al obtener las imágenes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     @PostMapping(value="/upload")
@@ -255,6 +271,9 @@ public class PersonasCtrl {
 
         try {
             iSubirarchivosServ.uploadimagen(id, archivo, tipo);
+        } catch (NumberFormatException e) {
+            mensajes.put("mensaje", "El ID de usuario no es válido.");
+            return new ResponseEntity<>(mensajes, HttpStatus.BAD_REQUEST);
         } catch (RuntimeException  e) {
             mensajes.put("mensaje", "Error al procesar el archivo: " + e.getMessage());
             return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -262,11 +281,25 @@ public class PersonasCtrl {
             mensajes.put("mensaje", "No se pudo cargar el archivo: " + archivo.getOriginalFilename() + ". Error: " + e.getMessage());
             return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        mensajes.put("mensaje", "Imagen subida con éxito");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+
+        mensajes.put("mensaje", "Se cargó el archivo con éxito: " + archivo.getOriginalFilename());
+        mensajes.put("mensaje", archivo);
+        return new ResponseEntity<>(mensajes, HttpStatus.OK);
     }
 
+    @GetMapping("/download")
+    public ResponseEntity<?> download(@RequestParam("id") Long id, @RequestParam("tipo") String tipo){
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Map<String, String>> imagenes = iSubirarchivosServ.downloadimagen(id, tipo);
 
+            return ResponseEntity.ok(imagenes);
+        } catch (Exception e) {
+            response.put("error", "Error al obtener las imágenes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
     @GetMapping(value="/descargar/{idusuario}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
     ResponseEntity<?> descargas(@PathVariable Long idusuario) {

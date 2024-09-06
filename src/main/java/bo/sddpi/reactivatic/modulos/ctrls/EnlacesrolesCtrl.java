@@ -15,7 +15,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import bo.sddpi.reactivatic.modulos.aods.IEnlacesrolesAod;
-import bo.sddpi.reactivatic.modulos.entidades.Enlaces;
 import bo.sddpi.reactivatic.modulos.entidades.Enlacesroles;
 
 @RestController

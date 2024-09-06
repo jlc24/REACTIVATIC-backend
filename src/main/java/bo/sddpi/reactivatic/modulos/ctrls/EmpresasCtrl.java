@@ -24,6 +24,10 @@ import bo.sddpi.reactivatic.modulos.aods.IEmpresasAod;
 import bo.sddpi.reactivatic.modulos.entidades.Empresas;
 import bo.sddpi.reactivatic.modulos.reportes.IEmpresasRep;
 import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+
 
 @RestController
 @RequestMapping("/apirest/empresas")
@@ -75,6 +79,21 @@ public class EmpresasCtrl {
         }
         return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
     }
+
+    @GetMapping("/l")
+    ResponseEntity<?> lista(){
+        List<Empresas> empresas = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            empresas = iEmpresasAod.lista();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Empresas>>(empresas, HttpStatus.OK);
+    }
+    
 
     @GetMapping(value = "/{id}")
     ResponseEntity<?> dato(@PathVariable Long id) {
@@ -163,6 +182,21 @@ public class EmpresasCtrl {
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
+    @GetMapping("/verificar/{id}")
+    ResponseEntity<?> verificar(@PathVariable Long id ){
+        Integer total = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            total = iEmpresasAod.total(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(total, HttpStatus.OK);
+    }
+    
+
     @GetMapping(value = "/datosXLS", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     ResponseEntity<?> datosXLS(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
         byte[] data = null;
@@ -227,6 +261,9 @@ public class EmpresasCtrl {
 
         try {
             iSubirarchivosServ.uploadimagen(id, archivo, tipo);
+        } catch (NumberFormatException e) {
+            mensajes.put("mensaje", "El ID de usuario no es válido.");
+            return new ResponseEntity<>(mensajes, HttpStatus.BAD_REQUEST);
         } catch (RuntimeException  e) {
             mensajes.put("mensaje", "Error al procesar el archivo: " + e.getMessage());
             return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -234,8 +271,23 @@ public class EmpresasCtrl {
             mensajes.put("mensaje", "No se pudo cargar el archivo: " + archivo.getOriginalFilename() + ". Error: " + e.getMessage());
             return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        mensajes.put("mensaje", "Imagen subida con éxito");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+
+        mensajes.put("mensaje", "Se cargó el archivo con éxito: " + archivo.getOriginalFilename());
+        return new ResponseEntity<>(mensajes, HttpStatus.OK);
+    }
+
+    @GetMapping("/downloadimage")
+    public ResponseEntity<?> downloadImage(@RequestParam("id") Long id, @RequestParam("tipo") String tipo){
+        Map<String, Object> response = new HashMap<>();
+        try {
+
+            List<Map<String, String>> imagenes = iSubirarchivosServ.downloadimagen(id, tipo);
+
+            return ResponseEntity.ok(imagenes);
+        } catch (Exception e) {
+            response.put("error", "Error al obtener las imágenes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     @PostMapping(value = "/cargare/{id}")

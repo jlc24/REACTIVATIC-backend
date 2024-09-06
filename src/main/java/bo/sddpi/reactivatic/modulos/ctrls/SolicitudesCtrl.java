@@ -118,7 +118,7 @@ public class SolicitudesCtrl {
         Map<String, Object> mensajes = new HashMap<>();
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            int resultado = iSolicitudesAod.procesasolicitud(idclientecarrito, Long.parseLong(auth.getName()));
+            iSolicitudesAod.procesasolicitud(idclientecarrito, Long.parseLong(auth.getName()));
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

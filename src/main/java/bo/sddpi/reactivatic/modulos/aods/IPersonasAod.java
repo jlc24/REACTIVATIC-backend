@@ -13,7 +13,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import bo.sddpi.reactivatic.modulos.entidades.Personas;
-import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 
 @Mapper
 public interface IPersonasAod {
@@ -22,7 +21,7 @@ public interface IPersonasAod {
     @Results({
         @Result(property = "tipogenero", column = "idtipogenero", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposgenerosAod.dato")),
         @Result(property = "tipodocumento", column = "idtipodocumento", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposdocumentosAod.dato")),
-        @Result(property = "tipoextension", column = "idtipoextension", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposextensionesAod.dato"))
+        @Result(property = "tipoextension", column = "idtipoextension", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposextensionesAod.dato")),
     })
     Personas dato(Long id);
     

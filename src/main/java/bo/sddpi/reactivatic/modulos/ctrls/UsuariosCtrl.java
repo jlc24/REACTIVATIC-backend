@@ -26,6 +26,9 @@ import bo.sddpi.reactivatic.modulos.aods.IUsuariosrolesAod;
 import bo.sddpi.reactivatic.modulos.entidades.Personas;
 import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 import bo.sddpi.reactivatic.modulos.reportes.IUsuariosRep;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @RestController
@@ -164,6 +167,30 @@ public class UsuariosCtrl {
         return new ResponseEntity<Usuarios>(dato, HttpStatus.OK);
     }
 
+    @PostMapping
+    ResponseEntity<?> adicionar(@Valid @RequestBody Usuarios dato, BindingResult resultado){
+        Map<String, Object> mensajes = new HashMap<>();
+        if (resultado.hasErrors()) {
+            List<String> errores = resultado.getFieldErrors().stream().map(err -> "El campo '"+err.getField()+"' "+err.getDefaultMessage()).collect(Collectors.toList());
+            mensajes.put("errores", errores);
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+        Long verificarusuario = iUsuariosAod.verificausuarioregistro(dato.getUsuario());
+        if (verificarusuario != null) {
+            mensajes.put("mensaje", "El usuario ya se encuentra registrado en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                iUsuariosAod.adicionar(dato);
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+        }
+    }
 
     @PutMapping
     ResponseEntity<?> modificar(@Valid @RequestBody Usuarios dato, BindingResult resultado) {

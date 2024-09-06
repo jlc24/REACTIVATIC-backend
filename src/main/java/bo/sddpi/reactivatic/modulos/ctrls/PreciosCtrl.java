@@ -68,7 +68,7 @@ public class PreciosCtrl {
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        mensajes.put("mensaje", "El rol ha sido eliminado con éxito");
+        mensajes.put("mensaje", "El precio ha sido eliminado con éxito");
         return new ResponseEntity<>(mensajes, HttpStatus.NO_CONTENT);
     }
 }

@@ -21,7 +21,7 @@ public interface IRepresentantesAod {
     @Select("SELECT r.idrepresentante, r.idpersona, p.primerapellido, p.segundoapellido, p.primernombre " +
         "FROM representantes r " +
         "JOIN personas p ON r.idpersona = p.idpersona " +
-        "WHERE CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido) ILIKE '%'||#{buscar}||'%' LIMIT #{cantidad} OFFSET #{pagina}")
+        "WHERE CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.dip) ILIKE '%'||#{buscar}||'%' LIMIT #{cantidad} OFFSET #{pagina}")
         @Results({
             @Result(property ="persona", column ="idpersona", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
         })
@@ -30,13 +30,13 @@ public interface IRepresentantesAod {
     @Select("SELECT count(r.idrepresentante) " +
         "FROM representantes r " +
         "JOIN personas p ON r.idpersona = p.idpersona " +
-        "WHERE CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido) ILIKE '%'||#{buscar}||'%'")
+        "WHERE CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.dip) ILIKE '%'||#{buscar}||'%'")
     Integer cantidad(String buscar);
 
     @Select("SELECT r.idrepresentante, r.idpersona, p.primerapellido, p.segundoapellido, p.primernombre " +
         "FROM representantes r " +
         "JOIN personas p ON r.idpersona = p.idpersona " +
-        "WHERE p.estado=true AND CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido) ILIKE '%' || #{buscar} || '%'")
+        "WHERE p.estado=true AND CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.dip, ' ') ILIKE '%' || #{buscar} || '%'")
         @Results({
             @Result(property ="persona", column ="idpersona", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
         })

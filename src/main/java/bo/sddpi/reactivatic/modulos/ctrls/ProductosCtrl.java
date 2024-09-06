@@ -17,16 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import bo.sddpi.reactivatic.modulos.aods.IEmpresasAod;
@@ -170,9 +161,11 @@ public class ProductosCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Long idempresa = iEmpresasAod.idempresa(Long.parseLong(auth.getName()));
-            dato.setIdempresa(idempresa);
+            if (dato.getIdempresa() == null) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                Long idempresa = iEmpresasAod.idempresa(Long.parseLong(auth.getName()));
+                dato.setIdempresa(idempresa);
+            }
             iProductosAod.adicionar(dato);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
@@ -204,6 +197,87 @@ public class ProductosCtrl {
         }
         mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<?> eliminar(@PathVariable Long id){
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            iProductosAod.eliminar(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al eliminar en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "El tamaño o talla ha sido eliminado con éxito");
+        return new ResponseEntity<>(mensajes, HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping(value = "/cambiarestado")
+    ResponseEntity<?> cambiarestado(@RequestBody Productos producto) {
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            iProductosAod.cambiarestado(producto);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Se ha modificado el estado del usuario");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
+
+    @PostMapping(value="/upload")
+    public ResponseEntity<Map<String, Object>> upload(
+            @RequestParam("id") Long id,
+            @RequestParam("tipo") String tipo,
+            @RequestParam("archivo") MultipartFile archivo) {
+
+        Map<String, Object> mensajes = new HashMap<>();
+
+        if (archivo.isEmpty()) {
+            mensajes.put("mensaje", "No se ha seleccionado ningún archivo.");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            iSubirarchivosServ.uploadimagen(id, archivo, tipo);
+        } catch (NumberFormatException e) {
+            mensajes.put("mensaje", "El ID de usuario no es válido.");
+            return new ResponseEntity<>(mensajes, HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException  e) {
+            mensajes.put("mensaje", "Error al procesar el archivo: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "No se pudo cargar el archivo: " + archivo.getOriginalFilename() + ". Error: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        mensajes.put("mensaje", "Se cargó el archivo con éxito: " + archivo.getOriginalFilename());
+        return new ResponseEntity<>(mensajes, HttpStatus.OK);
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<?> download(@RequestParam("id") Long id, @RequestParam("tipo") String tipo){
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Map<String, String>> imagenes = iSubirarchivosServ.downloadimagen(id, tipo);
+
+            if (imagenes.isEmpty()) {
+                // Si no se encontraron imágenes, devolver un mensaje informativo
+                response.put("mensaje", "No se encontraron imágenes.");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+            return ResponseEntity.ok(imagenes);
+        } catch (RuntimeException e) {
+            // Si hay un error en el proceso, capturarlo y devolver un mensaje adecuado
+            response.put("error", "Error al obtener las imágenes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } catch (Exception e) {
+            // Manejar otros errores no controlados
+            response.put("error", "Error inesperado al obtener las imágenes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     @PostMapping(value = "/cargarp/{id}")
