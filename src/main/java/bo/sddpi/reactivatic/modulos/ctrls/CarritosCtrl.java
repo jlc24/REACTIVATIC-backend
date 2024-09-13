@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import bo.sddpi.reactivatic.modulos.aods.ICarritosAod;
 import bo.sddpi.reactivatic.modulos.entidades.Carritos;
+import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
 
 @RestController
 @RequestMapping("/carritos")
@@ -30,6 +31,9 @@ public class CarritosCtrl {
 
     @Autowired
     ICarritosAod iCarritosAod;
+
+    @Autowired
+    ISubirarchivosServ iSubirarchivosServ;
 
     @GetMapping("/l")
     ResponseEntity<?> datosl(@RequestParam(value = "idcliente", defaultValue = "") Long idcliente) {
@@ -45,6 +49,44 @@ public class CarritosCtrl {
         return new ResponseEntity<List<Carritos>>(datos, HttpStatus.OK);
     }
 
+    @GetMapping("/atributosproducto/{id}")
+    ResponseEntity<?> atributos(@PathVariable Long id){
+        Carritos atributos = null;
+        String nombreimagen = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            atributos = iCarritosAod.atributosProducto(id);
+            nombreimagen = iSubirarchivosServ.descargarnombreimagen(id.toString());
+            if (atributos != null) {
+                atributos.setImagen(nombreimagen);
+            }
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (atributos == null) {
+            mensajes.put("mensaje", "El id: ".concat(id.toString()).concat(" no existe en la Base de Datos"));
+            return new ResponseEntity<>(mensajes, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(atributos, HttpStatus.OK);
+    }
+
+    @GetMapping("/descargarnombreimagen/{id}")
+    ResponseEntity<?> nombreimagen(@PathVariable Long id){
+        String nombre = null;
+        Map<String, String> nombrejson = new HashMap<>();
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            nombre = iSubirarchivosServ.descargarnombreimagen(id.toString());
+            nombrejson.put("imagen", nombre); 
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(nombrejson, HttpStatus.OK);
+    }
 
     @PostMapping
     ResponseEntity<?> adicionar(@Valid @RequestBody Carritos dato, BindingResult resultado) {
@@ -55,7 +97,16 @@ public class CarritosCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
-            iCarritosAod.adicionar(dato);
+            Carritos carrito = iCarritosAod.dato(dato);
+
+            if (carrito != null) {
+                Long newcantidad = carrito.getCantidad() + dato.getCantidad(); 
+                carrito.setCantidad(newcantidad);
+                iCarritosAod.actualizar(carrito);
+            }else{
+                iCarritosAod.adicionar(dato);
+
+            }
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -67,23 +118,23 @@ public class CarritosCtrl {
 
     @GetMapping("/cantidadcarrito")
     ResponseEntity<?> cantidadcarrito(@RequestParam(value = "idcliente", defaultValue = "") Long idcliente) {
-        Carritos dato = null;
+        Integer cantidad = null;
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            dato = iCarritosAod.cantidadcarrito(idcliente);
+            cantidad = iCarritosAod.cantidadcarrito(idcliente);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<Carritos>(dato, HttpStatus.OK);
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{idcliente}/{idproducto}")
-    ResponseEntity<?> eliminar(@PathVariable Long idcliente, @PathVariable Long idproducto) {
+    @DeleteMapping("/{id}")
+    ResponseEntity<?> eliminar(@PathVariable Long id) {
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            iCarritosAod.eliminar(idcliente, idproducto);
+            iCarritosAod.eliminar(id);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

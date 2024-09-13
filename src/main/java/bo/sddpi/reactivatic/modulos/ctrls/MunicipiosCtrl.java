@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import bo.sddpi.reactivatic.modulos.aods.ILocalidadesAod;
 import bo.sddpi.reactivatic.modulos.aods.IMunicipiosAod;
 import bo.sddpi.reactivatic.modulos.entidades.Municipios;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 @RestController
@@ -157,4 +160,6 @@ public class MunicipiosCtrl {
         mensajes.put("mensaje", "Se ha modificaco el estado del rubro");
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
+
+    
 }

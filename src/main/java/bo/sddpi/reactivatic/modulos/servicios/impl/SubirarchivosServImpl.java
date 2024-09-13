@@ -359,11 +359,9 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
         try {
             Path rutaProducto = rutaProductos.resolve(id);
             if (Files.exists(rutaProducto) && Files.isDirectory(rutaProducto)) {
-            // Obtener el primer archivo en el directorio
                 try (Stream<Path> paths = Files.list(rutaProducto)) {
                     Optional<Path> firstImage = paths
                         .filter(Files::isRegularFile)
-                        //.filter(path -> path.toString().endsWith(".png")) // Filtrar por tipo de archivo si es necesario
                         .findFirst();
                     
                     if (firstImage.isPresent()) {
@@ -372,24 +370,57 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
                 }
             }
 
-            // Si no hay imágenes, retornar una imagen por defecto
             Path defaultImage = rutaProductos.resolve("sinproducto.png");
             return new UrlResource(defaultImage.toUri());
         }
-    
-            // Resource resource = new UrlResource(file.toUri());
-    
-            // if (resource.exists() || resource.isReadable()) {
-            //     return resource;
-            // } else {
-            //     file = rutaProductos.resolve("sinproducto.png");
-            //     resource = new UrlResource(file.toUri());
-            //     return resource;
-            // }
          catch (MalformedURLException e) {
             throw new RuntimeException("Error: " + e.getMessage());
         } catch (IOException e) {
             throw new RuntimeException("Error al acceder al directorio: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String descargarnombreimagen(String id) {
+        try {
+            Path rutaProducto = rutaProductos.resolve(id);
+            if (Files.exists(rutaProducto) && Files.isDirectory(rutaProducto)) {
+                try (Stream<Path> paths = Files.list(rutaProducto)) {
+                    Optional<Path> firstImage = paths
+                        .filter(Files::isRegularFile)
+                        .findFirst();
+                    
+                    if (firstImage.isPresent()) {
+                        return firstImage.get().getFileName().toString();
+                    }
+                }
+            }
+            return "sinproducto.png";
+        } catch (IOException e) {
+            throw new RuntimeException("Error al acceder al directorio: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Resource descargarimageneproductocarrito(String id, String archivo) {
+        try {
+            // Supone que `rutaProductos` ya es un Path
+            Path file = rutaProductos.resolve(id+'/'+archivo);
+    
+            // Crear el recurso desde el Path
+            Resource resource = new UrlResource(file.toUri());
+    
+            // Verificar si el recurso existe y es legible
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                // Si el archivo no existe, devolver una imagen por defecto
+                file = rutaProductos.resolve("sinproducto.png");
+                resource = new UrlResource(file.toUri());
+                return resource;
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
         }
     }
 

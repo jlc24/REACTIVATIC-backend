@@ -35,4 +35,12 @@ public interface IMunicipiosAod {
 
     @Update("UPDATE municipios SET estado=#{estado} WHERE idmunicipio=#{idmunicipio}")
     void cambiarestado(Municipios municipio);
+
+    @Select("SELECT m.idmunicipio, m.municipio, COUNT(DISTINCT p.idproducto) AS cantidad " +
+            "FROM productos p " +
+            "JOIN empresas e ON p.idempresa = e.idempresa " +
+            "JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
+            "GROUP BY m.idmunicipio, m.municipio " +
+            "ORDER BY m.municipio;")
+    List<Municipios> productomunicipio();
 }

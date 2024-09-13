@@ -12,6 +12,9 @@ import bo.sddpi.reactivatic.modulos.entidades.Colores;
 @Mapper
 public interface IColoresAod {
 
+    @Select("SELECT * FROM colores WHERE idcolor=#{idcolor}")
+    Colores dato(Long idcolor);
+    
     @Select("SELECT * FROM colores WHERE idproducto=#{idproducto}")
     List<Colores> lista(Long idproducto);
 

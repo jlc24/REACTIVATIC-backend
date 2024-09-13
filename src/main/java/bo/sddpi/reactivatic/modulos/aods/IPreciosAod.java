@@ -12,6 +12,9 @@ import bo.sddpi.reactivatic.modulos.entidades.Precios;
 @Mapper
 public interface IPreciosAod {
 
+    @Select("SELECT * FROM precios WHERE idprecio=#{idprecio}")
+    Precios dato(Long idprecio);
+
     @Select("SELECT * FROM precios WHERE idproducto=#{idproducto}")
     List<Precios> lista(Long idproducto);
 

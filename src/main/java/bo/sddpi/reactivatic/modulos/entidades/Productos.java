@@ -18,6 +18,8 @@ public class Productos implements Serializable{
     private BigDecimal preciocompra;
     private BigDecimal precioventa;
     private Long cantidad;
+    private BigDecimal minPrecio;
+    private BigDecimal maxPrecio;
     private Boolean estado;
     private LocalDateTime created_at;
 

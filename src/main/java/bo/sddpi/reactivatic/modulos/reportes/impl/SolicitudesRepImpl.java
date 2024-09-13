@@ -18,7 +18,6 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import bo.sddpi.reactivatic.modulos.entidades.Carritos;
 import bo.sddpi.reactivatic.modulos.entidades.Solicitudes;
 import bo.sddpi.reactivatic.modulos.entidades.Solicitudesproductos;
 import bo.sddpi.reactivatic.modulos.reportes.ISolicitudesRep;

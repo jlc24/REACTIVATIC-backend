@@ -12,7 +12,7 @@ public class Rubros implements Serializable{
 
     private Long idrubro;
     private String rubro;
-    //private Long cantidad;
+    private Long cantidad;
     private Boolean estado;
     private LocalDateTime created_at;
 }

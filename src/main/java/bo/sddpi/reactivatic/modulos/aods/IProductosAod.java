@@ -34,7 +34,7 @@ public interface IProductosAod {
             "WHERE concat(p.producto, ' ', e.empresa, ' ', ur.subrubro, ' ', r.rubro, ' ', l.localidad, ' ', m.municipio, ' ') " +
             "ILIKE '%'||#{buscar}||'%' " +
             "AND r.rubro ILIKE '%'||#{rubro}||'%' " +
-            "ORDER BY idproducto DESC " +
+            "ORDER BY p.idproducto DESC " +
             "LIMIT #{cantidad} OFFSET #{pagina} ")
     @Results({
         @Result(property = "empresa", column = "idempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
@@ -75,35 +75,52 @@ public interface IProductosAod {
     @Delete("DELETE FROM productos WHERE idproducto=#{idproducto}")
     void eliminar(Long idproducto);
 
-    @Update("UPDATE personas SET estado=#{estado} WHERE idpersona=#{idpersona}")
+    @Update("UPDATE productos SET estado=#{estado} WHERE idproducto=#{idproducto}")
     void cambiarestado(Productos producto);
 
-    // @Select("SELECT idproducto, idempresa, idempresa as ifore1, producto, productos.descripcion, preciocompra, precioventa, cantidad FROM productos join empresas using(idempresa) join subrubros using(idsubrubro) join rubros using(idrubro) WHERE cantidad>0 and concat(rubro,empresa,producto) ilike '%'||#{buscar}||'%' ORDER BY producto LIMIT #{cantidad} OFFSET #{pagina} ")
-    // @Results({
-    //     @Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
-    // })
-    // List<Productos> datoscat(String buscar, Integer pagina, Integer cantidad);
-    @Select("SELECT p.idproducto, p.idempresa, e.idempresa as ifore1, p.producto, p.descripcion, p.preciocompra, p.precioventa, p.cantidad " +
-            "FROM productos p " +
-            "JOIN empresas e ON e.idempresa=p.idempresa " +
-            "JOIN subrubros sr ON sr.idsubrubro=e.idsubrubro " +
-            "JOIN rubros r ON r.idrubro=sr.idrubro " +
-            "WHERE  concat(p.producto, ' ', sr.subrubro, ' ', r.rubro, ' ', e.empresa) "+
-            "ILIKE '%'||#{buscar}||'%' " +
-            "ORDER BY p.producto LIMIT #{cantidad} OFFSET #{pagina} ")
+    @Select("<script>" +
+                "SELECT p.idproducto, p.idempresa, e.idempresa as ifore1, p.producto, p.descripcion, " +
+                "COALESCE(min_precio.min_precio, p.precioventa) AS min_precio, " +
+                "COALESCE(max_precio.max_precio, p.precioventa) AS max_precio " +
+                "FROM productos p " +
+                "JOIN empresas e ON e.idempresa=p.idempresa " +
+                "JOIN rubros r ON r.idrubro=e.idrubro " +
+                "JOIN municipios m ON m.idmunicipio=e.idmunicipio " +
+                "LEFT JOIN ( " +
+                "    SELECT idproducto, MIN(precio) AS min_precio " +
+                "    FROM precios " +
+                "    GROUP BY idproducto " +
+                ") min_precio ON min_precio.idproducto = p.idproducto " +
+                "LEFT JOIN ( " +
+                "    SELECT idproducto, MAX(precio) AS max_precio " +
+                "    FROM precios " +
+                "    GROUP BY idproducto " +
+                ") max_precio ON max_precio.idproducto = p.idproducto " +
+                "WHERE p.estado=true AND CONCAT(p.producto, ' ', r.rubro, ' ', m.municipio, ' ', e.empresa) ILIKE '%' || #{buscar} || '%' " +
+                "<choose>" +
+                "  <when test='orden == \"asc\"'>ORDER BY p.producto ASC</when>" +
+                "  <when test='orden == \"desc\"'>ORDER BY p.producto DESC</when>" +
+                "  <when test='orden == \"reciente\"'>ORDER BY p.created_at DESC</when>" +
+                //"  <when test='orden == \"popular\"'>ORDER BY p.numeroVentas DESC</when>" +
+                "  <otherwise>ORDER BY p.producto ASC</otherwise>" +
+                "</choose>" +
+                "LIMIT #{cantidad} OFFSET #{pagina}" +
+                "</script>")
     @Results({
-        @Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
+        @Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato")),
+        @Result(property = "minPrecio", column = "min_precio"),
+        @Result(property = "maxPrecio", column = "max_precio")
     })
-    List<Productos> datoscat(String buscar, Integer pagina, Integer cantidad);
+    List<Productos> datoscat(String buscar, Integer pagina, Integer cantidad, String orden);
 
     // @Select("SELECT count(idproducto) FROM productos join empresas using(idempresa) join subrubros using(idsubrubro) join rubros using(idrubro) where cantidad>0 and concat(rubro,empresa,producto) ilike '%'||#{buscar}||'%' ")
-    @Select("SELECT count(p.idproducto) " +
-            "FROM productos p " +
-            "JOIN empresas e ON e.idempresa=p.idempresa " +
-            "JOIN subrubros sr ON sr.idsubrubro=e.idsubrubro " +
-            "JOIN rubros r ON r.idrubro=sr.idrubro " +
-            "WHERE  concat(p.producto, ' ', sr.subrubro, ' ', r.rubro, ' ', e.empresa) "+
-            "ILIKE '%'||#{buscar}||'%' ")
+    @Select("<script>" +
+                "SELECT count(p.idproducto) " +
+                "FROM productos p " +
+                "JOIN empresas e ON e.idempresa=p.idempresa " +
+                "JOIN rubros r ON r.idrubro=e.idrubro " +
+                "WHERE p.estado=true AND CONCAT(p.producto, ' ', r.rubro, ' ', e.empresa) ILIKE '%' || #{buscar} || '%' " +
+                "</script>")
     Integer cantidadcat(String buscar);
 
     // @Select("SELECT idproducto, idempresa, idempresa as ifore1, producto, productos.descripcion, preciocompra, precioventa, cantidad FROM productos join empresas using(idempresa) join subrubros using(idsubrubro) join rubros using(idrubro) WHERE cantidad>0 and idproducto=#{id} ")
@@ -117,6 +134,8 @@ public interface IProductosAod {
         @Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
     })
     Productos datocat(Long id);
+
+    
 
 }
 

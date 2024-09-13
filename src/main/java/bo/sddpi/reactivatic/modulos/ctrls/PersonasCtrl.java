@@ -21,10 +21,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import bo.sddpi.reactivatic.modulos.aods.IClientesAod;
 import bo.sddpi.reactivatic.modulos.aods.IPersonasAod;
 import bo.sddpi.reactivatic.modulos.aods.IRepresentantesAod;
 import bo.sddpi.reactivatic.modulos.aods.IUsuariosAod;
 import bo.sddpi.reactivatic.modulos.aods.IUsuariosrolesAod;
+import bo.sddpi.reactivatic.modulos.entidades.Clientes;
 import bo.sddpi.reactivatic.modulos.entidades.Personas;
 import bo.sddpi.reactivatic.modulos.entidades.Representantes;
 import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
@@ -48,6 +50,9 @@ public class PersonasCtrl {
 
     @Autowired
     IRepresentantesAod iRepresentantesAod;
+
+    @Autowired
+    IClientesAod iClientesAod;
 
     @Autowired
     ISubirarchivosServ iSubirarchivosServ;
@@ -109,6 +114,7 @@ public class PersonasCtrl {
                 Usuarios usuarionuevo = new Usuarios();
                 Personas personanuevo = new Personas();
                 Usuariosroles usuariorolnuevo = new Usuariosroles();
+                Clientes clientenuevo = new Clientes();
                 
                 personanuevo.setIdtipogenero(dato.getIdtipogenero());
                 personanuevo.setPrimerapellido(dato.getPrimerapellido());
@@ -137,6 +143,13 @@ public class PersonasCtrl {
                 
                 usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
                 usuariorolnuevo.setIdrol(dato.getRol().getIdrol());
+                iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
+
+                clientenuevo.setIdpersona(personanuevo.getIdpersona());
+                iClientesAod.adicionar(clientenuevo);
+
+                usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
+                usuariorolnuevo.setIdrol(3L);
                 iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
             } catch (DataAccessException e) {
                 mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
@@ -339,6 +352,7 @@ public class PersonasCtrl {
                 Personas personanuevo = new Personas();
                 Representantes representantenuevo = new Representantes();
                 Usuariosroles usuariorolnuevo = new Usuariosroles();
+                Clientes clientenuevo = new Clientes();
 
                 personanuevo.setIdtipogenero(dato.getIdtipogenero());
                 personanuevo.setPrimerapellido(dato.getPrimerapellido());
@@ -370,6 +384,13 @@ public class PersonasCtrl {
 
                 representantenuevo.setIdpersona(personanuevo.getIdpersona());
                 iRepresentantesAod.adicionar(representantenuevo);
+
+                clientenuevo.setIdpersona(personanuevo.getIdpersona());
+                iClientesAod.adicionar(clientenuevo);
+
+                usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
+                usuariorolnuevo.setIdrol(7L);
+                iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
 
             } catch (DataAccessException e) {
                 mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");

@@ -26,6 +26,10 @@ public interface ISubirarchivosServ {
 
     public Resource descargarimagenproducto(String archivo);
 
+    public String descargarnombreimagen(String id);
+
+    public Resource descargarimageneproductocarrito(String id, String archivo);
+
     public void cargarimagenempresa(Long id, MultipartFile archivo);
 
     public void redimensionarempresa(Long id);

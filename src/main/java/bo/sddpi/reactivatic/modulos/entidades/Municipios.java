@@ -12,6 +12,7 @@ public class Municipios implements Serializable{
 
     private Long idmunicipio;
     private String municipio;
+    private Long cantidad;
     private Boolean estado;
     private LocalDateTime created_at;
 }

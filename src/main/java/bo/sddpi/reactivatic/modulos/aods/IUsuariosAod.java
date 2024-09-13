@@ -122,7 +122,7 @@ public interface IUsuariosAod {
     @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, ur.idrol as ifore2, u.usuario, u.clave, u.estado, u.idcargo " +
         "FROM usuarios u " +
         "LEFT JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
-        "WHERE u.estado = TRUE AND u.idusuario = #{id}")
+        "WHERE u.estado = TRUE AND u.idusuario = #{id} LIMIT 1")
     @Results({
         @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
         @Result(property = "rol", column = "ifore2", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato")),
@@ -204,6 +204,9 @@ public interface IUsuariosAod {
     @Select("SELECT idusuario from usuarios where usuario=#{usuario}")
     Long verificausuarioregistro(String usuario);
 
+    @Select("SELECT idusuario from usuarios where usuario=#{usuario}")
+    Long verificaclienteregistro(String usuario);
+
     @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore5, r.rol " +
         "FROM usuarios u " +
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
@@ -220,13 +223,13 @@ public interface IUsuariosAod {
     })
     List<Usuarios> datosrepo(String buscar);
 
-    @Select("SELECT primerapellido as nombre, celular, correo, clave " +
-        "FROM usuarios " +
-        "JOIN personas using(idpersona) " +
-        "JOIN usuariosroles using(idusuario) " +
+    @Select("SELECT p.primerapellido, p.segundoapellido, p.primernombre, u.usuario, p.celular, p.direccion, p.correo, u.clave " +
+        "FROM usuarios u " +
+        "JOIN personas p ON p.idpersona=u.idpersona " +
+        "JOIN usuariosroles ur ON ur.idusuario=u.idusuario " +
         "WHERE idrol = 3 " +
         //"WHERE idrol = 7 " +
-        "AND celular::integer = #{celular} limit 1")
+        "AND u.usuario = #{usuario}")
     Procesar usuariocatalogo(Procesar dato);
 
     @Select("SELECT idusuario, usuarios.idpersona, usuarios.idpersona as ifore1, usuario, clave, usuarios.estado " +

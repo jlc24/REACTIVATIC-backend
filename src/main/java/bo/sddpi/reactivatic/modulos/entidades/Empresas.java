@@ -58,7 +58,9 @@ public class Empresas implements Serializable {
     private LocalDateTime created_at;
 
     private Representantes representante;
+    private Rubros rubro;
     private Subrubros subrubro;
+    private Municipios municipio;
     private Localidades localidad;
     private Asociaciones asociacion;
     private Usuarios usuario;

@@ -61,7 +61,7 @@ public class CarritosRepImpl implements ICarritosRep {
             for (Carritos _item : datos) {
                 Row fila = hoja.createRow(filaid++);
                 fila.createCell(0).setCellValue(id++);
-                fila.createCell(1).setCellValue(_item.getFecha().toString());
+                //fila.createCell(1).setCellValue(_item.getFecha().toString());
                 fila.createCell(2).setCellValue(_item.getIdcliente().toString());
                 fila.createCell(3).setCellValue(_item.getProducto().getProducto());
                 fila.createCell(4).setCellValue(_item.getProducto().getEmpresa().getEmpresa());
@@ -154,10 +154,10 @@ public class CarritosRepImpl implements ICarritosRep {
                 celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 tabla.addCell(celda);
 
-                celda = new PdfPCell(new Phrase(_item.getFecha().toString(), FONT_DATO_TABLA));
-                celda.setHorizontalAlignment(Element.ALIGN_CENTER);
-                celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                tabla.addCell(celda);
+                // celda = new PdfPCell(new Phrase(_item.getFecha().toString(), FONT_DATO_TABLA));
+                // celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+                // celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                // tabla.addCell(celda);
 
                 celda = new PdfPCell(new Phrase(_item.getIdcliente().toString(), FONT_DATO_TABLA));
                 celda.setHorizontalAlignment(Element.ALIGN_CENTER);

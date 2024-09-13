@@ -12,6 +12,9 @@ import bo.sddpi.reactivatic.modulos.entidades.Tamanos;
 @Mapper
 public interface ITamanosAod {
 
+    @Select("SELECT * FROM tamanos WHERE idtamano=#{idtamano}")
+    Tamanos dato(Long idtamano);
+
     @Select("SELECT * FROM tamanos WHERE idproducto=#{idproducto}")
     List<Tamanos> lista(Long idproducto);
 

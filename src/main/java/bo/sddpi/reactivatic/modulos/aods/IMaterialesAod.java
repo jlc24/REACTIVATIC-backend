@@ -12,6 +12,9 @@ import bo.sddpi.reactivatic.modulos.entidades.Materiales;
 @Mapper
 public interface IMaterialesAod {
 
+    @Select("SELECT * FROM materiales WHERE idmaterial=#{idmaterial}")
+    Materiales dato(Long idmaterial);
+
     @Select("SELECT * FROM materiales WHERE idproducto=#{idproducto}")
     List<Materiales> lista(Long idproducto);
 

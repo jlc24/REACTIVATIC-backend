@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -33,7 +35,17 @@ public interface IRubrosAod {
     @Select("SELECT idrubro, rubro FROM rubros WHERE estado=true AND rubro=#{rubro} ORDER BY rubro")
     List<Rubros> datoslrubro(String rubro);
 
-    @Select("select rubro, count(idproducto) as cantidad from rubros join subrubros using(idrubro) join empresas using(idsubrubro) left join productos using(idempresa) where cantidad>0 group by rubro order by rubro")
+    @Select("SELECT r.idrubro, r.rubro, COUNT(DISTINCT p.idproducto) AS cantidad " + 
+            "FROM productos p " + 
+            "JOIN empresas e ON p.idempresa = e.idempresa " + 
+            "JOIN rubros r ON e.idrubro = r.idrubro " + 
+            "GROUP BY r.idrubro, r.rubro " + 
+            "ORDER BY r.rubro;")
+    @Results({
+        @Result(property = "idrubro", column = "idrubro"),
+        @Result(property = "rubro", column = "rubro"),
+        @Result(property = "cantidad", column = "cantidad")
+    })
     List<Rubros> cantidadporrubro();
 
     @Update("UPDATE rubros SET estado=#{estado} WHERE idrubro=#{idrubro}")

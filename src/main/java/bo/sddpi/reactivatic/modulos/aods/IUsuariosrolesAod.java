@@ -18,7 +18,7 @@ public interface IUsuariosrolesAod {
     @Insert("insert into usuariosroles(idusuario, idrol) values (#{idusuario}, #{idrol})")
     void adicionarusuariorol(Usuariosroles usuariorol);
 
-    @Select("select idrol from usuariosroles where idusuario=#{idusuario}")
+    @Select("select idrol from usuariosroles where idusuario=#{idusuario} LIMIT 1")
     @Results(value = {
         @Result(property = "rol", column = "idrol", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato"))
     })
