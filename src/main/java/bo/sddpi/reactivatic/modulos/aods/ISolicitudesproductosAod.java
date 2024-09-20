@@ -13,9 +13,14 @@ import bo.sddpi.reactivatic.modulos.entidades.Solicitudesproductos;
 @Mapper
 public interface ISolicitudesproductosAod {
 
-    @Select("SELECT idsolicitudproducto, idsolicitud, idproducto, idproducto as ifore1, cantidad, precioventa, total FROM solicitudesproductos WHERE idsolicitud=#{idsolicitud}")
+    @Select("SELECT * FROM solicitudesproductos WHERE idsolicitud=#{idsolicitud}")
     @Results({
-        @Result(property = "producto", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IProductosAod.dato"))
+        @Result(property = "producto", column = "idproducto", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IProductosAod.dato")),
+        @Result(property = "precio", column = "idprecio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPreciosAod.dato")),
+        @Result(property = "color", column = "idcolor", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IColoresAod.dato")),
+        @Result(property = "material", column = "idmaterial", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IMaterialesAod.dato")),
+        @Result(property = "tamano", column = "idtamano", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITamanosAod.dato")),
+
     })
     List<Solicitudesproductos> datosl(Long idsolicitud);
 

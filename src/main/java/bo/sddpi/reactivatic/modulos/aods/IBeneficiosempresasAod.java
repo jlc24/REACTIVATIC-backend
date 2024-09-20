@@ -26,4 +26,5 @@ public interface IBeneficiosempresasAod {
     @Delete("DELETE FROM beneficiosempresas Where idbeneficio=#{idbeneficio} AND idempresa=#{idempresa}")
     void eliminarempresabeneficio(Long idbeneficio, Long idempresa);
 
+
 }

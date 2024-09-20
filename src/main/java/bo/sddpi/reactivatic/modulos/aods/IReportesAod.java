@@ -18,4 +18,7 @@ public interface IReportesAod {
 
     @Select("select idproducto as id, producto as entidad, count(idproducto) as cantidad from solicitudesproductos join productos using(idproducto) group by idproducto, producto order by count(idproducto) desc;")
     List<Reportes> productosmasvendidos();
+
+    @Select("SELECT EXTRACT(YEAR FROM fechareg) AS entidad, COUNT(*) AS cantidad FROM empresas GROUP BY entidad ORDER BY entidad;")
+    List<Reportes> empresasporgestion();
 }

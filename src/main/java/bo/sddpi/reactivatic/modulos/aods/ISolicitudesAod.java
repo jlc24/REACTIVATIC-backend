@@ -26,21 +26,39 @@ public interface ISolicitudesAod {
     @Select("SELECT count(idsolicitud) FROM solicitudes join clientes using(idcliente) join personas using(idpersona) join usuarios using(idpersona) where idusuario=#{idusuario} ")
     Integer cantidad(Long idusuario);
 
-    @Select("SELECT idsolicitud, idsolicitud as idfore2, idempresa, idcliente as idfore1, idcliente, solicitud, fecha, hora, solicitudes.estado FROM solicitudes join empresas using(idempresa) join representantes using(idrepresentante) join personas using(idpersona) join usuarios using(idpersona) where idusuario=#{idusuario} ORDER BY fecha desc, hora desc LIMIT #{cantidad} OFFSET #{pagina} ")
+    @Select("SELECT s.idsolicitud, s.idsolicitud as ifore1, s.idcliente, s.solicitud, s.idempresa, s.estado, s.created_at, " +
+            "(SELECT COUNT(*) FROM solicitudesproductos sp WHERE sp.idsolicitud = s.idsolicitud) AS cantidad_productos " +
+            "FROM solicitudes s " +
+            "JOIN empresas e using(idempresa) " +
+            "JOIN representantes r using(idrepresentante) " +
+            "JOIN personas p using(idpersona) " +
+            "JOIN usuarios u using(idpersona) " +
+            "WHERE u.idusuario=#{idusuario} " +
+            "ORDER BY s.created_at DESC " +
+            "LIMIT #{cantidad} OFFSET #{pagina} ")
     @Results({
-        @Result(property = "cliente", column = "idfore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IClientesAod.dato")),
-        @Result(property = "solicitudproductos", column = "idfore2", many = @Many(select = "bo.sddpi.reactivatic.modulos.aods.ISolicitudesproductosAod.datosl" ))
+        @Result(property = "cliente", column = "idcliente", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IClientesAod.dato")),
+        @Result(property = "cantidadProductos", column = "cantidad_productos"),
+        @Result(property = "solicitudproductos", column = "ifore1", many = @Many(select = "bo.sddpi.reactivatic.modulos.aods.ISolicitudesproductosAod.datosl" ))
     })
     List<Solicitudes> datose(Long idusuario, Integer pagina, Integer cantidad);
 
-    @Select("SELECT count(idsolicitud) FROM solicitudes join empresas using(idempresa) join representantes using(idrepresentante) join personas using(idpersona) join usuarios using(idpersona) where idusuario=#{idusuario} ")
+    @Select("SELECT count(s.idsolicitud) " +
+            "FROM solicitudes s " +
+            "JOIN empresas e using(idempresa) " +
+            "JOIN representantes r using(idrepresentante) " +
+            "JOIN personas p using(idpersona) " +
+            "JOIN usuarios u using(idpersona) " +
+            "WHERE u.idusuario=#{idusuario} ")
     Integer cantidade(Long idusuario);
 
     @Select("select * from procesasolicitud(#{idcliente}, #{idusuario})")
     Integer procesasolicitud(Long idcliente, Long idusuario);
 
-    @Update("update solicitudes set estado=true where idsolicitud = #{idsolicitud}")
+    @Update("UPDATE solicitudes SET estado=true WHERE idsolicitud = #{idsolicitud}")
     void actualizarestado(Long idsolicitud);
+    @Update("UPDATE solicitudesproductos SET estado=true WHERE idsolicitud = #{idsolicitud}")
+    void actualizarestadoproductos(Long idsolicitud);
 
     @Select("select distinct correo as correo from carritos join productos using(idproducto) join empresas using(idempresa) where idcliente=#{idcliente}")
     List<Empresas> buscarporempresas(Long idcliente);

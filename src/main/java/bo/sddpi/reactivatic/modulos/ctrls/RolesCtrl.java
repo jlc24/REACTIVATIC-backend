@@ -119,6 +119,20 @@ public class RolesCtrl {
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 
+    @GetMapping("/dpeic")
+    public ResponseEntity<?> listardpeic() {
+        List<Roles> roles;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            roles = irolesAod.listardpeic();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(roles, HttpStatus.OK);
+    }
+
     @GetMapping("/reactivatic")
     public ResponseEntity<?> listarreactivatic() {
         List<Roles> roles;

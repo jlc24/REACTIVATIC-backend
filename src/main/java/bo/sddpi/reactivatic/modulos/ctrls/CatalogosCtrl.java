@@ -27,6 +27,7 @@ import bo.sddpi.reactivatic.modulos.aods.IAtributosAod;
 import bo.sddpi.reactivatic.modulos.aods.ICarritosAod;
 import bo.sddpi.reactivatic.modulos.aods.IClientesAod;
 import bo.sddpi.reactivatic.modulos.aods.IColoresAod;
+import bo.sddpi.reactivatic.modulos.aods.IEmpresasAod;
 import bo.sddpi.reactivatic.modulos.aods.IMaterialesAod;
 import bo.sddpi.reactivatic.modulos.aods.IMunicipiosAod;
 import bo.sddpi.reactivatic.modulos.aods.IPersonasAod;
@@ -80,6 +81,9 @@ public class CatalogosCtrl {
 
     @Autowired
     IAtributosAod iAtributosAod;
+
+    @Autowired
+    IEmpresasAod iEmpresasAod;
 
     @Autowired
     IMunicipiosAod iMunicipiosAod;
@@ -147,6 +151,21 @@ public class CatalogosCtrl {
         }
         return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
     }
+
+    @GetMapping("/destacados")
+    ResponseEntity<?> destacados(){
+        List<Productos> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iProductosAod.productosmasvendidos();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Productos>>(datos, HttpStatus.OK);
+    }
+    
 
     @GetMapping(value = "/{id}")
     ResponseEntity<?> dato(@PathVariable Long id) {
@@ -347,124 +366,150 @@ public class CatalogosCtrl {
         return new ResponseEntity<List<Atributos>>(atributos, HttpStatus.OK);
     }
 
-    // @PostMapping
-    // ResponseEntity<?> fprocesar(@RequestBody Procesar dato) {
-    //     Map<String, Object> mensajes = new HashMap<>();
-    //     try {
-    //         Long idusuario = iUsuariosAod.verificausuarioregistro(dato.getCelular().toString());
-    //         if (idusuario == null) {
-    //             Usuarios usuarionuevo = new Usuarios();
-    //             Personas personanuevo = new Personas();
-    //             Clientes clientenuevo = new Clientes();
-    //             personanuevo.setPrimerapellido(dato.getNombre());
-    //             personanuevo.setCelular(dato.getCelular().toString());
-    //             personanuevo.setCorreo(dato.getCorreo());
-    //             iPersonasAod.adicionar(personanuevo);
-    //             usuarionuevo.setUsuario(dato.getCelular().toString());
-    //             usuarionuevo.setClave(dato.getCelular().toString());
-    //             usuarionuevo.setEstado(true);
-    //             usuarionuevo.setIdpersona(personanuevo.getIdpersona());
-    //             iUsuariosAod.adicionar(usuarionuevo);
-    //             Usuariosroles usuariorolnuevo = new Usuariosroles();
-    //             usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
-    //             usuariorolnuevo.setIdrol(7L);
-    //             iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
-    //             clientenuevo.setIdpersona(personanuevo.getIdpersona());
-    //             iClientesAod.adicionar(clientenuevo);
-    //             iSolicitudesAod.procesasolicitud(dato.getIdcliente(), usuarionuevo.getIdusuario());
-    //             List<Carritos> datoscat = null;
-    //             try {
-    //                 List<Empresas> enviar = iSolicitudesAod.buscarporempresas(dato.getIdcliente());
-    //                 for (Empresas empresa : enviar) {
-    //                     if (empresa.getCorreo() != null) {
-    //                         try {
-    //                             Context context = new Context();
-    //                             context.setVariable("nombre", dato.getNombre());
-    //                             context.setVariable("empresa", empresa.getEmpresa());
-    //                             context.setVariable("logo", "logo");
-    //                             String contenido = plantilla.process("correoempresa", context);
-    //                             Correos correo = new Correos();
-    //                             correo.setCorreo(empresa.getCorreo());
-    //                             correo.setTema("Solicitud de productos");
-    //                             correo.setContenido(contenido);
-    //                             iCorreosServ.enviarcorreo(correo);
-    //                         } catch (Exception e) {
-    //                             System.out.println("Error: "+e.toString());
-    //                         }
-    //                     }
-    //                 }
-    //             } catch (Exception e) {
-    //                 System.out.println("Error: "+e.toString());
-    //             }
-    //             if (dato.getCorreo() != null) {
-    //                 try {
-    //                     datoscat = iCarritosAod.datosl(dato.getIdcliente());
-    //                     Context context = new Context();
-    //                     context.setVariable("nombre", dato.getNombre());
-    //                     context.setVariable("logo", "logo");
-    //                     context.setVariable("datoscat", datoscat);
-    //                     String contenido = plantilla.process("correocliente", context);
-    //                     Correos correo = new Correos();
-    //                     correo.setCorreo(dato.getCorreo());
-    //                     correo.setTema("Solicitud de productos");
-    //                     correo.setContenido(contenido);
-    //                     iCorreosServ.enviarcorreo(correo);
-    //                 } catch (Exception e) {
-    //                     System.out.println("Error: "+e.toString());
-    //                 }
-    //             }
-    //         } else {
-    //             iSolicitudesAod.procesasolicitud(dato.getIdcliente(), idusuario);
-    //             List<Carritos> datoscat = null;
-    //             try {
-    //                 List<Empresas> enviar = iSolicitudesAod.buscarporempresas(dato.getIdcliente());
-    //                 for (Empresas empresa : enviar) {
-    //                     if (empresa.getCorreo() !=null) {
-    //                         try {
-    //                             Context context = new Context();
-    //                             context.setVariable("nombre", dato.getNombre());
-    //                             context.setVariable("empresa", empresa.getEmpresa());
-    //                             context.setVariable("logo", "logo");
-    //                             String contenido = plantilla.process("correoempresa", context);
-    //                             Correos correo = new Correos();
-    //                             correo.setCorreo(empresa.getCorreo());
-    //                             correo.setTema("Solicitud de productos");
-    //                             correo.setContenido(contenido);
-    //                             iCorreosServ.enviarcorreo(correo);
-    //                         } catch (Exception e) {
-    //                             System.out.println("Error: "+e.toString());
-    //                         }
-    //                     }
-    //                 }
-    //             } catch (Exception e) {
-    //                 System.out.println("Error: "+e.toString());
-    //             }
-    //             if (dato.getCorreo() != null) {
-    //                 try {
-    //                     datoscat = iCarritosAod.datosl(dato.getIdcliente());
-    //                     Context context = new Context();
-    //                     context.setVariable("nombre", dato.getNombre());
-    //                     context.setVariable("logo", "logo");
-    //                     context.setVariable("datoscat", datoscat);
-    //                     String contenido = plantilla.process("correocliente", context);
-    //                     Correos correo = new Correos();
-    //                     correo.setCorreo(dato.getCorreo());
-    //                     correo.setTema("Solicitud de productos");
-    //                     correo.setContenido(contenido);
-    //                     iCorreosServ.enviarcorreo(correo);
-    //                 } catch (Exception e) {
-    //                     System.out.println("Error: "+e.toString());
-    //                 }
-    //             }
-    //         }
-    //     } catch (DataAccessException e) {
-    //         mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-    //         mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
-    //         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-    //     }
-    //     mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
-    //     return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
-    // }
+    @GetMapping(value = "/empresa/{id}")
+    ResponseEntity<?> datoempresa(@PathVariable Long id) {
+        Empresas dato = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            dato = iEmpresasAod.dato(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (dato==null) {
+            mensajes.put("mensaje", "El id: ".concat(id.toString()).concat(" no existe en la Base de Datos"));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<Empresas>(dato, HttpStatus.OK);
+    }
+
+    @PostMapping
+    ResponseEntity<?> fprocesar(@RequestBody Procesar dato) {
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            Long idusuario = iUsuariosAod.verificausuarioregistro(dato.getUsuario());
+            if (idusuario == null) {
+                Usuarios usuarionuevo = new Usuarios();
+                Personas personanuevo = new Personas();
+                Clientes clientenuevo = new Clientes();
+                Usuariosroles usuariorolnuevo = new Usuariosroles();
+
+                personanuevo.setPrimerapellido(dato.getPrimerapellido());
+                personanuevo.setSegundoapellido(dato.getSegundoapellido());
+                personanuevo.setPrimernombre(dato.getPrimernombre());
+                personanuevo.setCelular(dato.getCelular().toString());
+                personanuevo.setDireccion(dato.getDireccion());
+                personanuevo.setCorreo(dato.getCorreo());
+                iPersonasAod.adicionar(personanuevo);
+
+                clientenuevo.setIdpersona(personanuevo.getIdpersona());
+                iClientesAod.adicionar(clientenuevo);
+
+                usuarionuevo.setUsuario(dato.getUsuario());
+                usuarionuevo.setClave(dato.getClave());
+                usuarionuevo.setEstado(true);
+                usuarionuevo.setIdpersona(personanuevo.getIdpersona());
+                iUsuariosAod.adicionar(usuarionuevo);
+                
+                usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
+                usuariorolnuevo.setIdrol(7L);
+                iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
+
+                iSolicitudesAod.procesasolicitud(dato.getIdcliente(), usuarionuevo.getIdusuario());
+                List<Carritos> datoscat = null;
+                try {
+                    List<Empresas> enviar = iSolicitudesAod.buscarporempresas(dato.getIdcliente());
+                    for (Empresas empresa : enviar) {
+                        if (empresa.getCorreo() != null) {
+                            try {
+                                Context context = new Context();
+                                context.setVariable("nombre", dato.getPrimernombre());
+                                context.setVariable("empresa", empresa.getEmpresa());
+                                context.setVariable("logo", "logo");
+                                String contenido = plantilla.process("correoempresa", context);
+                                Correos correo = new Correos();
+                                correo.setCorreo(empresa.getCorreo());
+                                correo.setTema("Solicitud de productos");
+                                correo.setContenido(contenido);
+                                iCorreosServ.enviarcorreo(correo);
+                            } catch (Exception e) {
+                                System.out.println("Error: "+e.toString());
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error: "+e.toString());
+                }
+                if (dato.getCorreo() != null) {
+                    try {
+                        datoscat = iCarritosAod.datosl(dato.getIdcliente());
+                        Context context = new Context();
+                        context.setVariable("nombre", dato.getPrimernombre());
+                        context.setVariable("logo", "logo");
+                        context.setVariable("datoscat", datoscat);
+                        String contenido = plantilla.process("correocliente", context);
+                        Correos correo = new Correos();
+                        correo.setCorreo(dato.getCorreo());
+                        correo.setTema("Solicitud de productos");
+                        correo.setContenido(contenido);
+                        iCorreosServ.enviarcorreo(correo);
+                    } catch (Exception e) {
+                        System.out.println("Error: "+e.toString());
+                    }
+                }
+            } else {
+                iSolicitudesAod.procesasolicitud(dato.getIdcliente(), idusuario);
+                List<Carritos> datoscat = null;
+                try {
+                    List<Empresas> enviar = iSolicitudesAod.buscarporempresas(dato.getIdcliente());
+                    for (Empresas empresa : enviar) {
+                        if (empresa.getCorreo() !=null) {
+                            try {
+                                Context context = new Context();
+                                context.setVariable("nombre", dato.getPrimernombre());
+                                context.setVariable("empresa", empresa.getEmpresa());
+                                context.setVariable("logo", "logo");
+                                String contenido = plantilla.process("correoempresa", context);
+                                Correos correo = new Correos();
+                                correo.setCorreo(empresa.getCorreo());
+                                correo.setTema("Solicitud de productos");
+                                correo.setContenido(contenido);
+                                iCorreosServ.enviarcorreo(correo);
+                            } catch (Exception e) {
+                                System.out.println("Error: "+e.toString());
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error: "+e.toString());
+                }
+                if (dato.getCorreo() != null) {
+                    try {
+                        datoscat = iCarritosAod.datosl(dato.getIdcliente());
+                        Context context = new Context();
+                        context.setVariable("nombre", dato.getPrimernombre());
+                        context.setVariable("logo", "logo");
+                        context.setVariable("datoscat", datoscat);
+                        String contenido = plantilla.process("correocliente", context);
+                        Correos correo = new Correos();
+                        correo.setCorreo(dato.getCorreo());
+                        correo.setTema("Solicitud de productos");
+                        correo.setContenido(contenido);
+                        iCorreosServ.enviarcorreo(correo);
+                    } catch (Exception e) {
+                        System.out.println("Error: "+e.toString());
+                    }
+                }
+            }
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
 
     @PostMapping("/usuariocatalogo")
     ResponseEntity<?> usuariocatalogo(@RequestBody Procesar dato) {
@@ -501,5 +546,46 @@ public class CatalogosCtrl {
         
         // Retorna el objeto Procesar si la autenticación es exitosa
         return new ResponseEntity<Procesar>(datom, HttpStatus.OK);
+    }
+
+    @PostMapping("/registrar")
+    ResponseEntity<?> registrar(@RequestBody Procesar dato) {
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            Long idusuario = iUsuariosAod.verificausuarioregistro(dato.getUsuario());
+            if (idusuario == null) {
+                Personas personanuevo = new Personas();
+                Clientes clientenuevo = new Clientes();
+                Usuarios usuarionuevo = new Usuarios();
+                Usuariosroles usuariorolnuevo = new Usuariosroles();
+
+                personanuevo.setPrimerapellido(dato.getPrimerapellido());
+                personanuevo.setSegundoapellido(dato.getSegundoapellido());
+                personanuevo.setPrimernombre(dato.getPrimernombre());
+                personanuevo.setCelular(dato.getCelular().toString());
+                personanuevo.setDireccion(dato.getDireccion());
+                personanuevo.setCorreo(dato.getCorreo());
+                iPersonasAod.adicionar(personanuevo);
+
+                clientenuevo.setIdpersona(personanuevo.getIdpersona());
+                iClientesAod.adicionar(clientenuevo);
+
+                usuarionuevo.setUsuario(dato.getUsuario());
+                usuarionuevo.setClave(dato.getClave());
+                usuarionuevo.setEstado(true);
+                usuarionuevo.setIdpersona(personanuevo.getIdpersona());
+                iUsuariosAod.adicionar(usuarionuevo);
+                
+                usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
+                usuariorolnuevo.setIdrol(7L);
+                iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
+            }
+        }catch(DataAccessException e){
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Se ha registrado correctamente el dato en la Base de Datos");
+        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 }

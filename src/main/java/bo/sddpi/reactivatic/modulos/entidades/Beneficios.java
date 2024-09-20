@@ -1,7 +1,6 @@
 package bo.sddpi.reactivatic.modulos.entidades;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 import lombok.Data;
@@ -11,11 +10,22 @@ public class Beneficios implements Serializable {
     
     private static final long serialVersionUID = 1L;
 
-    private Long idbeneficios;
+    private Long idbeneficio;
     private String beneficio;
-    private Integer participacion;
-    private Date fecha;
-    private String lugar;
+    private String descripcion;
+    private Long idtipobeneficio;
+    private Long idmunicipio;
+    private String direccion;
+    private LocalDateTime fechainicio;
+    private LocalDateTime fechafin;
+    private Long idcapacitador;
+    private Integer capacidad;
+    private Long idusuario;
     private Boolean estado;
     private LocalDateTime created_at;
+
+    private Tiposbeneficios tipobeneficio;
+    private Municipios municipio;
+    private Usuarios capacitador;
+    private Usuarios usuario;
 }

@@ -11,10 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import bo.sddpi.reactivatic.modulos.aods.IBeneficiosAod;
+import bo.sddpi.reactivatic.modulos.aods.IUsuariosAod;
 import bo.sddpi.reactivatic.modulos.entidades.Beneficios;
 
 @RestController
@@ -24,21 +27,32 @@ public class BeneficiosCtrl {
     @Autowired
     private IBeneficiosAod ibeneficiosAod;
 
+    @Autowired
+    private IUsuariosAod iUsuariosAod;
+
     //BUSCAR BENEFICIOS->PAGINACION->CANTIDAD
     @GetMapping
     ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
             @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
-            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad,
+            @RequestParam(value = "rol", defaultValue = "") String rol) {
         List<Beneficios> datos = null;
         Map<String, Object> mensajes = new HashMap<>();
         int nropagina;
+        Long id = null;
         try {
             if ((pagina-1) * cantidad < 0) {
                 nropagina = 0;
             }else{
                 nropagina = (pagina-1) * cantidad;
             }
-            datos = ibeneficiosAod.buscar(buscar, cantidad, nropagina);
+            if (rol.equals("admin")) {
+                id = null;
+            }else{
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                id = Long.parseLong(auth.getName());
+            }
+            datos = ibeneficiosAod.buscar(id, buscar, cantidad, nropagina);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en al base de datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -48,11 +62,19 @@ public class BeneficiosCtrl {
     }
 
     @GetMapping(value = ("/cantidad"))
-    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar){
+    ResponseEntity<?> cantidad(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                @RequestParam(value = "rol", defaultValue = "") String rol){
         Integer cantidad = null;
         Map<String, Object> mensajes = new HashMap<>();
+        Long id = null;
         try{
-            cantidad = ibeneficiosAod.cantidad(buscar);
+            if (rol.equals("admin")) {
+                id = null;
+            }else{
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                id = Long.parseLong(auth.getName());
+            }
+            cantidad = ibeneficiosAod.cantidad(id, buscar);
         }catch(DataAccessException e){
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -101,6 +123,9 @@ public class BeneficiosCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
         }
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            Long idusuario = Long.parseLong(auth.getName());
+            beneficio.setIdusuario(idusuario);
             ibeneficiosAod.insertar(beneficio);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");

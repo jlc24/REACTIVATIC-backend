@@ -18,7 +18,7 @@ public interface IMunicipiosAod {
     @Select("SELECT count(idmunicipio) FROM municipios where municipio ilike '%'||#{buscar}||'%' ")
     Integer cantidad(String buscar);
 
-    @Select("SELECT idmunicipio, municipio FROM municipios where idmunicipio=#{id} ")
+    @Select("SELECT * FROM municipios where idmunicipio=#{id} ")
     Municipios dato(Long id);
 
     @Insert("insert into municipios(municipio) values (#{municipio})")

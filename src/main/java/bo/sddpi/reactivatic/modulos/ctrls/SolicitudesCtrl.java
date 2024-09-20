@@ -133,6 +133,7 @@ public class SolicitudesCtrl {
         Map<String, Object> mensajes = new HashMap<>();
         try {
             iSolicitudesAod.actualizarestado(dato.getIdsolicitud());
+            iSolicitudesAod.actualizarestadoproductos(dato.getIdsolicitud());
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

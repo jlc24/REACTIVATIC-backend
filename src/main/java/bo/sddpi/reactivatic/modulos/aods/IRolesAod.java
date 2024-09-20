@@ -21,20 +21,20 @@ public interface IRolesAod {
     @Select("SELECT count(idrol) FROM roles WHERE nombrerol ilike '%'||#{buscar}||'%' OR rol ilike '%'||#{buscar}||'%'")
     Integer cantidad(String buscar);
 
-    @Select("SELECT * FROM roles WHERE idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
-    //@Select("SELECT * FROM roles WHERE idrol = 1 OR idrol = 2 OR idrol = 3 OR idrol = 4 or idrol = 5")
+    @Select("SELECT * FROM roles WHERE idrol NOT IN (2, 3)")
+    //@Select("SELECT * FROM roles WHERE idrol NOT IN (6, 7)")
     List<Roles> listaradmin();
 
-    @Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
-    //@Select("SELECT * FROM roles WHERE idrol = 2 OR idrol = 3 OR idrol = 4 or idrol = 5")
+    @Select("SELECT * FROM roles WHERE idrol NOT IN (1, 2, 3)")
+    //@Select("SELECT * FROM roles WHERE idrol NOT IN (1, 6, 7, 8)")
     List<Roles> listarsddpi();
 
     @Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7")
-    //@Select("SELECT * FROM roles WHERE idrol = 3 OR idrol = 4 or idrol = 5")
+    //@Select("SELECT * FROM roles WHERE idrol NOT IN (1, 2, 6, 7, 8)")
     List<Roles> listardpeic();
 
-    @Select("SELECT * FROM roles WHERE idrol = 4 OR idrol = 6")
-    //@Select("SELECT * FROM roles WHERE idrol = 4 or idrol = 5")
+    @Select("SELECT * FROM roles WHERE idrol NOT IN (1, 2, 3, 5, 7)")
+    //@Select("SELECT * FROM roles WHERE idrol NOT IN (1, 2, 3, 6, 7)")
     List<Roles> listarreactivatic();
 
     @Insert("INSERT INTO roles (rol, nombrerol) VALUES (#{rol}, #{nombrerol})")

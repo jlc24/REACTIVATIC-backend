@@ -22,9 +22,7 @@ public interface IEmpresasAod {
     List<Empresas> lista();
     
     @Select("SELECT * FROM empresas e " +
-        //"JOIN subrubros ur ON e.idsubrubro = ur.idsubrubro " +
         "JOIN rubros r ON e.idrubro = r.idrubro " +
-        //"JOIN localidades l ON e.idlocalidad = l.idlocalidad " +
         "JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
         "LEFT JOIN asociaciones a ON e.idasociacion = a.idasociacion " +
         "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
@@ -43,9 +41,7 @@ public interface IEmpresasAod {
     List<Empresas> datos(String buscar, String rubro, Integer pagina, Integer cantidad);
 
     @Select("SELECT count(idempresa) FROM empresas e " +
-        //"JOIN subrubros ur ON e.idsubrubro = ur.idsubrubro " +
         "JOIN rubros r ON e.idrubro = r.idrubro " +
-        //"JOIN localidades l ON e.idlocalidad = l.idlocalidad " +
         "JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
         "LEFT JOIN asociaciones a ON e.idasociacion = a.idasociacion " +
         "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +

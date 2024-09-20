@@ -67,6 +67,10 @@ public class UsuariosCtrl {
         return new ResponseEntity<List<Usuarios>>(datos, HttpStatus.OK);
     }
 
+    @GetMapping("/lista")
+    public ResponseEntity<?> lista() {
+        return obtenerDatos(() -> iUsuariosAod.lista());
+    }
     @GetMapping
     public ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
                             @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,

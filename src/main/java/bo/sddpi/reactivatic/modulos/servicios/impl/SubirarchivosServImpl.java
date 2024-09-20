@@ -68,12 +68,12 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
             Files.createDirectories(rutaRepresentantes);
             Files.createDirectories(rutaEmpresas);
             Files.createDirectories(rutaProductos);
-            boolean canRead = Files.isReadable(rutaUsuarios);
-            boolean canWrite = Files.isWritable(rutaUsuarios);
+            // boolean canRead = Files.isReadable(rutaUsuarios);
+            // boolean canWrite = Files.isWritable(rutaUsuarios);
 
-            System.out.println("Permisos para el directorio:");
-            System.out.println("Readable: " + canRead);
-            System.out.println("Writable: " + canWrite);
+            // System.out.println("Permisos para el directorio:");
+            // System.out.println("Readable: " + canRead);
+            // System.out.println("Writable: " + canWrite);
 
             if (!os.contains("win")) {
                 Files.setPosixFilePermissions(rutaUsuarios, PosixFilePermissions.fromString("rwxr-xr-x"));

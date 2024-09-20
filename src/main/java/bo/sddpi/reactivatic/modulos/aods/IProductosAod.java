@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import bo.sddpi.reactivatic.modulos.entidades.Productos;
+import bo.sddpi.reactivatic.modulos.entidades.Reportes;
 
 @Mapper
 public interface IProductosAod {
@@ -135,7 +136,29 @@ public interface IProductosAod {
     })
     Productos datocat(Long id);
 
-    
+    @Select("SELECT p.idproducto, p.producto, COUNT(p.idproducto) as cantidad, " + 
+            "COALESCE(min_precio.min_precio, p.precioventa) AS min_precio, " +
+            "COALESCE(max_precio.max_precio, p.precioventa) AS max_precio " +
+            "FROM solicitudesproductos sp " + 
+            "JOIN productos p using(idproducto) " + 
+            "LEFT JOIN ( " +
+                "    SELECT idproducto, MIN(precio) AS min_precio " +
+                "    FROM precios " +
+                "    GROUP BY idproducto " +
+                ") min_precio ON min_precio.idproducto = p.idproducto " +
+                "LEFT JOIN ( " +
+                "    SELECT idproducto, MAX(precio) AS max_precio " +
+                "    FROM precios " +
+                "    GROUP BY idproducto " +
+                ") max_precio ON max_precio.idproducto = p.idproducto " +
+            "GROUP BY p.idproducto, p.producto, min_precio, max_precio " + 
+            "ORDER BY count(p.idproducto) DESC LIMIT 8;")
+    @Results({
+        //@Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
+        @Result(property = "minPrecio", column = "min_precio"),
+        @Result(property = "maxPrecio", column = "max_precio")
+    })
+    List<Productos> productosmasvendidos();
 
 }
 

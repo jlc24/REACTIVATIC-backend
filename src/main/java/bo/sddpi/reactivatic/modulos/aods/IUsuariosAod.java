@@ -2,15 +2,7 @@ package bo.sddpi.reactivatic.modulos.aods;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.One;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import bo.sddpi.reactivatic.modulos.entidades.Procesar;
 import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
@@ -18,20 +10,31 @@ import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 @Mapper
 public interface IUsuariosAod {
 
+    @Select("SELECT u.idusuario, p.idpersona, p.primerapellido, p.segundoapellido, p.primernombre " +
+            "FROM usuarios u " +
+            "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
+            "JOIN personas p ON u.idpersona = p.idpersona " +
+            "WHERE ur.idrol NOT IN (2, 3) " +
+            //"WHERE ur.idrol NOT IN (6, 7) " +
+            "ORDER BY p.primerapellido DESC ")
+    @Results({
+        @Result(property = "persona", column = "idpersona", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
+    })
+    List<Usuarios> lista();
+
     @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, u.usuario, u.clave, u.estado, ur.idrol as ifore5, r.rol " +
         "FROM usuarios u " +
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE (ur.idrol = 1 OR ur.idrol = 4 OR ur.idrol = 5 OR ur.idrol = 6 OR ur.idrol = 7) " +
-        //"WHERE (ur.idrol = 1 OR ur.idrol = 2 OR ur.idrol = 3 OR ur.idrol = 4 OR ur.idrol = 5) " +
+        "WHERE ur.idrol NOT IN (2, 3) " +
+        //"WHERE ur.idrol NOT IN (6, 7) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.created_at DESC " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
     @Results({
         @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
         @Result(property = "rol", column = "ifore5", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato")),
-        @Result(property = "tipogenero", column = "idtipogenero", one = @One(select = "bo.sddpi.rectivatic.modulos.aods.ITiposgenerosAod.dato"))
     })
     List<Usuarios> datos(String buscar, Integer pagina, Integer cantidad);
 
@@ -72,8 +75,8 @@ public interface IUsuariosAod {
         "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
         "JOIN personas p ON u.idpersona = p.idpersona " +
         "JOIN roles r ON ur.idrol = r.idrol " +
-        "WHERE (ur.idrol = 4 OR ur.idrol = 6) " +
-        //"WHERE (ur.idrol = 4 OR ur.idrol = 5) " +
+        "WHERE ur.idrol NOT IN (1, 2, 3, 5, 7) " +
+        //"WHERE ur.idrol NOT IN (1, 2, 3, 6, 7) " +
         "AND concat(u.usuario, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.primernombre) ILIKE '%'||#{buscar}||'%' " +
         "ORDER BY u.usuario " +
         "LIMIT #{cantidad} OFFSET #{pagina}")
@@ -87,8 +90,8 @@ public interface IUsuariosAod {
         "FROM usuarios " + 
         "JOIN usuariosroles using(idusuario) " + 
         "JOIN personas using(idpersona) " + 
-        "WHERE (idrol = 1 OR idrol = 4 OR idrol = 5 OR idrol = 6 OR idrol = 7) " +
-        //"WHERE (idrol = 1 OR idrol = 2 OR idrol = 3 OR idrol = 4 OR idrol = 5) " +
+        "WHERE idrol NOT IN (2, 3) " +
+        //"WHERE idrol NOT IN (6, 7) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidad(String buscar);
 
@@ -114,8 +117,8 @@ public interface IUsuariosAod {
         "FROM usuarios " +
         "JOIN usuariosroles using(idusuario) " +
         "JOIN personas using(idpersona) " +
-        "WHERE (idrol = 4 OR idrol = 6) " +
-        //"WHERE (idrol = 4 OR idrol = 5) " +
+        "WHERE idrol NOT IN (1, 2, 3, 5, 7) " +
+        //"WHERE idrol NOT IN (1, 2, 3, 6, 7) " +
         "AND concat(usuario,' ',primerapellido,' ',segundoapellido,' ',primernombre,' ',segundonombre) ilike '%'||#{buscar}||'%' ")
     Integer cantidadreactivatic(String buscar);
 

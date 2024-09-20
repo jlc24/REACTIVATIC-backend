@@ -62,7 +62,7 @@ public class SolicitudesRepImpl implements ISolicitudesRep {
             for (Solicitudes _item : datos) {
                 Row fila = hoja.createRow(filaid++);
                 fila.createCell(0).setCellValue(id++);
-                fila.createCell(1).setCellValue(_item.getFecha().toString());
+                //fila.createCell(1).setCellValue(_item.getFecha().toString());
                 //fila.createCell(2).setCellValue(_item.getCliente().getPersona().getPrimerapellido());
                 fila.createCell(3).setCellValue(_item.getEmpresa().getEmpresa());
                 if (_item.getEstado()) {
@@ -75,13 +75,13 @@ public class SolicitudesRepImpl implements ISolicitudesRep {
                 fila.createCell(2).setCellValue("Cantidad");
                 fila.createCell(3).setCellValue("Precio de venta");
                 fila.createCell(4).setCellValue("Total");
-                for (Solicitudesproductos _itemp : _item.getSolicitudproductos()) {
-                    fila = hoja.createRow(filaid++);
-                    fila.createCell(1).setCellValue(_itemp.getProducto().getProducto());
-                    fila.createCell(2).setCellValue(_itemp.getCantidad().toString());
-                    fila.createCell(3).setCellValue(_itemp.getPrecioventa().toString());
-                    fila.createCell(4).setCellValue(_itemp.getTotal().toString());
-                }
+                // for (Solicitudesproductos _itemp : _item.getSolicitudproductos()) {
+                //     fila = hoja.createRow(filaid++);
+                //     fila.createCell(1).setCellValue(_itemp.getProducto().getProducto());
+                //     fila.createCell(2).setCellValue(_itemp.getCantidad().toString());
+                //     fila.createCell(3).setCellValue(_itemp.getPrecioventa().toString());
+                //     fila.createCell(4).setCellValue(_itemp.getTotal().toString());
+                // }
 
             }
             libro.write(salida);
@@ -172,10 +172,10 @@ public class SolicitudesRepImpl implements ISolicitudesRep {
                 celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 tabla.addCell(celda);
 
-                celda = new PdfPCell(new Phrase(_item.getFecha().toString(), FONT_DATO_TABLA));
-                celda.setHorizontalAlignment(Element.ALIGN_CENTER);
-                celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                tabla.addCell(celda);
+                // celda = new PdfPCell(new Phrase(_item.getFecha().toString(), FONT_DATO_TABLA));
+                // celda.setHorizontalAlignment(Element.ALIGN_CENTER);
+                // celda.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                // tabla.addCell(celda);
 
                 // celda = new PdfPCell(new Phrase(_item.getCliente().getPersona().getPrimerapellido(), FONT_DATO_TABLA));
                 // celda.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -217,28 +217,28 @@ public class SolicitudesRepImpl implements ISolicitudesRep {
                 hcelda1.setHorizontalAlignment(Element.ALIGN_CENTER);
                 tabla.addCell(hcelda1);
 
-                _item.getSolicitudproductos().forEach((Solicitudesproductos _itemp) -> {
-                    PdfPCell celda1 = new PdfPCell(new Phrase(_itemp.getProducto().getProducto(), FONT_DATO_TABLA));
-                    celda1.setColspan(2);
-                    celda1.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                    tabla.addCell(celda1);
+                // _item.getSolicitudproductos().forEach((Solicitudesproductos _itemp) -> {
+                //     PdfPCell celda1 = new PdfPCell(new Phrase(_itemp.getProducto().getProducto(), FONT_DATO_TABLA));
+                //     celda1.setColspan(2);
+                //     celda1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                //     celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                //     tabla.addCell(celda1);
 
-                    celda1 = new PdfPCell(new Phrase(_itemp.getCantidad().toString(), FONT_DATO_TABLA));
-                    celda1.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                    tabla.addCell(celda1);
+                //     celda1 = new PdfPCell(new Phrase(_itemp.getCantidad().toString(), FONT_DATO_TABLA));
+                //     celda1.setHorizontalAlignment(Element.ALIGN_CENTER);
+                //     celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                //     tabla.addCell(celda1);
 
-                    celda1 = new PdfPCell(new Phrase(_itemp.getPrecioventa().toString(), FONT_DATO_TABLA));
-                    celda1.setHorizontalAlignment(Element.ALIGN_LEFT);
-                    celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                    tabla.addCell(celda1);
+                //     celda1 = new PdfPCell(new Phrase(_itemp.getPrecioventa().toString(), FONT_DATO_TABLA));
+                //     celda1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                //     celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                //     tabla.addCell(celda1);
 
-                    celda1 = new PdfPCell(new Phrase(_itemp.getTotal().toString(), FONT_DATO_TABLA));
-                    celda1.setHorizontalAlignment(Element.ALIGN_LEFT);
-                    celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-                    tabla.addCell(celda1);
-                });
+                //     celda1 = new PdfPCell(new Phrase(_itemp.getTotal().toString(), FONT_DATO_TABLA));
+                //     celda1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                //     celda1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                //     tabla.addCell(celda1);
+                // });
 
                 _contador.incrementAndGet();
             });
