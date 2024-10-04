@@ -23,7 +23,7 @@ public interface IEmpresasAod {
     
     @Select("SELECT * FROM empresas e " +
         "JOIN rubros r ON e.idrubro = r.idrubro " +
-        "JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
+        "LEFT JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
         "LEFT JOIN asociaciones a ON e.idasociacion = a.idasociacion " +
         "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
         "LEFT JOIN personas p ON rep.idpersona = p.idpersona " +
@@ -42,7 +42,7 @@ public interface IEmpresasAod {
 
     @Select("SELECT count(idempresa) FROM empresas e " +
         "JOIN rubros r ON e.idrubro = r.idrubro " +
-        "JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
+        "LEFT JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
         "LEFT JOIN asociaciones a ON e.idasociacion = a.idasociacion " +
         "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
         "LEFT JOIN personas p ON rep.idpersona = p.idpersona " +
@@ -104,6 +104,9 @@ public interface IEmpresasAod {
         "JOIN representantes r ON r.idrepresentante=e.idrepresentante " +
         "WHERE r.idrepresentante=#{idrepresentante}")
     Integer total(Long idrepresentante);
+
+    @Select("SELECT idempresa FROM empresas WHERE idrepresentante=#{idrepresentante}")
+    Long empresa(Long idrepresentante);
 
 }
 

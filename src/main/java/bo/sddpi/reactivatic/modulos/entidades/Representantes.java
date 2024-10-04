@@ -11,6 +11,7 @@ public class Representantes implements Serializable{
 
     private Long idrepresentante;
     private Long idpersona;
+    private Boolean enBeneficio;
 
     private Personas persona;
 

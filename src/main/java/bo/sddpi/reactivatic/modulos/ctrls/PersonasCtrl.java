@@ -1,5 +1,6 @@
 package bo.sddpi.reactivatic.modulos.ctrls;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.itextpdf.text.DocumentException;
+
 import bo.sddpi.reactivatic.modulos.aods.IClientesAod;
 import bo.sddpi.reactivatic.modulos.aods.IPersonasAod;
 import bo.sddpi.reactivatic.modulos.aods.IRepresentantesAod;
@@ -32,6 +35,7 @@ import bo.sddpi.reactivatic.modulos.entidades.Representantes;
 import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 import bo.sddpi.reactivatic.modulos.entidades.Usuariosroles;
 import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
+
 
 
 @RestController
@@ -149,7 +153,7 @@ public class PersonasCtrl {
                 iClientesAod.adicionar(clientenuevo);
 
                 usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
-                usuariorolnuevo.setIdrol(3L);
+                usuariorolnuevo.setIdrol(8L);
                 iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
             } catch (DataAccessException e) {
                 mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
@@ -249,7 +253,6 @@ public class PersonasCtrl {
         }
 
         mensajes.put("mensaje", "Se cargó el archivo con éxito: " + archivo.getOriginalFilename());
-        //mensajes.put("mensaje", archivo);
         return new ResponseEntity<>(mensajes, HttpStatus.OK);
     }
 
@@ -258,7 +261,12 @@ public class PersonasCtrl {
         Map<String, Object> response = new HashMap<>();
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Long id = Long.parseLong(auth.getName());
+            Long id;
+            if (tipo.equals("repanverso") || tipo.equals("repreverso")) {
+                id = iPersonasAod.verificarpersona(Long.parseLong(auth.getName()));
+            }else{
+                id = Long.parseLong(auth.getName());
+            }
 
             List<Map<String, String>> imagenes = iSubirarchivosServ.downloadimagen(id, tipo);
 
@@ -296,7 +304,6 @@ public class PersonasCtrl {
         }
 
         mensajes.put("mensaje", "Se cargó el archivo con éxito: " + archivo.getOriginalFilename());
-        mensajes.put("mensaje", archivo);
         return new ResponseEntity<>(mensajes, HttpStatus.OK);
     }
 
@@ -379,7 +386,7 @@ public class PersonasCtrl {
                 iUsuariosAod.adicionar(usuarionuevo);
 
                 usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
-                usuariorolnuevo.setIdrol(6L);
+                usuariorolnuevo.setIdrol(7L);
                 iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
 
                 representantenuevo.setIdpersona(personanuevo.getIdpersona());
@@ -389,7 +396,7 @@ public class PersonasCtrl {
                 iClientesAod.adicionar(clientenuevo);
 
                 usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
-                usuariorolnuevo.setIdrol(7L);
+                usuariorolnuevo.setIdrol(8L);
                 iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
 
             } catch (DataAccessException e) {
@@ -415,5 +422,88 @@ public class PersonasCtrl {
         }
         return new ResponseEntity<List<Personas>>(datos, HttpStatus.OK);
     }
+
+    @PostMapping("/generarusuario")
+    ResponseEntity<?> generarusuario(@RequestBody Map<String, Long> payload){
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            Long id = payload.get("id");
+            if (id == null) {
+                mensajes.put("mensaje", "El ID es requerido");
+                return new ResponseEntity<>(mensajes, HttpStatus.BAD_REQUEST);
+            }
+
+            Personas persona = iPersonasAod.dato(id);
+            if (persona == null) {
+                mensajes.put("mensaje", "No se encontró la persona con el ID proporcionado");
+                return new ResponseEntity<>(mensajes, HttpStatus.NOT_FOUND);
+            }
+
+            String primerApellido = persona.getPrimerapellido() != null ? persona.getPrimerapellido() : "";
+            String segundoApellido = persona.getSegundoapellido() != null ? persona.getSegundoapellido() : "";
+            String primerNombre = persona.getPrimernombre() != null ? persona.getPrimernombre() : "";
+            String dip = persona.getDip() != null ? persona.getDip() : "";
+
+            String parteUsuario;
+            if (segundoApellido.isEmpty()) {
+                parteUsuario = primerApellido.substring(0, Math.min(4, primerApellido.length())) + 
+                            primerNombre.substring(0, Math.min(2, primerNombre.length()));
+            } else {
+                parteUsuario = primerApellido.substring(0, Math.min(2, primerApellido.length())) +
+                            segundoApellido.substring(0, Math.min(2, segundoApellido.length())) +
+                            primerNombre.substring(0, Math.min(2, primerNombre.length()));
+            }
+
+            String parteDIP = dip.length() >= 3 ? dip.substring(dip.length() - 3) : dip;
+            String usuarioGenerado = parteUsuario.toLowerCase() + parteDIP;
+            String claveGenerada = usuarioGenerado; 
+
+            Usuarios nuevoUsuario = new Usuarios();
+            nuevoUsuario.setIdpersona(persona.getIdpersona());
+            nuevoUsuario.setUsuario(usuarioGenerado);
+            nuevoUsuario.setClave(claveGenerada);
+            iUsuariosAod.adicionar(nuevoUsuario);
+
+            Long idUsuarioGenerado = nuevoUsuario.getIdusuario();
+            Usuariosroles usuarioRol = new Usuariosroles();
+            usuarioRol.setIdusuario(idUsuarioGenerado);
+            usuarioRol.setIdrol(7L); 
+            iUsuariosrolesAod.adicionarusuariorol(usuarioRol);
+
+            Usuariosroles usuarioRolCliente = new Usuariosroles();
+            usuarioRolCliente.setIdusuario(idUsuarioGenerado);
+            usuarioRolCliente.setIdrol(8L); 
+            iUsuariosrolesAod.adicionarusuariorol(usuarioRolCliente);
+
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la operación en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        mensajes.put("mensaje", "Usuario generado correctamente");
+        return new ResponseEntity<>(mensajes, HttpStatus.CREATED);
+    }
     
+    @GetMapping("/carnet/{idpersona}")
+    public ResponseEntity<?> generarCarnetPdf(@PathVariable Long idpersona) {
+        try {
+            // Llamamos al servicio que genera el PDF
+            byte[] pdfBytes = iSubirarchivosServ.generarCarnetPdf(idpersona);
+
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=carnet_" + idpersona + ".pdf")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .body(pdfBytes);
+
+        } catch (IOException e) {
+            Map<String, Object> mensajes = new HashMap<>();
+            mensajes.put("mensaje", "Error: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.NOT_FOUND); // Cambiar a NOT_FOUND ya que el recurso no existe.
+
+        } catch (DocumentException e) {
+            Map<String, Object> mensajes = new HashMap<>();
+            mensajes.put("mensaje", "Error al generar el PDF: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

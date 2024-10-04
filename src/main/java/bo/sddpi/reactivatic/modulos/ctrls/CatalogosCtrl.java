@@ -116,7 +116,8 @@ public class CatalogosCtrl {
     ISubirarchivosServ iSubirarchivosServ;
 
     @GetMapping
-    ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+    ResponseEntity<?> datos(@RequestParam(value = "empresa", defaultValue = "") Long id,
+            @RequestParam(value = "buscar", defaultValue = "") String buscar,
             @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
             @RequestParam(value = "cantidad", defaultValue = "12") Integer cantidad,
             @RequestParam(value = "orden" , defaultValue = "asc") String orden) {
@@ -129,7 +130,7 @@ public class CatalogosCtrl {
             } else {
                 nropagina = (pagina - 1) * cantidad;
             }
-            datos = iProductosAod.datoscat(buscar, nropagina, cantidad, orden);
+            datos = iProductosAod.datoscat(id, buscar, nropagina, cantidad, orden);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

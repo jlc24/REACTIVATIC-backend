@@ -1,10 +1,13 @@
 package bo.sddpi.reactivatic.modulos.servicios;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.itextpdf.text.DocumentException;
 
 public interface ISubirarchivosServ {
 
@@ -35,5 +38,7 @@ public interface ISubirarchivosServ {
     public void redimensionarempresa(Long id);
 
     public Resource descargarimagenempresa(String archivo);
+
+    public byte[] generarCarnetPdf(Long idPersona) throws DocumentException, IOException;
 
 }

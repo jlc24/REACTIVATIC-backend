@@ -15,10 +15,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import bo.sddpi.reactivatic.modulos.aods.IBeneficiosAod;
-import bo.sddpi.reactivatic.modulos.aods.IUsuariosAod;
 import bo.sddpi.reactivatic.modulos.entidades.Beneficios;
+import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
 
 @RestController
 @RequestMapping("/apirest/beneficios")
@@ -28,7 +29,8 @@ public class BeneficiosCtrl {
     private IBeneficiosAod ibeneficiosAod;
 
     @Autowired
-    private IUsuariosAod iUsuariosAod;
+    private ISubirarchivosServ iSubirarchivosServ;
+
 
     //BUSCAR BENEFICIOS->PAGINACION->CANTIDAD
     @GetMapping
@@ -197,5 +199,48 @@ public class BeneficiosCtrl {
         }
         mensajes.put("mensaje", "El beneficio ha sido eliminado con exito");
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+    }
+
+    @PostMapping(value="/upload")
+    public ResponseEntity<Map<String, Object>> upload(
+            @RequestParam("id") Long id,
+            @RequestParam("tipo") String tipo,
+            @RequestParam("archivo") MultipartFile archivo) {
+
+        Map<String, Object> mensajes = new HashMap<>();
+
+        if (archivo.isEmpty()) {
+            mensajes.put("mensaje", "No se ha seleccionado ningún archivo.");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            iSubirarchivosServ.uploadimagen(id, archivo, tipo);
+        } catch (NumberFormatException e) {
+            mensajes.put("mensaje", "El ID de usuario no es válido.");
+            return new ResponseEntity<>(mensajes, HttpStatus.BAD_REQUEST);
+        } catch (RuntimeException  e) {
+            mensajes.put("mensaje", "Error al procesar el archivo: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "No se pudo cargar el archivo: " + archivo.getOriginalFilename() + ". Error: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        mensajes.put("mensaje", "Se cargó el archivo con éxito: " + archivo.getOriginalFilename());
+        return new ResponseEntity<>(mensajes, HttpStatus.OK);
+    }
+
+    @GetMapping("/downloadimage")
+    public ResponseEntity<?> downloadImage(@RequestParam("id") Long id, @RequestParam("tipo") String tipo){
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            List<Map<String, String>> imagenes = iSubirarchivosServ.downloadimagen(id, tipo);
+
+            return ResponseEntity.ok(imagenes);
+        } catch (Exception e) {
+            mensajes.put("error", "Error al obtener las imágenes: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mensajes);
+        }
     }
 }

@@ -32,4 +32,7 @@ public interface IClientesAod {
     @Select("SELECT count(idpersona) FROM personas AS p WHERE p.primerapellido ilike '%'||#{buscar}||'%' OR p.segundoapellido ilike '%'||#{buscar}||'%' OR p.primernombre ilike '%'||#{buscar}||'%' ")
     Integer cantidad(String buscar);
 
+    @Delete("DELETE FROM clientes WHERE idpersona=#{idpersona}")
+    void eliminar(Long idpersona);
+
 }

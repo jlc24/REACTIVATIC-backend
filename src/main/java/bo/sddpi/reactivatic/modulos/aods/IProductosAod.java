@@ -13,7 +13,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import bo.sddpi.reactivatic.modulos.entidades.Productos;
-import bo.sddpi.reactivatic.modulos.entidades.Reportes;
 
 @Mapper
 public interface IProductosAod {
@@ -98,6 +97,9 @@ public interface IProductosAod {
                 "    GROUP BY idproducto " +
                 ") max_precio ON max_precio.idproducto = p.idproducto " +
                 "WHERE p.estado=true AND CONCAT(p.producto, ' ', r.rubro, ' ', m.municipio, ' ', e.empresa) ILIKE '%' || #{buscar} || '%' " +
+                "<if test='idempresa != null'> " +
+                "  AND p.idempresa = #{idempresa} " +
+                "</if>" +
                 "<choose>" +
                 "  <when test='orden == \"asc\"'>ORDER BY p.producto ASC</when>" +
                 "  <when test='orden == \"desc\"'>ORDER BY p.producto DESC</when>" +
@@ -112,7 +114,7 @@ public interface IProductosAod {
         @Result(property = "minPrecio", column = "min_precio"),
         @Result(property = "maxPrecio", column = "max_precio")
     })
-    List<Productos> datoscat(String buscar, Integer pagina, Integer cantidad, String orden);
+    List<Productos> datoscat(Long idempresa, String buscar, Integer pagina, Integer cantidad, String orden);
 
     // @Select("SELECT count(idproducto) FROM productos join empresas using(idempresa) join subrubros using(idsubrubro) join rubros using(idrubro) where cantidad>0 and concat(rubro,empresa,producto) ilike '%'||#{buscar}||'%' ")
     @Select("<script>" +
@@ -128,8 +130,6 @@ public interface IProductosAod {
     @Select("SELECT p.idproducto, p.idempresa, e.idempresa as ifore1, p.producto, p.descripcion, p.preciocompra, p.precioventa, p.cantidad " +
             "FROM productos p " +
             "JOIN empresas e ON e.idempresa=p.idempresa " +
-            "JOIN subrubros sr ON sr.idsubrubro=e.idsubrubro " +
-            "JOIN rubros r ON r.idrubro=sr.idrubro " +
             "WHERE p.idproducto=#{id} ")
     @Results({
         @Result(property = "empresa", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))

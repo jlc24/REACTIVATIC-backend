@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import bo.sddpi.reactivatic.modulos.aods.IClientesAod;
 import bo.sddpi.reactivatic.modulos.aods.IPersonasAod;
 import bo.sddpi.reactivatic.modulos.aods.IRepresentantesAod;
 import bo.sddpi.reactivatic.modulos.aods.IUsuariosAod;
@@ -26,8 +27,6 @@ import bo.sddpi.reactivatic.modulos.aods.IUsuariosrolesAod;
 import bo.sddpi.reactivatic.modulos.entidades.Personas;
 import bo.sddpi.reactivatic.modulos.entidades.Usuarios;
 import bo.sddpi.reactivatic.modulos.reportes.IUsuariosRep;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 
@@ -49,6 +48,9 @@ public class UsuariosCtrl {
 
     @Autowired
     IUsuariosRep iUsuariosRep;
+
+    @Autowired
+    IClientesAod iClientesAod;
 
     private ResponseEntity<?> obtenerDatos(Callable<List<Usuarios>> consultaDatos) {
         List<Usuarios> datos = null;
@@ -268,19 +270,54 @@ public class UsuariosCtrl {
     @DeleteMapping(value = "/rep/{id}")
     ResponseEntity<?> eliminarrep(@PathVariable Long id) {
         Map<String, Object> mensajes = new HashMap<>();
+        Usuarios usuario;
         try {
-            Personas persona = iPersonasAod.infoadicional(id);
-            iUsuariosrolesAod.eliminar(id);
-            iUsuariosAod.eliminar(id);
-            iRepresentantesAod.eliminar(persona.getIdpersona());
-            iPersonasAod.eliminar(persona.getIdpersona());
+            usuario = iUsuariosAod.datorep(id);
+            if (usuario != null) {
+                try {
+                    iUsuariosrolesAod.eliminar(usuario.getIdusuario());
+                } catch (DataAccessException e) {
+                    mensajes.put("errorRoles", "Error al eliminar los roles del usuario: " + e.getMostSpecificCause().getMessage());
+                    return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+        
+                try {
+                    iUsuariosAod.eliminar(usuario.getIdusuario());
+                } catch (DataAccessException e) {
+                    mensajes.put("errorUsuario", "Error al eliminar el usuario: " + e.getMostSpecificCause().getMessage());
+                    return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+        
+                try {
+                    iRepresentantesAod.eliminar(usuario.getIdpersona());
+                } catch (DataAccessException e) {
+                    mensajes.put("errorRepresentante", "Error al eliminar el representante: " + e.getMostSpecificCause().getMessage());
+                    return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+
+                try {
+                    iClientesAod.eliminar(usuario.getIdpersona());
+                } catch (DataAccessException e) {
+                    mensajes.put("errorRepresentante", "Error al eliminar el representante: " + e.getMostSpecificCause().getMessage());
+                    return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+        
+                try {
+                    iPersonasAod.eliminar(usuario.getIdpersona());
+                } catch (DataAccessException e) {
+                    mensajes.put("errorPersona", "Error al eliminar la persona: " + e.getMostSpecificCause().getMessage());
+                    return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+                mensajes.put("mensaje", "Se ha borrado correctamente el dato en la Base de Datos");
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+            }else{
+                mensajes.put("errorConsulta", "No se encontró ningún representante con el ID proporcionado.");
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.NOT_FOUND);
+            }
         } catch (DataAccessException e) {
-            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
-            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            mensajes.put("errorConsulta", "Error al consultar los datos del representante: " + e.getMostSpecificCause().getMessage());
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        mensajes.put("mensaje", "Se ha borrado correctamente el dato en la Base de Datos");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
     @PutMapping(value = "/cambiarclave")

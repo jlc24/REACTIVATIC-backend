@@ -2,8 +2,10 @@ package bo.sddpi.reactivatic.modulos.servicios.impl;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -30,6 +32,9 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
 
 @Service
@@ -48,6 +53,7 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
     private Path rutaRepresentantes;
     private Path rutaEmpresas;
     private Path rutaProductos;
+    private Path rutaBeneficios;
 
     @PostConstruct
     public void init() {
@@ -62,49 +68,73 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
         rutaRepresentantes = Paths.get(rutaprincipal, "/imagenes/representantes");
         rutaEmpresas = Paths.get(rutaprincipal, "/imagenes/empresas");
         rutaProductos = Paths.get(rutaprincipal, "/imagenes/productos");
+        rutaBeneficios = Paths.get(rutaprincipal, "/imagenes/beneficios");
 
         try {
             Files.createDirectories(rutaUsuarios);
             Files.createDirectories(rutaRepresentantes);
             Files.createDirectories(rutaEmpresas);
             Files.createDirectories(rutaProductos);
-            // boolean canRead = Files.isReadable(rutaUsuarios);
-            // boolean canWrite = Files.isWritable(rutaUsuarios);
-
-            // System.out.println("Permisos para el directorio:");
-            // System.out.println("Readable: " + canRead);
-            // System.out.println("Writable: " + canWrite);
+            Files.createDirectories(rutaBeneficios);
 
             if (!os.contains("win")) {
                 Files.setPosixFilePermissions(rutaUsuarios, PosixFilePermissions.fromString("rwxr-xr-x"));
                 Files.setPosixFilePermissions(rutaRepresentantes, PosixFilePermissions.fromString("rwxr-xr-x"));
                 Files.setPosixFilePermissions(rutaEmpresas, PosixFilePermissions.fromString("rwxr-xr-x"));
                 Files.setPosixFilePermissions(rutaProductos, PosixFilePermissions.fromString("rwxr-xr-x"));
+                Files.setPosixFilePermissions(rutaBeneficios, PosixFilePermissions.fromString("rwxr-xr-x"));
             }
 
         } catch (IOException e) {
             throw new RuntimeException("No se pudo crear los directorios de archivos. Error: " + e.getMessage());
         }
 
-        try {
-            Resource recursoArchivoLogo = new ClassPathResource("fondologo.png");
-            Resource recursoArchivoSinCarnet = new ClassPathResource("sincarnet.png");
-            Resource recursoArchivoSinUsuario = new ClassPathResource("sinusuario.png");
-            Resource recursoArchivoSinImagen = new ClassPathResource("sinimagen.png");
-            File archivoFondologo = recursoArchivoLogo.getFile();
-            File archivoSinCarnet = recursoArchivoSinCarnet.getFile();
-            File archivoSinUsuario = recursoArchivoSinUsuario.getFile();
-            File archivoSinImagen = recursoArchivoSinImagen.getFile();
-            
-            Files.copy(archivoFondologo.toPath(), rutaProductos.resolve("productos.png"), StandardCopyOption.REPLACE_EXISTING);
-
-            Files.copy(archivoSinUsuario.toPath(), rutaUsuarios.resolve("sinusuario.png"), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(archivoSinCarnet.toPath(), rutaRepresentantes.resolve("carnet_anverso.png"), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(archivoSinCarnet.toPath(), rutaRepresentantes.resolve("carnet_reverso.png"), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(archivoSinImagen.toPath(), rutaEmpresas.resolve("sinempresa.png"), StandardCopyOption.REPLACE_EXISTING);
-            Files.copy(archivoSinImagen.toPath(), rutaProductos.resolve("sinproducto.png"), StandardCopyOption.REPLACE_EXISTING);
+        try (InputStream inputStreamLogo = new ClassPathResource("fondologo.png").getInputStream()) {
+            Files.copy(inputStreamLogo, rutaProductos.resolve("productos.png"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new RuntimeException("No se pudo copiar el archivo de logo. Error: " + e.getMessage());
+            throw new RuntimeException("Error al copiar el archivo fondologo.png: " + e.getMessage(), e);
+        }
+
+        try (InputStream inputStreamSinCarnet = new ClassPathResource("sincarnet.png").getInputStream()) {
+            Files.copy(inputStreamSinCarnet, rutaRepresentantes.resolve("carnet_anverso.png"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al copiar el archivo sincarnet.png (anverso): " + e.getMessage(), e);
+        }
+
+        try (InputStream inputStreamSinCarnetReverso = new ClassPathResource("sincarnet.png").getInputStream()) {
+            Files.copy(inputStreamSinCarnetReverso, rutaRepresentantes.resolve("carnet_reverso.png"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al copiar el archivo sincarnet.png (reverso): " + e.getMessage(), e);
+        }
+
+        try (InputStream inputStreamSinUsuario = new ClassPathResource("sinusuario.png").getInputStream()) {
+            Files.copy(inputStreamSinUsuario, rutaUsuarios.resolve("sinusuario.png"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al copiar el archivo sinusuario.png: " + e.getMessage(), e);
+        }
+
+        try (InputStream inputStreamSinImagen = new ClassPathResource("sinimagen.png").getInputStream()) {
+            Files.copy(inputStreamSinImagen, rutaEmpresas.resolve("sinempresa.png"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al copiar el archivo sinimagen.png (empresa): " + e.getMessage(), e);
+        }
+
+        try (InputStream inputStreamSinImagenBeneficio = new ClassPathResource("sinbeneficio.png").getInputStream()) {
+            Files.copy(inputStreamSinImagenBeneficio, rutaEmpresas.resolve("sinformulario.png"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al copiar el archivo sinformulario.png (formulario): " + e.getMessage(), e);
+        }
+
+        try (InputStream inputStreamSinImagenProducto = new ClassPathResource("sinimagen.png").getInputStream()) {
+            Files.copy(inputStreamSinImagenProducto, rutaProductos.resolve("sinproducto.png"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al copiar el archivo sinimagen.png (producto): " + e.getMessage(), e);
+        }
+
+        try (InputStream inputStreamSinImagenBeneficio = new ClassPathResource("sinbeneficio.png").getInputStream()) {
+            Files.copy(inputStreamSinImagenBeneficio, rutaBeneficios.resolve("sinbeneficio.png"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al copiar el archivo sinbeneficio.png (beneficio): " + e.getMessage(), e);
         }
     }
 
@@ -144,7 +174,40 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
                 rutaDestino = Paths.get(rutaUsuarios.toString(), id.toString() + ".png");
                 break;
             case "empresas":
-                rutaDestino = Paths.get(rutaEmpresas.toString(), id.toString() + "_logo.png");
+                Path directorioEmpresas = Paths.get(rutaEmpresas.toString(), id.toString());
+                try {
+                    Files.createDirectories(directorioEmpresas);
+                    rutaDestino = directorioEmpresas.resolve(id.toString() + "_logo.png");
+                } catch (Exception e) {
+                    throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
+                }
+                break;
+            case "carousel":
+                Path directorioEmpresasCar = Paths.get(rutaEmpresas.toString(), id.toString() + "/carousel");
+                try {
+                    Files.createDirectories(directorioEmpresasCar);
+                    rutaDestino = directorioEmpresasCar.resolve(archivo.getOriginalFilename());
+                } catch (Exception e) {
+                    throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
+                }
+                break;
+            case "formularioA":
+                Path directorioEmpresasForA = Paths.get(rutaEmpresas.toString(), id.toString() + "/formulario");
+                try {
+                    Files.createDirectories(directorioEmpresasForA);
+                    rutaDestino = directorioEmpresasForA.resolve(id.toString() + "_formulario_a.png");
+                } catch (Exception e) {
+                    throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
+                }
+                break;
+            case "formularioB":
+                Path directorioEmpresasForB = Paths.get(rutaEmpresas.toString(), id.toString() + "/formulario");
+                try {
+                    Files.createDirectories(directorioEmpresasForB);
+                    rutaDestino = directorioEmpresasForB.resolve(id.toString() + "_formulario_b.png");
+                } catch (Exception e) {
+                    throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
+                }
                 break;
             case "repanverso":
                 Path directorioRepAnverso = Paths.get(rutaRepresentantes.toString(), id.toString());
@@ -169,6 +232,24 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
                 try {
                     Files.createDirectories(directorioProductos);
                     rutaDestino = directorioProductos.resolve(archivo.getOriginalFilename());
+                } catch (IOException e) {
+                    throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
+                }
+                break;
+            case "convocatoria":
+                Path directorioBeneficioConv = Paths.get(rutaBeneficios.toString(), id.toString());
+                try {
+                    Files.createDirectories(directorioBeneficioConv);
+                    rutaDestino = directorioBeneficioConv.resolve(id.toString() + "_convocatoria.png");
+                } catch (IOException e) {
+                    throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
+                }
+                break;
+            case "afiche":
+                Path directorioBeneficioAf = Paths.get(rutaBeneficios.toString(), id.toString());
+                try {
+                    Files.createDirectories(directorioBeneficioAf);
+                    rutaDestino = directorioBeneficioAf.resolve(id.toString() + "_afiche.png");
                 } catch (IOException e) {
                     throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
                 }
@@ -200,11 +281,48 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
                 }
                 break;
             case "empresas":
-                rutaEspecifica = rutaEmpresas.resolve(id.toString() + "_logo.png");
+                Path rutaEmpresaEspecifica = rutaEmpresas.resolve(id.toString());
+                rutaEspecifica = rutaEmpresaEspecifica.resolve(id.toString() + "_logo.png");
                 if (Files.exists(rutaEspecifica)) {
                     imagenes.add(convertToBase64(rutaEspecifica));
                 } else {
                     imagenes.add(convertToBase64(rutaEmpresas.resolve("sinempresa.png")));
+                }
+                break;
+            case "carousel":
+                Path rutaCarouselEspecifica = rutaEmpresas.resolve(id.toString() + "/carousel");
+                if (!Files.exists(rutaCarouselEspecifica)) {
+                    imagenes.add(convertToBase64(rutaEmpresas.resolve("sinempresa.png")));
+                } else if (Files.exists(rutaCarouselEspecifica) && Files.isDirectory(rutaCarouselEspecifica)) {
+                    try (Stream<Path> paths = Files.walk(rutaCarouselEspecifica)) {
+                        List<Path> imagenesEncontradas = paths.filter(Files::isRegularFile).collect(Collectors.toList());
+                        if (imagenesEncontradas.isEmpty()) {
+                            imagenes.add(convertToBase64(rutaEmpresas.resolve("sinempresa.png")));
+                        }
+                        imagenesEncontradas.forEach(path -> imagenes.add(convertToBase64(path)));
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error al leer los archivos de empresa: " + e.getMessage());
+                    }
+                } else {
+                    imagenes.add(convertToBase64(rutaEmpresas.resolve("sinempresa.png")));
+                }
+                break;
+            case "formularioA":
+                Path rutaFormularioEspecificoA = rutaEmpresas.resolve(id.toString() + "/formulario");
+                rutaEspecifica = rutaFormularioEspecificoA.resolve(id.toString() + "_formulario_a.png");
+                if (Files.exists(rutaEspecifica)) {
+                    imagenes.add(convertToBase64(rutaEspecifica));
+                } else {
+                    imagenes.add(convertToBase64(rutaEmpresas.resolve("sinformulario.png")));
+                }
+                break;
+            case "formularioB":
+                Path rutaFormularioEspecificoB = rutaEmpresas.resolve(id.toString() + "/formulario");
+                rutaEspecifica = rutaFormularioEspecificoB.resolve(id.toString() + "_formulario_b.png");
+                if (Files.exists(rutaEspecifica)) {
+                    imagenes.add(convertToBase64(rutaEspecifica));
+                } else {
+                    imagenes.add(convertToBase64(rutaEmpresas.resolve("sinformulario.png")));
                 }
                 break;
             case "repanverso":
@@ -231,22 +349,34 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
                     imagenes.add(convertToBase64(rutaProductos.resolve("sinproducto.png")));
                 } else if (Files.exists(rutaProductosEspecifica) && Files.isDirectory(rutaProductosEspecifica)) {
                     try (Stream<Path> paths = Files.walk(rutaProductosEspecifica)) {
-                        // paths.filter(Files::isRegularFile)
-                        //     .forEach(path -> imagenes.add(convertToBase64(path)));
                         List<Path> imagenesEncontradas = paths.filter(Files::isRegularFile).collect(Collectors.toList());
-            
                         if (imagenesEncontradas.isEmpty()) {
-                            // Si la ruta existe, pero no hay imágenes
                             imagenes.add(convertToBase64(rutaProductos.resolve("sinproducto.png")));
                         }
-                        
-                        // Convertir las imágenes encontradas a Base64
                         imagenesEncontradas.forEach(path -> imagenes.add(convertToBase64(path)));
                     } catch (IOException e) {
                         throw new RuntimeException("Error al leer los archivos de productos: " + e.getMessage());
                     }
                 } else {
                     imagenes.add(convertToBase64(rutaProductos.resolve("sinproducto.png")));
+                }
+                break;
+            case "convocatoria":
+                Path directorioBeneficioConv = rutaBeneficios.resolve(id.toString());
+                rutaEspecifica = directorioBeneficioConv.resolve(id.toString() + "_convocatoria.png");
+                if (Files.exists(rutaEspecifica)) {
+                    imagenes.add(convertToBase64(rutaEspecifica));
+                } else {
+                    imagenes.add(convertToBase64(rutaBeneficios.resolve("sinbeneficio.png")));
+                }
+                break;
+            case "afiche":
+                Path directorioBeneficioAf = rutaBeneficios.resolve(id.toString());
+                rutaEspecifica = directorioBeneficioAf.resolve(id.toString() + "_afiche.png");
+                if (Files.exists(rutaEspecifica)) {
+                    imagenes.add(convertToBase64(rutaEspecifica));
+                } else {
+                    imagenes.add(convertToBase64(rutaBeneficios.resolve("sinbeneficio.png")));
                 }
                 break;
             default:
@@ -438,7 +568,8 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
     public Resource descargarimagenempresa(String archivo) {
         try {
             // Supone que `rutaProductos` ya es un Path
-            Path file = rutaEmpresas.resolve(archivo + "_logo.png");
+            Path fileDirectorio = rutaEmpresas.resolve(archivo);
+            Path file = fileDirectorio.resolve(archivo + "_logo.png");
     
             // Crear el recurso desde el Path
             Resource resource = new UrlResource(file.toUri());
@@ -513,6 +644,71 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    public byte[] generarCarnetPdf(Long idPersona) throws DocumentException, IOException {
+        Path representanteDir = rutaRepresentantes.resolve(String.valueOf(idPersona));
+        
+        // Verificamos si el directorio del representante existe
+        if (!Files.exists(representanteDir) || !Files.isDirectory(representanteDir)) {
+            throw new IOException("El usuario no tiene registrado sus credenciales.");
+        }
+
+        Path anversoPath = representanteDir.resolve("carnet_anverso.png");
+        Path reversoPath = representanteDir.resolve("carnet_reverso.png");
+
+        // Verificamos si los archivos de imagen existen
+        if (!Files.exists(anversoPath)) {
+            throw new IOException("La imagen 'carnet_anverso.png' no fue encontrada");
+        }
+
+        if (!Files.exists(reversoPath)) {
+            throw new IOException("La imagen 'carnet_reverso.png' no fue encontrada");
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.LETTER);
+        PdfWriter writer = PdfWriter.getInstance(document, byteArrayOutputStream);
+        document.open();
+
+        try {
+            byte[] anversoBytes = Files.readAllBytes(anversoPath);
+            byte[] reversoBytes = Files.readAllBytes(reversoPath);
+
+            Image anverso = Image.getInstance(anversoBytes);
+            Image reverso = Image.getInstance(reversoBytes);
+
+            float anchoCm = 8.5f;
+            float altoCm = 5.5f;
+            float puntosPorCm = 28.35f;
+            float espacioEntreImagenes = altoCm * puntosPorCm;
+
+            anverso.scaleAbsolute(anchoCm * puntosPorCm, altoCm * puntosPorCm);
+            reverso.scaleAbsolute(anchoCm * puntosPorCm, altoCm * puntosPorCm);
+
+            float posicionX = (PageSize.LETTER.getWidth() - anverso.getScaledWidth()) / 2;
+            float posicionYAnverso = (PageSize.LETTER.getHeight() + espacioEntreImagenes) / 2;
+            float posicionYReverso = posicionYAnverso - espacioEntreImagenes - anverso.getScaledHeight();
+
+            anverso.setAbsolutePosition(posicionX, posicionYAnverso);
+            reverso.setAbsolutePosition(posicionX, posicionYReverso);
+
+            // Agregamos las imágenes al documento
+            document.add(anverso);
+            document.add(reverso);
+
+            // Verificamos si se añadieron páginas al documento
+            if (writer.getPageNumber() == 0) {
+                throw new DocumentException("No se pudieron añadir imágenes al documento PDF.");
+            }
+
+        } catch (BadElementException | IOException e) {
+            throw new IOException("Error al cargar las imágenes: " + e.getMessage());
+        } finally {
+            document.close();
+        }
+
+        return byteArrayOutputStream.toByteArray();
     }
 
 }

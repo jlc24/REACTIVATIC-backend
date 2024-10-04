@@ -73,4 +73,7 @@ public interface IPersonasAod {
         "JOIN personas p using(idpersona) " +
         "WHERE ur.idrol = #{idrol}")
     List<Personas> obtenerPersonasPorRol(Long idrol);
+
+    @Select("SELECT p.idpersona FROM personas p JOIN usuarios u On u.idpersona = p.idpersona WHERE u.idusuario = #{idusuario}")
+    Long verificarpersona(Long idusuario);
 }
