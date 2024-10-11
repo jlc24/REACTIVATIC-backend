@@ -10,9 +10,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,10 +19,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import bo.sddpi.reactivatic.modulos.aods.IBeneficiosAod;
 import bo.sddpi.reactivatic.modulos.aods.IBeneficiosempresasAod;
 import bo.sddpi.reactivatic.modulos.aods.IEmpresasAod;
 import bo.sddpi.reactivatic.modulos.entidades.Beneficios;
 import bo.sddpi.reactivatic.modulos.entidades.Beneficiosempresas;
+import bo.sddpi.reactivatic.modulos.reportes.IPlanillasRep;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,7 +39,13 @@ public class BeneficiosempresasCtrl {
     private IBeneficiosempresasAod iBeneficiosempresasAod;
 
     @Autowired
+    private IBeneficiosAod iBeneficiosAod;
+
+    @Autowired
     private IEmpresasAod iEmpresasAod;
+
+    @Autowired
+    private IPlanillasRep iPlanillasRep;
 
     @GetMapping
     ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
@@ -195,6 +203,50 @@ public class BeneficiosempresasCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/planillaregistro/{id}", produces = MediaType.APPLICATION_PDF_VALUE)
+    ResponseEntity<?> planillaReg(@PathVariable Long id){
+        Long beneficio = id;
+
+        byte[] dato = null;
+        List<Beneficiosempresas> datos = null;
+        Beneficios datobeneficio = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iBeneficiosempresasAod.planillareg(beneficio);
+            datobeneficio = iBeneficiosAod.dato(beneficio);
+            dato = iPlanillasRep.planillaRegistroPDF(datos, datobeneficio);
+
+            if (datos == null || datos.isEmpty()) {
+                throw new IllegalArgumentException("No se encontraron datos para generar el PDF.");
+            }
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al realizar el archivo Excel");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<byte[]>(dato, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/planillainscripcion/{id}", produces = MediaType.APPLICATION_PDF_VALUE)
+    ResponseEntity<?> planillaInsc(@PathVariable Long id){
+        Long beneficio = id;
+
+        byte[] dato = null;
+        Beneficios datobeneficio = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datobeneficio = iBeneficiosAod.dato(beneficio);
+            dato = iPlanillasRep.planillaInscripcionPDF(datobeneficio);
+
+            if (datobeneficio == null ) {
+                throw new IllegalArgumentException("No se encontraron datos para generar el PDF.");
+            }
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al realizar el archivo Excel");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<byte[]>(dato, HttpStatus.OK);
     }
     
 }

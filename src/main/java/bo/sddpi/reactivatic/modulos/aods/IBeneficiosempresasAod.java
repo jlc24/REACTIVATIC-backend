@@ -63,4 +63,16 @@ public interface IBeneficiosempresasAod {
             "INNER JOIN beneficiosempresas AS be ON be.idebeneficio=b.idebeneficio" +
             "WHERE be.idempresa=#{idempresa} ORDER BY b.beneficio")
     List<String> buscarempresa(Long idempresa);
+
+    @Select("SELECT * FROM beneficiosempresas be " +
+            "JOIN empresas e ON e.idempresa=be.idempresa " +
+            "JOIN rubros rb ON rb.idrubro = e.idrubro " +
+            "JOIN representantes r ON r.idrepresentante=e.idrepresentante " +
+            "JOIN personas p ON p.idpersona=r.idpersona " +
+            "WHERE be.idbeneficio=#{idbeneficio} " +
+            "ORDER BY rb.rubro, p.primerapellido ")
+        @Results({
+                @Result(property = "empresa", column = "idempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato")),
+        })
+    List<Beneficiosempresas> planillareg(Long idbeneficio);
 }

@@ -88,9 +88,9 @@ public class EmpresasRepImpl implements IEmpresasRep {
         try {
             Document documento = new Document(PageSize.LETTER.rotate());
             documento.setMargins(20f, 20f, 20f, 20f);
-            EventosPDF evento = new EventosPDF();
+            //EventosPDF evento = new EventosPDF();
             PdfWriter writer = PdfWriter.getInstance(documento, salida);
-            writer.setPageEvent(evento);
+            //writer.setPageEvent(evento);
             documento.open();
 
             Image foto = Image.getInstance(new ClassPathResource("/logo.png").getURL());

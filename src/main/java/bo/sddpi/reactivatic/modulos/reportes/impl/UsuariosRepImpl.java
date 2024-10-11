@@ -76,9 +76,9 @@ public class UsuariosRepImpl implements IUsuariosRep {
         try {
             Document documento = new Document(PageSize.LETTER.rotate());
             documento.setMargins(10f, 10f, 10f, 10f);
-            EventosPDF evento = new EventosPDF();
+            //EventosPDF evento = new EventosPDF();
             PdfWriter writer = PdfWriter.getInstance(documento, salida);
-            writer.setPageEvent(evento);
+            //writer.setPageEvent(evento);
             documento.open();
 
             Image logoRectiva = Image.getInstance(new ClassPathResource("/logo.png").getURL());

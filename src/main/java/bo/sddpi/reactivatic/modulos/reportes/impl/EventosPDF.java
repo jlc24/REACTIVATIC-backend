@@ -20,6 +20,11 @@ public class EventosPDF extends PdfPageEventHelper {
 
     protected float startpos = -1;
     protected boolean title = true;
+    private String nombreUsuario;
+
+    public EventosPDF(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
 
     public void setTitle(boolean title) {
         this.title = title;
@@ -40,20 +45,21 @@ public class EventosPDF extends PdfPageEventHelper {
         try {
             helvetica = BaseFont.createFont(BaseFont.HELVETICA, "Cp1252", false);
         } catch (DocumentException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        cb.setFontAndSize(helvetica, 8);
+        cb.setFontAndSize(helvetica, 5);
 
         ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_RIGHT,
                 new Phrase("Página "+String.valueOf(writer.getPageNumber())), pagesize.getRight() - 20, pagesize.getBottom() + 10, 0);
 
         ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_LEFT,
                 new Phrase(LocalDate.now().format(formatofecha)+ " - " + LocalTime.now().format(formatohora)), pagesize.getLeft()+ 20, pagesize.getBottom() + 10, 0);
+                
+        ColumnText.showTextAligned(cb, Element.ALIGN_CENTER,
+                new Phrase("Registrado por: " + nombreUsuario), (pagesize.getLeft() + pagesize.getRight()) / 2, pagesize.getBottom() + 10, 0);
     }
 
 }
