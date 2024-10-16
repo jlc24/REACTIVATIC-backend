@@ -42,18 +42,20 @@ public interface IRepresentantesAod {
         })
     List<Representantes> buscar(String buscar);
 
-    @Select("SELECT r.idrepresentante, r.idpersona, p.primerapellido, p.segundoapellido, p.primernombre, p.dip, " +
-        "EXISTS (SELECT 1 FROM beneficiosempresas be WHERE be.idempresa = e.idempresa) AS en_beneficio " +
+    @Select("SELECT DISTINCT r.idrepresentante, r.idpersona, p.primerapellido, p.segundoapellido, p.primernombre, p.dip, " +
+        "EXISTS (SELECT 1 FROM beneficiosempresas be WHERE be.idempresa = e.idempresa AND be.idbeneficio = #{idbeneficio}) AS en_beneficio " +
         "FROM representantes r " +
         "JOIN personas p ON r.idpersona = p.idpersona " +
         "JOIN empresas e ON e.idrepresentante = r.idrepresentante " +
-        "WHERE CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.dip) ILIKE '%'||#{buscar}||'%' AND p.estado=true " +
+        "LEFT JOIN beneficiosempresas be ON be.idempresa = e.idempresa " +
+        "WHERE CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.dip) ILIKE '%'||#{buscar}||'%' " +
+        "AND p.estado=true " +
         "ORDER BY p.primerapellido LIMIT #{cantidad} OFFSET #{pagina}")
     @Results({
         @Result(property ="persona", column ="idpersona", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
         @Result(property = "enBeneficio", column = "en_beneficio"),
     })
-    List<Representantes> datosl(String buscar, Integer pagina, Integer cantidad);
+    List<Representantes> datosl(String buscar, Integer pagina, Integer cantidad, Long idbeneficio);
 
     @Select("SELECT COUNT(r.idrepresentante) " +
         "FROM representantes r " +

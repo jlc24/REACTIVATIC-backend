@@ -1,6 +1,7 @@
 package bo.sddpi.reactivatic.modulos.aods;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -9,6 +10,7 @@ import org.apache.ibatis.annotations.One;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.Update;
 
 import bo.sddpi.reactivatic.modulos.entidades.Empresas;
@@ -107,6 +109,15 @@ public interface IEmpresasAod {
 
     @Select("SELECT idempresa FROM empresas WHERE idrepresentante=#{idrepresentante}")
     Long empresa(Long idrepresentante);
+
+    @SelectProvider(type = MyMapper.class, method = "construirConsultaDinamica")
+    @Results({
+        @Result(property = "representante", column = "idrepresentante", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRepresentantesAod.dato")),
+        @Result(property = "rubro", column = "idrubro", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRubrosAod.dato")),
+        @Result(property = "municipio", column = "idmunicipio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IMunicipiosAod.dato")),
+        @Result(property = "asociacion", column = "idasociacion", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IAsociacionesAod.dato"))
+    })
+    List<Empresas> obtenerEmpresasDinamico(Map<String, Object> parametros);
 
 }
 

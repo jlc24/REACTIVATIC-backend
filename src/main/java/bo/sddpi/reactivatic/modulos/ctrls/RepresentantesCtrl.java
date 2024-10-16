@@ -105,8 +105,9 @@ public class RepresentantesCtrl {
 
     @GetMapping("/l")
     ResponseEntity<?> datosl(@RequestParam(value = "buscar", defaultValue = "") String buscar,
-    @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
-    @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+                             @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                             @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad,
+                             @RequestParam(value = "beneficio", required = true) Long beneficio) {
         List<Representantes> datos = null;
         Map<String, Object> mensajes = new HashMap<>();
         int nropagina = 0;
@@ -116,7 +117,7 @@ public class RepresentantesCtrl {
             }else{
                 nropagina = (pagina - 1) * cantidad;
             }
-            datos = iRepresentantesAod.datosl(buscar, nropagina, cantidad);
+            datos = iRepresentantesAod.datosl(buscar, nropagina, cantidad, beneficio);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

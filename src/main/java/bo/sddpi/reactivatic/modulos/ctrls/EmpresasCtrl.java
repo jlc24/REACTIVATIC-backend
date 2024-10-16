@@ -1,8 +1,12 @@
 package bo.sddpi.reactivatic.modulos.ctrls;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -24,8 +28,6 @@ import bo.sddpi.reactivatic.modulos.aods.IEmpresasAod;
 import bo.sddpi.reactivatic.modulos.entidades.Empresas;
 import bo.sddpi.reactivatic.modulos.reportes.IEmpresasRep;
 import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -195,37 +197,6 @@ public class EmpresasCtrl {
         }
         return new ResponseEntity<Integer>(total, HttpStatus.OK);
     }
-    
-
-    @GetMapping(value = "/datosXLS", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    ResponseEntity<?> datosXLS(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
-        byte[] data = null;
-        List<Empresas> datos = null;
-        Map<String, Object> mensajes = new HashMap<>();
-        try {
-            datos = iEmpresasAod.datosrepo(buscar);
-            data = iEmpresasRep.datosXLS(datos);
-        } catch (Exception e) {
-            mensajes.put("mensaje", "Error al realizar el archivo Excel");
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<byte[]>(data, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/datosPDF", produces = MediaType.APPLICATION_PDF_VALUE)
-    ResponseEntity<?> datosPDF(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
-        byte[] data = null;
-        List<Empresas> datos = null;
-        Map<String, Object> mensajes = new HashMap<>();
-        try {
-            datos = iEmpresasAod.datosrepo(buscar);
-            data = iEmpresasRep.datosPDF(datos);
-        } catch (Exception e) {
-            mensajes.put("mensaje", "Error al realizar el archivo Excel");
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<byte[]>(data, HttpStatus.OK);
-    }
 
     @GetMapping(value = "/perfilempresa")
     ResponseEntity<?> perfilempresa() {
@@ -319,4 +290,151 @@ public class EmpresasCtrl {
         cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + archivo.getFilename() + "\"");
         return new ResponseEntity<Resource>(archivo, cabecera, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/datosXLS", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    ResponseEntity<?> datosXLS(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        byte[] data = null;
+        List<Empresas> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iEmpresasAod.datosrepo(buscar);
+            //data = iEmpresasRep.datosXLS(datos);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al realizar el archivo Excel");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<byte[]>(data, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/datosPDF", produces = MediaType.APPLICATION_PDF_VALUE)
+    ResponseEntity<?> datosPDF(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        byte[] data = null;
+        List<Empresas> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iEmpresasAod.datosrepo(buscar);
+            data = iEmpresasRep.datosPDF(datos);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al realizar el archivo Excel");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<byte[]>(data, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/reportePDF")//, produces = MediaType.APPLICATION_PDF_VALUE
+    ResponseEntity<?> reportesPDF(@RequestParam(value = "columnsemp", required = false) List<String> columnsemp,
+                                  @RequestParam(value = "columnsrub", required = false) List<String> columnsrub,
+                                  @RequestParam(value = "columnsmun", required = false) List<String> columnsmun,
+                                  @RequestParam(value = "columnsrep", required = false) List<String> columnsrep,
+                                  @RequestParam(value = "columnsper", required = false) List<String> columnsper,
+                                  @RequestParam(value = "municipio", defaultValue = "allM") String municipio,
+                                  @RequestParam(value = "rubro", defaultValue = "allR") String rubro,
+                                  @RequestParam(value = "fecharegistro", defaultValue = "allReg") String fecharegistro,
+                                  @RequestParam(value = "orden", defaultValue = "fechareg") String orden,
+                                  @RequestParam(value = "direccion", defaultValue = "ASC") String direccion){
+    
+        byte[] data = null;
+        Map<String, Object> parametros = new HashMap<>();
+        List<String> columns = new ArrayList<>();
+        
+        parametros.put("columnsemp", columnsemp);
+        parametros.put("columnsrub", columnsrub);
+        parametros.put("columnsmun", columnsmun);
+        parametros.put("columnsrep", columnsrep);
+        parametros.put("columnsper", columnsper);
+        parametros.put("municipio", municipio);
+        parametros.put("rubro", rubro);
+        parametros.put("fecharegistro", fecharegistro);
+        parametros.put("ordenCampo", orden);
+        parametros.put("ordenDireccion", direccion);
+
+        if (columnsemp != null) {
+            columnsemp.forEach(col -> columns.add(col));
+        }
+        if (columnsrub != null) {
+            columnsrub.forEach(col -> columns.add(col));
+        }
+        if (columnsmun != null) {
+            columnsmun.forEach(col -> columns.add(col));
+        }
+        if (columnsrep != null) {
+            columnsrep.forEach(col -> columns.add(col));
+        }
+        if (columnsper != null) {
+            columnsper.forEach(col -> columns.add(col));
+        }
+        
+        List<Empresas> empresas = iEmpresasAod.obtenerEmpresasDinamico(parametros);
+        
+    
+        return ResponseEntity.ok(empresas);
+    }
+    
+    @GetMapping(value = "/reporteXLS", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    ResponseEntity<?> reportesXLS(@RequestParam(value = "columnsemp", required = false) List<String> columnsemp,
+                                  @RequestParam(value = "columnsrub", required = false) List<String> columnsrub,
+                                  @RequestParam(value = "columnsmun", required = false) List<String> columnsmun,
+                                  @RequestParam(value = "columnsrep", required = false) List<String> columnsrep,
+                                  @RequestParam(value = "columnsper", required = false) List<String> columnsper,
+                                  @RequestParam(value = "municipio", defaultValue = "allM") String municipio,
+                                  @RequestParam(value = "rubro", defaultValue = "allR") String rubro,
+                                  @RequestParam(value = "fecharegistro", defaultValue = "allReg") String fecharegistro,
+                                  @RequestParam(value = "orden", defaultValue = "fechareg") String orden,
+                                  @RequestParam(value = "direccion", defaultValue = "ASC") String direccion) throws IOException{
+    
+        byte[] data = null;
+        Map<String, Object> parametros = new HashMap<>();
+        List<String> columns = new ArrayList<>();
+        Map<String, Object> mensajes = new HashMap<>();
+
+        parametros.put("columnsrep", columnsrep);
+        parametros.put("columnsper", columnsper);
+        parametros.put("columnsemp", columnsemp);
+        parametros.put("columnsrub", columnsrub);
+        parametros.put("columnsmun", columnsmun);
+        parametros.put("municipio", municipio);
+        parametros.put("rubro", rubro);
+        parametros.put("fecharegistro", fecharegistro);
+        parametros.put("ordenCampo", orden);
+        parametros.put("ordenDireccion", direccion); 
+
+        BiConsumer<List<String>, List<String>> addFilteredColumns = (sourceColumns, targetColumns) -> {
+            if (sourceColumns != null) {
+                boolean hasNombreFields = sourceColumns.contains("primerapellido") &&
+                                  sourceColumns.contains("segundoapellido") &&
+                                  sourceColumns.contains("primernombre");
+                if (hasNombreFields) {
+                    targetColumns.add("nombre");
+                }
+
+                sourceColumns.stream()
+                    .filter(col -> !col.equalsIgnoreCase("idrepresentante") && 
+                                   !col.equalsIgnoreCase("idpersona") && 
+                                   !col.equalsIgnoreCase("primerapellido") && 
+                                   !col.equalsIgnoreCase("segundoapellido") && 
+                                   !col.equalsIgnoreCase("primernombre") && 
+                                   !col.equalsIgnoreCase("idrubro") && 
+                                   !col.equalsIgnoreCase("idmunicipio") &&
+                                   !col.equalsIgnoreCase("carnet")) 
+                    .forEach(targetColumns::add);
+            }
+        };
+
+        addFilteredColumns.accept(columnsrep, columns);
+        addFilteredColumns.accept(columnsper, columns);
+        addFilteredColumns.accept(columnsemp, columns);
+        addFilteredColumns.accept(columnsrub, columns);
+        addFilteredColumns.accept(columnsmun, columns);
+
+        try {
+            List<Empresas> empresas = iEmpresasAod.obtenerEmpresasDinamico(parametros);
+            //System.out.println("Columnas para excel: " + columns.toString());
+            data = iEmpresasRep.datosXLS(empresas, columns);
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al realizar el archivo Excel");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<byte[]>(data, HttpStatus.OK);
+    }
+    
 }
