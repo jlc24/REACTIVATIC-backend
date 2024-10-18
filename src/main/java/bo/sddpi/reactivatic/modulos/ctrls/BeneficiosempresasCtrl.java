@@ -1,5 +1,6 @@
 package bo.sddpi.reactivatic.modulos.ctrls;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -242,6 +243,25 @@ public class BeneficiosempresasCtrl {
             if (datobeneficio == null ) {
                 throw new IllegalArgumentException("No se encontraron datos para generar el PDF.");
             }
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al realizar el archivo Excel");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<byte[]>(dato, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/reporteXLS/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    ResponseEntity<?> planillaRegXLS(@PathVariable Long id) {
+        Long beneficio = id;
+
+        byte[] dato = null;
+        List<Beneficiosempresas> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        
+        try {
+            datos = iBeneficiosempresasAod.planillareg(beneficio);
+            dato = iPlanillasRep.planillaRegistroXLS(datos);
+            
         } catch (Exception e) {
             mensajes.put("mensaje", "Error al realizar el archivo Excel");
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);

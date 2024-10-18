@@ -9,6 +9,8 @@ import bo.sddpi.reactivatic.modulos.entidades.Beneficiosempresas;
 public interface IPlanillasRep {
 
     byte[] planillaInscripcionXLS(List<Beneficiosempresas> datos) throws IOException;
+    byte[] planillaRegistroXLS(List<Beneficiosempresas> datos) throws IOException;
+    byte[] planillaAsistenciaXLS(List<Beneficiosempresas> datos) throws IOException;
 
     byte[] planillaInscripcionPDF(Beneficios dato) throws IOException;
     byte[] planillaRegistroPDF(List<Beneficiosempresas> datos, Beneficios dato) throws IOException;

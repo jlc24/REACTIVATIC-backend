@@ -38,7 +38,7 @@ public interface IBeneficiosAod {
             "</script>")
     Integer cantidad(Long idusuario, String buscar);
 
-    @Select("SELECT idbeneficio, beneficio FROM beneficios WHERE estado=true ORDER BY beneficio")
+    @Select("SELECT * FROM beneficios WHERE estado=true ORDER BY beneficio")
     List<Beneficios> listar();
 
     @Insert("INSERT INTO beneficios (beneficio, descripcion, idtipobeneficio, idmunicipio, direccion, fechainicio, fechafin, idcapacitador, capacidad, idusuario) " +
