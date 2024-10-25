@@ -24,6 +24,22 @@ public interface IBeneficiosempresasAod {
         })
     List<Beneficiosempresas> datos(Long idbeneficio, String buscar, Integer cantidad, Integer pagina);
 
+    @Select("SELECT * FROM beneficiosempresas be " +
+            "JOIN empresas e ON e.idempresa=be.idempresa " +
+            "JOIN rubros rb ON rb.idrubro = e.idrubro " +
+            "JOIN representantes r ON r.idrepresentante=e.idrepresentante " +
+            "JOIN personas p ON p.idpersona=r.idpersona " +
+            "WHERE be.idbeneficio=#{idbeneficio} " +
+            "ORDER BY rb.rubro, p.primerapellido ")
+        @Results({
+                @Result(property = "empresa", column = "idempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato")),
+        })
+    List<Beneficiosempresas> datoslista(Long idbeneficio);
+
+    @Select("SELECT * FROM beneficiosempresas " +
+            "WHERE idbeneficio=#{idbeneficio} ")
+    List<Beneficiosempresas> datosl(Long idbeneficio);
+
     @Select("SELECT COUNT(be.idbeneficioempresa) FROM beneficiosempresas be " +
             "JOIN empresas e ON e.idempresa=be.idempresa " +
             "JOIN representantes r ON r.idrepresentante=e.idrepresentante " +
@@ -59,10 +75,22 @@ public interface IBeneficiosempresasAod {
             "WHERE b.idbeneficio=#{idbeneficio} ORDER BY e.empresa")
     List<String> buscarbeneficio(Long idbeneficio);
 
-    @Select("SELECT b.beneficio FROM beneficios AS b " + 
-            "INNER JOIN beneficiosempresas AS be ON be.idebeneficio=b.idebeneficio" +
-            "WHERE be.idempresa=#{idempresa} ORDER BY b.beneficio")
-    List<String> buscarempresa(Long idempresa);
+    @Select("SELECT * FROM beneficiosempresas be " + 
+            "JOIN beneficios b ON b.idbeneficio=be.idbeneficio " +
+            "JOIN tiposbeneficios tb ON tb.idtipobeneficio=b.idtipobeneficio " +
+            "WHERE CONCAT(b.beneficio, ' ', tb.tipobeneficio) ILIKE '%'||#{buscar}||'%' " +
+            "AND be.idempresa=#{idempresa} ORDER BY b.fechainicio DESC ")
+    @Results({
+        @Result(property = "beneficio", column = "idbeneficio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IBeneficiosAod.dato"))
+    })
+    List<Beneficiosempresas> empresabeneficios(Long idempresa, String buscar);
+
+    @Select("SELECT COUNT(be.idbeneficioempresa) FROM beneficiosempresas be " + 
+            "JOIN beneficios b ON b.idbeneficio=be.idbeneficio " +
+            "JOIN tiposbeneficios tb ON tb.idtipobeneficio=b.idtipobeneficio " +
+            "WHERE CONCAT(b.beneficio, ' ', tb.tipobeneficio) ILIKE '%'||#{buscar}||'%' " +
+            "AND be.idempresa=#{idempresa} ")
+    Integer cantidadbe(Long idempresa, String buscar);
 
     @Select("SELECT * FROM beneficiosempresas be " +
             "JOIN empresas e ON e.idempresa=be.idempresa " +

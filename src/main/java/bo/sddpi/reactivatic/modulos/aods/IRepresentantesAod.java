@@ -36,7 +36,8 @@ public interface IRepresentantesAod {
     @Select("SELECT r.idrepresentante, r.idpersona, p.primerapellido, p.segundoapellido, p.primernombre " +
         "FROM representantes r " +
         "JOIN personas p ON r.idpersona = p.idpersona " +
-        "WHERE p.estado=true AND CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.dip, ' ') ILIKE '%' || #{buscar} || '%'")
+        "WHERE p.estado=true AND CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.dip, ' ') ILIKE '%' || #{buscar} || '%' " +
+        "ORDER BY p.created_at DESC ")
         @Results({
             @Result(property ="persona", column ="idpersona", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
         })

@@ -99,6 +99,24 @@ public class BeneficiosempresasCtrl {
         }
         return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
     }
+    @GetMapping("/l/{id}")
+    ResponseEntity<?> datoslista(@PathVariable Long id){
+        List<Beneficiosempresas> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+
+        if (id == null || id <= 0) {
+            mensajes.put("mensaje", "El parámetro 'beneficio' es obligatorio y debe ser un valor positivo.");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            datos = iBeneficiosempresasAod.datoslista(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Beneficiosempresas>>(datos, HttpStatus.OK);
+    }
 
     @PostMapping
     ResponseEntity<?> crear(@Valid @RequestBody Map<String, Object> datos, BindingResult resultado){
@@ -206,6 +224,42 @@ public class BeneficiosempresasCtrl {
         return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
     }
 
+    @GetMapping("/beneficios")
+    ResponseEntity<?> empresabeneficios(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                        @RequestParam(value = "empresa", required = true) Long empresa) {
+        List<Beneficiosempresas> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+
+        if (empresa == null || empresa <= 0) {
+            mensajes.put("mensaje", "El parámetro 'empresa' es obligatorio y debe ser un valor positivo.");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            datos = iBeneficiosempresasAod.empresabeneficios(empresa, buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en al base de datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Beneficiosempresas>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping("/beneficios/cantidad")
+    ResponseEntity<?> cantidadbeneficio(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                        @RequestParam(value = "empresa", required = true) Long empresa){
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            cantidad = iBeneficiosempresasAod.cantidadbe(empresa, buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/planillaregistro/{id}", produces = MediaType.APPLICATION_PDF_VALUE)
     ResponseEntity<?> planillaReg(@PathVariable Long id){
         Long beneficio = id;
@@ -250,7 +304,7 @@ public class BeneficiosempresasCtrl {
         return new ResponseEntity<byte[]>(dato, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/reporteXLS/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/planillaXLS/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     ResponseEntity<?> planillaRegXLS(@PathVariable Long id) {
         Long beneficio = id;
 
