@@ -191,7 +191,7 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
                     throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
                 }
                 break;
-            case "formularioA":
+            case "formularioa":
                 Path directorioEmpresasForA = Paths.get(rutaEmpresas.toString(), id.toString() + "/formulario");
                 try {
                     Files.createDirectories(directorioEmpresasForA);
@@ -200,7 +200,7 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
                     throw new RuntimeException("No se pudo crear el directorio. Error: " + e.getMessage());
                 }
                 break;
-            case "formularioB":
+            case "formulariob":
                 Path directorioEmpresasForB = Paths.get(rutaEmpresas.toString(), id.toString() + "/formulario");
                 try {
                     Files.createDirectories(directorioEmpresasForB);
@@ -701,6 +701,68 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
             if (writer.getPageNumber() == 0) {
                 throw new DocumentException("No se pudieron añadir imágenes al documento PDF.");
             }
+
+        } catch (BadElementException | IOException e) {
+            throw new IOException("Error al cargar las imágenes: " + e.getMessage());
+        } finally {
+            document.close();
+        }
+
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    public byte[] generarFormularioPdf(Long idempresa) throws DocumentException, IOException {
+        Path empresaDir = rutaEmpresas.resolve(String.valueOf(idempresa));
+        
+        // Verificamos si el directorio del representante existe
+        if (!Files.exists(empresaDir) || !Files.isDirectory(empresaDir)) {
+            throw new IOException("El usuario no tiene registrado sus credenciales.");
+        }
+
+        Path formAPath = empresaDir.resolve("formulario/" + idempresa + "_formulario_a.png");
+        Path formBPath = empresaDir.resolve("formulario/" + idempresa + "_formulario_b.png");
+
+        // Verificamos si los archivos de imagen existen
+        if (!Files.exists(formAPath)) {
+            throw new IOException("La imagen '" + idempresa + "_formulario_a.png' no fue encontrada");
+        }
+
+        if (!Files.exists(formBPath)) {
+            throw new IOException("La imagen '" + idempresa + "_formulario_b.png' no fue encontrada");
+        }
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.LETTER);
+        PdfWriter.getInstance(document, byteArrayOutputStream);
+        document.open();
+
+        try {
+            byte[] formABytes = Files.readAllBytes(formAPath);
+            byte[] formBBytes = Files.readAllBytes(formBPath);
+
+            Image formularioA = Image.getInstance(formABytes);
+            Image formularioB = Image.getInstance(formBBytes);
+
+            // Ajustamos cada imagen al tamaño de la página carta
+            formularioA.scaleToFit(PageSize.LETTER.getWidth(), PageSize.LETTER.getHeight());
+            formularioB.scaleToFit(PageSize.LETTER.getWidth(), PageSize.LETTER.getHeight());
+
+            // Centramos cada imagen en la página
+            formularioA.setAbsolutePosition(
+                (PageSize.LETTER.getWidth() - formularioA.getScaledWidth()) / 2,
+                (PageSize.LETTER.getHeight() - formularioA.getScaledHeight()) / 2
+            );
+            formularioB.setAbsolutePosition(
+                (PageSize.LETTER.getWidth() - formularioB.getScaledWidth()) / 2,
+                (PageSize.LETTER.getHeight() - formularioB.getScaledHeight()) / 2
+            );
+
+            // Agregamos la primera imagen a la primera página
+            document.add(formularioA);
+            document.newPage(); // Crea una nueva página para la siguiente imagen
+
+            // Agregamos la segunda imagen a la segunda página
+            document.add(formularioB);
 
         } catch (BadElementException | IOException e) {
             throw new IOException("Error al cargar las imágenes: " + e.getMessage());

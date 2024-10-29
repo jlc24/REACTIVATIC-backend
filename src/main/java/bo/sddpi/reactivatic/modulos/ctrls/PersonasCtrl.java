@@ -506,4 +506,6 @@ public class PersonasCtrl {
             return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    
 }

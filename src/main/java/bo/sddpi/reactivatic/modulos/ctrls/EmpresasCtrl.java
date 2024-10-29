@@ -24,6 +24,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.itextpdf.text.DocumentException;
+
 import bo.sddpi.reactivatic.modulos.aods.IEmpresasAod;
 import bo.sddpi.reactivatic.modulos.entidades.Empresas;
 import bo.sddpi.reactivatic.modulos.reportes.IEmpresasRep;
@@ -289,6 +291,29 @@ public class EmpresasCtrl {
         HttpHeaders cabecera = new HttpHeaders();
         cabecera.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + archivo.getFilename() + "\"");
         return new ResponseEntity<Resource>(archivo, cabecera, HttpStatus.OK);
+    }
+
+    @GetMapping("/formulario/{id}")
+    public ResponseEntity<?> generarFormularioPdf(@PathVariable Long id) {
+        try {
+            // Llamamos al servicio que genera el PDF
+            byte[] pdfBytes = iSubirarchivosServ.generarFormularioPdf(id);
+
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=formulario_" + id + ".pdf")
+                    .contentType(org.springframework.http.MediaType.APPLICATION_PDF)
+                    .body(pdfBytes);
+
+        } catch (IOException e) {
+            Map<String, Object> mensajes = new HashMap<>();
+            mensajes.put("mensaje", "Error: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.NOT_FOUND); // Cambiar a NOT_FOUND ya que el recurso no existe.
+
+        } catch (DocumentException e) {
+            Map<String, Object> mensajes = new HashMap<>();
+            mensajes.put("mensaje", "Error al generar el PDF: " + e.getMessage());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(value = "/datosXLS", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

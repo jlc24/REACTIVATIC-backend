@@ -40,5 +40,7 @@ public interface ISubirarchivosServ {
     public Resource descargarimagenempresa(String archivo);
 
     public byte[] generarCarnetPdf(Long idPersona) throws DocumentException, IOException;
+    
+    public byte[] generarFormularioPdf(Long idempresa) throws DocumentException, IOException;
 
 }
