@@ -98,13 +98,28 @@ public class SolicitudesCtrl {
         return new ResponseEntity<List<Solicitudes>>(datos, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/cantidade")
-    ResponseEntity<?> cantidade() {
+    @GetMapping(value = "/cantidadvp")
+    ResponseEntity<?> cantidadvp() {
         Integer cantidad = null;
         Map<String, Object> mensajes = new HashMap<>();
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            cantidad = iSolicitudesAod.cantidade(Long.parseLong(auth.getName()));
+            cantidad = iSolicitudesAod.cantidadvp(Long.parseLong(auth.getName()));
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/cantidadvr")
+    ResponseEntity<?> cantidadvr() {
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            cantidad = iSolicitudesAod.cantidadvr(Long.parseLong(auth.getName()));
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

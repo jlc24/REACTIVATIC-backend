@@ -13,7 +13,7 @@ public interface IAsistenciasempresasAod {
     @Options(useGeneratedKeys = true, keyProperty = "idasistenciaempresa", keyColumn = "idasistenciaempresa")
     void adicionar(Asistenciasempresas dato);
 
-    @Update("UPDATE asistenciasempresas SET asistencia=#{asistencia} WHERE idasistenciaempresa=#{idasistenciaempresa})")
+    @Update("UPDATE asistenciasempresas SET asistencia=#{asistencia} WHERE idasistenciaempresa=#{idasistenciaempresa} ")
     void modificarasistencia(Asistenciasempresas asistenciaempresa);
 
     @Delete("DELETE FROM asistenciaempresas WHERE idasistenciaempresa=#{id}")
@@ -22,7 +22,7 @@ public interface IAsistenciasempresasAod {
     @Select("SELECT fecha FROM asistenciasempresas WHERE idasistencia=#{idasistencia} GROUP BY fecha ORDER BY fecha")
     List<Asistenciasempresas> fechas(Long idasistencia);
 
-    @Select("SELECT * FROM asistenciasempresas WHERE idasistencia=#{idasistencia}")
+    @Select("SELECT * FROM asistenciasempresas WHERE idasistencia=#{idasistencia} ORDER BY idasistenciaempresa")
     List<Asistenciasempresas> datos(Long idasistencia);
 
 }

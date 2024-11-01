@@ -49,8 +49,16 @@ public interface ISolicitudesAod {
             "JOIN representantes r using(idrepresentante) " +
             "JOIN personas p using(idpersona) " +
             "JOIN usuarios u using(idpersona) " +
-            "WHERE u.idusuario=#{idusuario} ")
-    Integer cantidade(Long idusuario);
+            "WHERE u.idusuario=#{idusuario} AND s.estado=false")
+    Integer cantidadvp(Long idusuario);
+    @Select("SELECT count(s.idsolicitud) " +
+            "FROM solicitudes s " +
+            "JOIN empresas e using(idempresa) " +
+            "JOIN representantes r using(idrepresentante) " +
+            "JOIN personas p using(idpersona) " +
+            "JOIN usuarios u using(idpersona) " +
+            "WHERE u.idusuario=#{idusuario} AND s.estado=true")
+    Integer cantidadvr(Long idusuario);
 
     @Select("select * from procesasolicitud(#{idcliente}, #{idusuario})")
     Integer procesasolicitud(Long idcliente, Long idusuario);

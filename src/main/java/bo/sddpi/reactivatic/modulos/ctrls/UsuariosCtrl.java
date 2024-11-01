@@ -324,8 +324,10 @@ public class UsuariosCtrl {
     ResponseEntity<?> cambiarclave(@RequestBody Usuarios usuario) {
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            usuario.setIdusuario(Long.parseLong(auth.getName()));
+            if (usuario.getIdusuario() == null) {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                usuario.setIdusuario(Long.parseLong(auth.getName()));
+            }
             iUsuariosAod.cambiarclave(usuario);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");

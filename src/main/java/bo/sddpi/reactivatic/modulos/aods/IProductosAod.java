@@ -27,11 +27,9 @@ public interface IProductosAod {
     @Select("SELECT p.* " +
             "FROM productos p " +
             "JOIN empresas e ON e.idempresa=p.idempresa " +
-            "JOIN subrubros ur ON e.idsubrubro = ur.idsubrubro " +
-            "JOIN rubros r ON ur.idrubro = r.idrubro " +
-            "JOIN localidades l ON e.idlocalidad = l.idlocalidad " +
-            "JOIN municipios m ON l.idmunicipio = m.idmunicipio " +
-            "WHERE concat(p.producto, ' ', e.empresa, ' ', ur.subrubro, ' ', r.rubro, ' ', l.localidad, ' ', m.municipio, ' ') " +
+            "JOIN rubros r ON r.idrubro = e.idrubro " +
+            "JOIN municipios m ON m.idmunicipio = e.idmunicipio " +
+            "WHERE concat(p.producto, ' ', e.empresa, ' ', r.rubro, ' ', m.municipio, ' ') " +
             "ILIKE '%'||#{buscar}||'%' " +
             "AND r.rubro ILIKE '%'||#{rubro}||'%' " +
             "ORDER BY p.idproducto DESC " +
@@ -47,11 +45,9 @@ public interface IProductosAod {
     @Select("SELECT count(p.idproducto) " +
             "FROM productos p " +
             "JOIN empresas e ON e.idempresa=p.idempresa " +
-            "JOIN subrubros ur ON e.idsubrubro = ur.idsubrubro " +
-            "JOIN rubros r ON ur.idrubro = r.idrubro " +
-            "JOIN localidades l ON e.idlocalidad = l.idlocalidad " +
-            "JOIN municipios m ON l.idmunicipio = m.idmunicipio " +
-            "WHERE concat(p.producto, ' ', e.empresa, ' ', ur.subrubro, ' ', r.rubro, ' ', l.localidad, ' ', m.municipio, ' ') " +
+            "JOIN rubros r ON r.idrubro = e.idrubro " +
+            "JOIN municipios m ON m.idmunicipio = e.idmunicipio " +
+            "WHERE concat(p.producto, ' ', e.empresa, ' ', r.rubro, ' ', m.municipio, ' ') " +
             "ILIKE '%'||#{buscar}||'%' " +
             "AND r.rubro ILIKE '%'||#{rubro}||'%' ")
     Integer cantidadAdmin(String buscar, String rubro);
