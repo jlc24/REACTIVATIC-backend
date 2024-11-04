@@ -23,13 +23,19 @@ public interface IClientesAod {
             "INNER JOIN clientes AS c ON c.idpersona=p.idpersona")
     List<Clientes> listar();
 
-    @Select("SELECT c.idcliente, p.idpersona, p.primerapellido, p.segundoapellidos, p.primernombre, p.telefono, p.celular" + 
-            "FROM personas AS p" +
-            "INNER JOIN clientes AS c ON c.idpersona=p.idpersona," + 
-            "WHERE p.primerapellido ilike '%'||#{buscar}||'%' OR p.segundoapellido ilike '%'||#{buscar}||'%' OR p.primernombre ilike '%'||#{buscar}||'%' ORDER BY orden LIMIT #{cantidad} OFFSET #{pagina}")
+    @Select("SELECT c.idcliente, p.idpersona, p.primerapellido, p.segundoapellido, p.primernombre, p.telefono, p.celular " + 
+            "FROM clientes c " +
+            "JOIN personas AS p ON c.idpersona=p.idpersona " + 
+            "WHERE p.primerapellido ilike '%'||#{buscar}||'%' OR p.segundoapellido ilike '%'||#{buscar}||'%' OR p.primernombre ilike '%'||#{buscar}||'%' " + 
+            "ORDER BY p.created_at DESC LIMIT #{cantidad} OFFSET #{pagina} ")
+    @Results({
+        @Result(property ="persona", column ="idpersona", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
+    })
     List<Clientes> buscar(String buscar, Integer pagina, Integer cantidad);
 
-    @Select("SELECT count(idpersona) FROM personas AS p WHERE p.primerapellido ilike '%'||#{buscar}||'%' OR p.segundoapellido ilike '%'||#{buscar}||'%' OR p.primernombre ilike '%'||#{buscar}||'%' ")
+    @Select("SELECT count(c.idcliente) " + 
+            "FROM clientes c " +
+            "JOIN personas AS p ON c.idpersona=p.idpersona ")
     Integer cantidad(String buscar);
 
     @Delete("DELETE FROM clientes WHERE idpersona=#{idpersona}")

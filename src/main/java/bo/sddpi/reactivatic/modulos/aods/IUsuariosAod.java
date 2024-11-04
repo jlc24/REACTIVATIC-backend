@@ -201,6 +201,17 @@ public interface IUsuariosAod {
     })
     Usuarios datorep(Long id);
 
+    @Select("SELECT u.idusuario, u.idpersona, u.idpersona as ifore1, ur.idrol as ifore2, u.usuario, u.clave, u.estado, u.idcargo " +
+        "FROM usuarios u " +
+        "JOIN usuariosroles ur ON u.idusuario = ur.idusuario " +
+        "WHERE u.estado = TRUE AND ur.idrol=8 AND u.idpersona = #{id}")
+    @Results({
+        @Result(property = "persona", column = "ifore1", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
+        @Result(property = "rol", column = "ifore2", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRolesAod.dato")),
+        @Result(property = "cargo", column = "idcargo", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ICargosAod.dato"))
+    })
+    Usuarios datocli(Long id);
+
     //ANALIZANDO...
     @Select("SELECT idusuario from usuarios where usuario=#{usuario}")
     Long verificausuarioregistro(String usuario);

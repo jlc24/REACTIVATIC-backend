@@ -414,7 +414,7 @@ public class CatalogosCtrl {
                 iUsuariosAod.adicionar(usuarionuevo);
                 
                 usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
-                usuariorolnuevo.setIdrol(7L);
+                usuariorolnuevo.setIdrol(8L);
                 iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
 
                 iSolicitudesAod.procesasolicitud(dato.getIdcliente(), usuarionuevo.getIdusuario());

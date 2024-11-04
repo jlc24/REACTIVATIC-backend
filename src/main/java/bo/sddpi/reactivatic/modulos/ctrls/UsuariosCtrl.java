@@ -172,6 +172,23 @@ public class UsuariosCtrl {
         }
         return new ResponseEntity<Usuarios>(dato, HttpStatus.OK);
     }
+    @GetMapping(value = "/clientes/{id}")
+    public ResponseEntity<?> datocli(@PathVariable Long id) {
+        Usuarios dato = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            dato = iUsuariosAod.datocli(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        if (dato==null) {
+            mensajes.put("mensaje", "El id: ".concat(id.toString()).concat(" no existe en la Base de Datos"));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<Usuarios>(dato, HttpStatus.OK);
+    }
 
     @PostMapping
     ResponseEntity<?> adicionar(@Valid @RequestBody Usuarios dato, BindingResult resultado){

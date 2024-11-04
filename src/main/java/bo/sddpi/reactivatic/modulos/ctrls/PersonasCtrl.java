@@ -409,6 +409,61 @@ public class PersonasCtrl {
         }
     }
 
+    @PostMapping("/adicionarcli")
+    ResponseEntity<?> adicionarCli(@Valid @RequestBody Personas dato, BindingResult resultado) {
+        Map<String, Object> mensajes = new HashMap<>();
+        if (resultado.hasErrors()) {
+            List<String> errores = resultado.getFieldErrors().stream().map(err -> "El campo '"+err.getField()+"' "+err.getDefaultMessage()).collect(Collectors.toList());
+            mensajes.put("errores", errores);
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.BAD_REQUEST);
+        }
+        Long verificarpersona = iPersonasAod.verificarpersonaregistro(dato.getPrimerapellido(), dato.getSegundoapellido(), dato.getPrimernombre(), dato.getDip());
+        Long verificarusuario = iUsuariosAod.verificausuarioregistro(dato.getUsuario().getUsuario());
+        if (verificarpersona != null) {
+            mensajes.put("mensaje", "La persona ya se encuentra registrada en el sistema.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else if (verificarusuario != null) {
+            mensajes.put("mensaje", "El usuario ya existe.");
+            return new ResponseEntity<>(mensajes, HttpStatus.CONFLICT);
+        }else{
+            try {
+                Usuarios usuarionuevo = new Usuarios();
+                Personas personanuevo = new Personas();
+                Usuariosroles usuariorolnuevo = new Usuariosroles();
+                Clientes clientenuevo = new Clientes();
+
+                personanuevo.setPrimerapellido(dato.getPrimerapellido());
+                personanuevo.setSegundoapellido(dato.getSegundoapellido());
+                personanuevo.setPrimernombre(dato.getPrimernombre());
+                personanuevo.setDireccion(dato.getDireccion());
+                personanuevo.setCelular(dato.getCelular());
+                personanuevo.setCorreo(dato.getCorreo());
+                personanuevo.setEstado(true);
+                iPersonasAod.adicionar(personanuevo);
+
+                usuarionuevo.setUsuario(dato.getUsuario().getUsuario());
+                usuarionuevo.setClave(dato.getUsuario().getClave());
+                usuarionuevo.setEstado(true);
+                usuarionuevo.setIdpersona(personanuevo.getIdpersona());
+                iUsuariosAod.adicionar(usuarionuevo);
+
+                clientenuevo.setIdpersona(personanuevo.getIdpersona());
+                iClientesAod.adicionar(clientenuevo);
+
+                usuariorolnuevo.setIdusuario(usuarionuevo.getIdusuario());
+                usuariorolnuevo.setIdrol(8L);
+                iUsuariosrolesAod.adicionarusuariorol(usuariorolnuevo);
+
+            } catch (DataAccessException e) {
+                mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+                mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+                return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            mensajes.put("mensaje", "Se ha modificado correctamente el dato en la Base de Datos");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
+        }
+    }
+
     @GetMapping("/roles/{id}")
     ResponseEntity<?> usuariosrol(@PathVariable Long id){
         List<Personas> datos = null;
