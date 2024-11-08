@@ -39,6 +39,10 @@ public interface IBeneficiosAod {
     Integer cantidad(Long idusuario, String buscar);
 
     @Select("SELECT * FROM beneficios WHERE estado=true ORDER BY beneficio")
+    @Results({
+        @Result(property = "tipobeneficio", column = "idtipobeneficio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.ITiposbeneficiosAod.dato")),
+        @Result(property = "municipio", column = "idmunicipio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IMunicipiosAod.dato")),
+    })
     List<Beneficios> listar();
 
     @Insert("INSERT INTO beneficios (beneficio, descripcion, idtipobeneficio, idmunicipio, direccion, fechainicio, fechafin, idcapacitador, capacidad, idusuario) " +
