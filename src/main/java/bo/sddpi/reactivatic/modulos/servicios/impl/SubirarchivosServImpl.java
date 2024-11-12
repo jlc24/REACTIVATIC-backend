@@ -420,7 +420,7 @@ public class SubirarchivosServImpl implements ISubirarchivosServ {
                 break;
             case "productos":
                 directorio = Paths.get(rutaProductos.toString(), id.toString());
-                rutaArchivo = buscarArchivoEnDirectorio(directorio, archivo + ".png");
+                rutaArchivo = buscarArchivoEnDirectorio(directorio, archivo);
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de archivo no válido");

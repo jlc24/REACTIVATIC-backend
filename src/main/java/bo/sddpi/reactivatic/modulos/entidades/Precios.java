@@ -15,10 +15,12 @@ public class Precios implements Serializable {
     private Long idproducto;
     private BigDecimal precio;
     private Long idtamano;
+    private Long idmaterial;
     private String cantidad;
     private Boolean estado;
     private LocalDateTime created_at;
 
     private Productos producto;
     private Tamanos tamano;
+    private Materiales material;
 }

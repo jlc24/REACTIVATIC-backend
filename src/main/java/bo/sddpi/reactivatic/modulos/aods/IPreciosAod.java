@@ -18,7 +18,7 @@ public interface IPreciosAod {
     @Select("SELECT * FROM precios WHERE idproducto=#{idproducto}")
     List<Precios> lista(Long idproducto);
 
-    @Insert("INSERT INTO precios (idproducto, precio, cantidad) VALUES (#{idproducto}, #{precio}, #{cantidad})")
+    @Insert("INSERT INTO precios (idproducto, precio, cantidad, idtamano, idmaterial) VALUES (#{idproducto}, #{precio}, #{cantidad}, #{idtamano}, #{idmaterial})")
     void adicionar(Precios precio);
 
     @Delete("DELETE FROM precios WHERE idprecio=#{idprecio}")

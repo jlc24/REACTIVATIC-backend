@@ -18,6 +18,8 @@ public interface ISubirarchivosServ {
     public void uploadimagen(Long id, MultipartFile archivo, String tipo);
 
     public List<Map<String, String>> downloadimagen(Long id, String tipo);
+    
+    public void eliminarimagen(Long id, String archivo, String tipo );
 
     public void cargarimagenproducto(Long id, MultipartFile archivo);
 

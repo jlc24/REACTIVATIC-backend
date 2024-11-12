@@ -295,17 +295,21 @@ public class ProductosCtrl {
         return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/eliminarp/{id}")
-    ResponseEntity<?> cargar(@PathVariable Long id) {
+    @PostMapping(value = "/eliminarp")
+    public ResponseEntity<?> eliminarImagen(@RequestBody Map<String, Object> parametros) {
         Map<String, Object> mensajes = new HashMap<>();
         try {
-            iSubirarchivosServ.eliminarimagenproducto(id);
+            Long id = Long.valueOf(parametros.get("id").toString());
+            String archivo = parametros.get("archivo").toString();
+            String tipo = parametros.get("tipo").toString();
+
+            iSubirarchivosServ.eliminarimagen(id, archivo, tipo);
+            mensajes.put("mensaje", "Se eliminó el archivo con éxito.");
+            return new ResponseEntity<>(mensajes, HttpStatus.OK);
         } catch (Exception e) {
-            mensajes.put("mensaje", "No se pudo eliminar el archivo: !!! error:" + e.toString());
-            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+            mensajes.put("mensaje", "No se pudo eliminar el archivo: error: " + e.toString());
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        mensajes.put("mensaje", "Se elimino el archivo con éxito: ");
-        return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.OK);
     }
 
     @GetMapping(value="/descargarproducto/{idproducto}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
