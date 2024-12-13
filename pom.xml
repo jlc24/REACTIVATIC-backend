@@ -119,7 +119,7 @@
 	</dependencyManagement>
 
 	<build>
-		<finalName>mipymesapp</finalName>
+		<finalName>reactivaticapp</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
