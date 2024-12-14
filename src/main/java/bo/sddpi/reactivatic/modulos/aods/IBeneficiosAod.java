@@ -59,4 +59,11 @@ public interface IBeneficiosAod {
 
     @Delete("DELETE FROM beneficios WHERE idbeneficio=#{idbeneficio}")
     void eliminar(Beneficios beneficio);
+
+    @Select("SELECT * FROM beneficios " +
+            "WHERE estado=true " +
+            "AND idtipobeneficio=7 " +
+            "AND CAST(fechainicio AS DATE) <= CAST(CURRENT_DATE AS DATE) " +
+            "AND CAST(fechafin AS DATE) >= CAST(CURRENT_DATE AS DATE); ")
+    Beneficios negocios();
 }

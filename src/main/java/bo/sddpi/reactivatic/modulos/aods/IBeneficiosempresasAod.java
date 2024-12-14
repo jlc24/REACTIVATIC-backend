@@ -5,12 +5,20 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.*;
 
+import bo.sddpi.reactivatic.modulos.entidades.Beneficios;
 import bo.sddpi.reactivatic.modulos.entidades.Beneficiosempresas;
 
 
 @Mapper
 public interface IBeneficiosempresasAod {
     
+    @Select("SELECT * FROM beneficiosempresas WHERE idbeneficioempresa=#{id}")
+    @Results({
+        @Result(property = "beneficio", column = "idbeneficio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IBeneficioAod.dato")),
+        @Result(property = "Empresa", column = "idempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresaAod.dato"))
+    })
+    Beneficios dato(Long id);
+
     @Select("SELECT * FROM beneficiosempresas be " +
             "JOIN empresas e ON e.idempresa=be.idempresa " +
             "JOIN rubros rb ON rb.idrubro = e.idrubro " +

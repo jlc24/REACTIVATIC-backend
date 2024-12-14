@@ -20,6 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import bo.sddpi.reactivatic.modulos.aods.IBeneficiosAod;
 import bo.sddpi.reactivatic.modulos.entidades.Beneficios;
 import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/apirest/beneficios")
@@ -243,4 +246,19 @@ public class BeneficiosCtrl {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mensajes);
         }
     }
+
+    @GetMapping("/negocios")
+    ResponseEntity<?> negocio(){
+        Beneficios beneficio = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            beneficio = ibeneficiosAod.negocios();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<>(beneficio, HttpStatus.OK);
+    }
+    
 }
