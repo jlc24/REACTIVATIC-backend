@@ -14,14 +14,15 @@ import bo.sddpi.reactivatic.modulos.entidades.Negocios;
 public interface INegociosAod {
 
     @Select("SELECT * FROM negocios n " +
-            "JOIN benficios b ON b.idbeneficio = n.idbeneficio " +
-            "LEFT JOIN benficiosempresas be ON be.idbeneficioempresa = n.idbeneficioempresa " +
+            "JOIN beneficios b ON b.idbeneficio = n.idbeneficio " +
+            "LEFT JOIN beneficiosempresas be ON be.idbeneficioempresa = n.idbeneficioempresa " +
             "LEFT JOIN empresas e ON e.idempresa = be.idempresa " +
             "LEFT JOIN rubros r ON e.idrubro = r.idrubro " +
             "LEFT JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
             "LEFT JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
-            "JOIN personas p ON rep.idpersona = p.idpersona " +
-            "WHERE idbeneficio=#{beneficio} AND CONCAT(COALESCE(e.empresa, ''), ' ', COALESCE(r.rubro, ''), ' ', COALESCE(m.municipio, ''), ' ', " +
+            "JOIN personas p ON p.idpersona = n.idpersona " +
+            "LEFT JOIN clientes c ON c.idpersona = p.idpersona " +
+            "WHERE n.idbeneficio=#{beneficio} AND CONCAT(COALESCE(e.empresa, ''), ' ', COALESCE(r.rubro, ''), ' ', COALESCE(m.municipio, ''), ' ', " +
             "COALESCE(p.primerNombre, ''), ' ', COALESCE(p.primerApellido, ''), ' ', COALESCE(p.segundoApellido, ''), ' ', " +
             "COALESCE(p.dip, '')) " +
             "ILIKE '%' || #{buscar} || '%' " +

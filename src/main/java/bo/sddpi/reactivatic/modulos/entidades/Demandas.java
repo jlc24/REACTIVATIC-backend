@@ -6,14 +6,14 @@ import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class Ofertas implements Serializable {
+public class Demandas implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long idoferta;
+    private Long iddemanda;
     private Long idempresa;
-    private String tipooferta;
-    private String oferta;
+    private String tipodemanda;
+    private String demanda;
     private Boolean estado;
     private LocalDateTime created_at;
 

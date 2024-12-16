@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import bo.sddpi.reactivatic.modulos.aods.INegociosAod;
-import bo.sddpi.reactivatic.modulos.entidades.Empresas;
 import bo.sddpi.reactivatic.modulos.entidades.Negocios;
 
 import org.springframework.web.bind.annotation.GetMapping;

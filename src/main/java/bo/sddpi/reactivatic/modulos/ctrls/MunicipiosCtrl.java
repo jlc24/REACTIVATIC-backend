@@ -86,9 +86,6 @@ public class MunicipiosCtrl {
         return new ResponseEntity<Municipios>(dato, HttpStatus.OK);
     }
 
-    
-    
-
     @PostMapping
     ResponseEntity<?> adicionar(@Valid @RequestBody Municipios dato, BindingResult resultado) {
         Map<String, Object> mensajes = new HashMap<>();
