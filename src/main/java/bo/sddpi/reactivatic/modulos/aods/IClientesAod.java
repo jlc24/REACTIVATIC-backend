@@ -41,4 +41,14 @@ public interface IClientesAod {
     @Delete("DELETE FROM clientes WHERE idpersona=#{idpersona}")
     void eliminar(Long idpersona);
 
+    @Select("SELECT c.idcliente, c.idpersona, p.primerapellido, p.segundoapellido, p.primernombre " +
+        "FROM clientes c " +
+        "JOIN personas p ON c.idpersona = p.idpersona " +
+        "WHERE p.estado=true AND CONCAT(p.primernombre, ' ', p.primerapellido, ' ', p.segundoapellido, ' ', p.celular, ' ') ILIKE '%' || #{buscar} || '%' " +
+        "ORDER BY p.created_at DESC ")
+    @Results({
+        @Result(property ="persona", column ="idpersona", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato")),
+    })
+    List<Clientes> buscarclientes(String buscar);
+
 }

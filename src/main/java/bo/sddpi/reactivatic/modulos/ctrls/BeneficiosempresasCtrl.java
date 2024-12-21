@@ -1,6 +1,9 @@
 package bo.sddpi.reactivatic.modulos.ctrls;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 import bo.sddpi.reactivatic.modulos.aods.IBeneficiosAod;
 import bo.sddpi.reactivatic.modulos.aods.IBeneficiosempresasAod;
 import bo.sddpi.reactivatic.modulos.aods.IEmpresasAod;
+import bo.sddpi.reactivatic.modulos.aods.INegociosAod;
 import bo.sddpi.reactivatic.modulos.entidades.Beneficios;
 import bo.sddpi.reactivatic.modulos.entidades.Beneficiosempresas;
+import bo.sddpi.reactivatic.modulos.entidades.Horarios;
+import bo.sddpi.reactivatic.modulos.entidades.Negocios;
 import bo.sddpi.reactivatic.modulos.reportes.IPlanillasRep;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,6 +50,9 @@ public class BeneficiosempresasCtrl {
 
     @Autowired
     private IEmpresasAod iEmpresasAod;
+
+    @Autowired
+    private INegociosAod iNegociosAod;
 
     @Autowired
     private IPlanillasRep iPlanillasRep;
@@ -155,6 +164,34 @@ public class BeneficiosempresasCtrl {
             beneficioempresa.setIdbeneficio(idbeneficio);
 
             iBeneficiosempresasAod.adicionar(beneficioempresa);
+
+            Beneficios beneficio = iBeneficiosAod.dato(idbeneficio);
+            
+            if (beneficio.getTipobeneficio().getIdtipobeneficio() == 7) {
+                if (beneficio == null || beneficio.getFechainicio() == null || beneficio.getFechafin() == null) {
+                    mensajes.put("mensaje", "No se encontró el beneficio o las fechas de inicio y fin no están definidas.");
+                    return new ResponseEntity<>(mensajes, HttpStatus.BAD_REQUEST);
+                }
+                LocalTime horaInicio = beneficio.getFechainicio().toLocalTime();
+                LocalTime horaFin = beneficio.getFechafin().toLocalTime();
+                int duracionMinutos = beneficio.getDuracion();
+                List<LocalDate> rangoFechas = generarRangoFechas(beneficio.getFechainicio().toLocalDate(), beneficio.getFechafin().toLocalDate());
+                List<Horarios> horarios = generarRangoHorarios(horaInicio, horaFin, duracionMinutos);
+                
+                for (LocalDate fecha : rangoFechas) {
+                    for (Horarios horario : horarios) {
+                        Negocios negocio = new Negocios();
+                        negocio.setIdbeneficio(idbeneficio);
+                        negocio.setIdbeneficioempresa(beneficioempresa.getIdbeneficioempresa());
+                        negocio.setFecha(fecha);
+                        negocio.setHorainicio(horario.getInicio());
+                        negocio.setHorafin(horario.getFin());
+                        negocio.setDuracion(horario.getDuracion());
+
+                        iNegociosAod.adicionar(negocio);
+                    }
+                }
+            }
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la inserción en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -162,6 +199,34 @@ public class BeneficiosempresasCtrl {
         }
         mensajes.put("mensaje", "El beneficioempresa ha sido creado");
         return new ResponseEntity<>(mensajes, HttpStatus.CREATED);
+    }
+
+    private List<LocalDate> generarRangoFechas(LocalDate fechaInicio, LocalDate fechaFin) {
+        List<LocalDate> fechas = new ArrayList<>();
+        LocalDate fechaActual = fechaInicio;
+
+        while (!fechaActual.isAfter(fechaFin)) {
+            fechas.add(fechaActual);
+            fechaActual = fechaActual.plusDays(1);
+        }
+
+        return fechas;
+    }
+
+    private List<Horarios> generarRangoHorarios(LocalTime horaInicio, LocalTime horaFin, int intervaloMinutos) {
+        List<Horarios> horarios = new ArrayList<>();
+    
+        while (horaInicio.isBefore(horaFin)) {
+            LocalTime finIntervalo = horaInicio.plusMinutes(intervaloMinutos);
+            Horarios horario = new Horarios();
+            horario.setInicio(horaInicio);
+            horario.setFin(finIntervalo);
+            horario.setDuracion(intervaloMinutos);
+            horarios.add(horario);
+            horaInicio = finIntervalo;
+        }
+    
+        return horarios;
     }
 
     @DeleteMapping
@@ -200,6 +265,13 @@ public class BeneficiosempresasCtrl {
             beneficioempresa.setIdempresa(idempresa);
             beneficioempresa.setIdbeneficio(idbeneficio);
 
+            Beneficios beneficio = iBeneficiosAod.dato(idbeneficio);
+            
+            if (beneficio.getTipobeneficio().getIdtipobeneficio() == 7) {
+                Long idbeneficioempresa;
+                idbeneficioempresa = iBeneficiosempresasAod.idbeneficioempresa(idbeneficio, idempresa);
+                iNegociosAod.eliminarempresa(idbeneficio, idbeneficioempresa);
+            }
             iBeneficiosempresasAod.eliminar(beneficioempresa);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Vase de datos");

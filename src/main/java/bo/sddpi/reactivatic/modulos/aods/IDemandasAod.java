@@ -12,7 +12,7 @@ public interface IDemandasAod {
     @Select("SELECT * FROM demandas WHERE idempresa=#{empresa}")
     List<Demandas> demandas(Long empresa);
 
-    @Select("SELECT * FROM ofertas WHERE idempresa=#{empresa} AND idoferta=#{id}")
+    @Select("SELECT * FROM demandas WHERE idempresa=#{empresa} AND iddemanda=#{id}")
     Demandas dato(Long empresa, Long id);
 
     @Select("SELECT * FROM demandas WHERE demanda=#{demanda}")

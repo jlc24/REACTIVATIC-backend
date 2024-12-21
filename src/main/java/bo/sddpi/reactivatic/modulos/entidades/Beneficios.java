@@ -14,6 +14,8 @@ public class Beneficios implements Serializable {
     private String beneficio;
     private String descripcion;
     private Long idtipobeneficio;
+    private Integer mesas;
+    private Integer duracion;
     private Long idmunicipio;
     private String direccion;
     private LocalDateTime fechainicio;

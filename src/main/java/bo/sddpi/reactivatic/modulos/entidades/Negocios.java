@@ -2,6 +2,7 @@ package bo.sddpi.reactivatic.modulos.entidades;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -13,12 +14,14 @@ public class Negocios implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long idnegocio;
-    private Long idbenficio;
+    private String tipo;
+    private Long idbeneficio;
     private Long idbeneficioempresa;
     private Long idpersona;
+    private LocalDate fecha;
     private LocalTime horainicio;
     private LocalTime horafin;
-    private Long duracion;
+    private Integer duracion;
     private Long mesa;
     private BigDecimal cantidad;
     private Integer estadoempresa;

@@ -14,10 +14,10 @@ public interface IBeneficiosempresasAod {
     
     @Select("SELECT * FROM beneficiosempresas WHERE idbeneficioempresa=#{id}")
     @Results({
-        @Result(property = "beneficio", column = "idbeneficio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IBeneficioAod.dato")),
-        @Result(property = "Empresa", column = "idempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresaAod.dato"))
+        @Result(property = "beneficio", column = "idbeneficio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IBeneficiosAod.dato")),
+        @Result(property = "empresa", column = "idempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato"))
     })
-    Beneficios dato(Long id);
+    Beneficiosempresas dato(Long id);
 
     @Select("SELECT * FROM beneficiosempresas be " +
             "JOIN empresas e ON e.idempresa=be.idempresa " +
@@ -111,4 +111,7 @@ public interface IBeneficiosempresasAod {
                 @Result(property = "empresa", column = "idempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IEmpresasAod.dato")),
         })
     List<Beneficiosempresas> planillareg(Long idbeneficio);
+
+    @Select("SELECT idbeneficioempresa FROM beneficiosempresas WHERE idbeneficio=#{idbeneficio} AND idempresa=#{idempresa} ")
+    Long idbeneficioempresa(Long idbeneficio, Long idempresa);
 }

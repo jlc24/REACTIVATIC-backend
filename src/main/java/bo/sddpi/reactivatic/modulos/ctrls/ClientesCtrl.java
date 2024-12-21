@@ -70,4 +70,18 @@ public class ClientesCtrl {
         }
         return new ResponseEntity<>(clientes, HttpStatus.OK);
     }
+
+    @GetMapping("/buscar")
+    ResponseEntity<?> search(@RequestParam(value = "buscar", defaultValue = "") String buscar){
+        List<Clientes> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iClientesAod.buscarclientes(buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Clientes>>(datos, HttpStatus.OK);
+    }
 }

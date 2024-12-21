@@ -45,12 +45,12 @@ public interface IBeneficiosAod {
     })
     List<Beneficios> listar();
 
-    @Insert("INSERT INTO beneficios (beneficio, descripcion, idtipobeneficio, idmunicipio, direccion, fechainicio, fechafin, idcapacitador, capacidad, idusuario) " +
-            "VALUES (#{beneficio}, #{descripcion}, #{idtipobeneficio}, #{idmunicipio}, #{direccion}, #{fechainicio}, #{fechafin}, #{idcapacitador}, #{capacidad}, #{idusuario})")
+    @Insert("INSERT INTO beneficios (beneficio, descripcion, idtipobeneficio, mesas, duracion, idmunicipio, direccion, fechainicio, fechafin, idcapacitador, capacidad, idusuario) " +
+            "VALUES (#{beneficio}, #{descripcion}, #{idtipobeneficio}, #{mesas}, #{duracion}, #{idmunicipio}, #{direccion}, #{fechainicio}, #{fechafin}, #{idcapacitador}, #{capacidad}, #{idusuario})")
     @Options(useGeneratedKeys = true, keyProperty = "idbeneficio")
     void insertar(Beneficios beneficio);
 
-    @Update("UPDATE beneficios SET beneficio=#{beneficio}, descripcion=#{descripcion}, idtipobeneficio=#{idtipobeneficio}, idmunicipio=#{idmunicipio}, direccion=#{direccion}, fechainicio=#{fechainicio}, fechafin=#{fechafin}, idcapacitador=#{idcapacitador}, capacidad=#{capacidad} " +
+    @Update("UPDATE beneficios SET beneficio=#{beneficio}, descripcion=#{descripcion}, idtipobeneficio=#{idtipobeneficio}, mesas=#{mesas}, duracion=#{duracion}, idmunicipio=#{idmunicipio}, direccion=#{direccion}, fechainicio=#{fechainicio}, fechafin=#{fechafin}, idcapacitador=#{idcapacitador}, capacidad=#{capacidad} " +
             "WHERE idbeneficio=#{idbeneficio}")
     void actualizar(Beneficios beneficio);
 

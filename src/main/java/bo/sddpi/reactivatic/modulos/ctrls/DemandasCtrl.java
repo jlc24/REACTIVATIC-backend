@@ -39,7 +39,7 @@ public class DemandasCtrl {
         Long idempresa = null;
         try {
             idempresa = Long.parseLong(empresa);
-            dato = iDemandasAod.dato(id, idempresa);
+            dato = iDemandasAod.dato(idempresa, id);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
