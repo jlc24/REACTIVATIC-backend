@@ -1,7 +1,7 @@
 package bo.sddpi.reactivatic.modulos.aods;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.apache.ibatis.annotations.*;
@@ -31,7 +31,12 @@ public interface INegociosAod {
             "COALESCE(p.primerNombre, ''), ' ', COALESCE(p.primerApellido, ''), ' ', COALESCE(p.segundoApellido, ''), ' ', " +
             "COALESCE(p.dip, '')) " +
             "ILIKE '%' || #{buscar} || '%' " +
-            "ORDER BY n.fecha, n.horainicio, n.estadoempresa, n.estadopersona  ASC ")   
+            "ORDER BY " +
+                "CASE " + 
+                "    WHEN n.fecha = CURRENT_DATE THEN 0 " + 
+                "    ELSE 1 " + 
+                "END, " +
+            "n.fecha, n.estadoempresa, n.estadopersona, n.horainicio  ASC ")  
     @Results({
          @Result(property = "beneficioempresa", column = "idbeneficioempresa", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IBeneficiosempresasAod.dato")),
          @Result(property = "persona", column = "idpersona", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IPersonasAod.dato"))
@@ -70,7 +75,7 @@ public interface INegociosAod {
             "VALUES (#{tipo}, #{idbeneficio},  #{idbeneficioempresa}, #{horainicio}, #{horafin}, #{duracion}, #{mesa}, #{fecha}) ")
     void adicionar(Negocios negocio);
 
-    @Update("UPDATE negocios SET tipo=#{tipo} idpersona=#{idpersona}, estadoempresa=#{estadoempresa}, estadopersona=#{estadopersona}, mesa=#{mesa} WHERE idnegocio=#{idnegocio}")
+    @Update("UPDATE negocios SET tipo=#{tipo}, idpersona=#{idpersona}, estadoempresa=#{estadoempresa}, estadopersona=#{estadopersona}, mesa=#{mesa} WHERE idnegocio=#{idnegocio}")
     void modificar(Negocios negocio);
 
     @Delete("DELETE FROM negocios WHERE idnegocio=#{idnegocio}  ")
@@ -99,5 +104,10 @@ public interface INegociosAod {
     })
     List<Negocios> negocios(String buscar, String fecha);
 
-    //@Select("SELECT * FROM negocios WHERE ")
+    @Select("SELECT mesa FROM negocios " +
+            "WHERE idbeneficio =#{idbeneficio} AND fecha = #{fecha} " +
+            "AND horainicio = #{hora} " +
+            "AND idpersona IS NOT NULL " +
+            "AND mesa IS NOT NULL;")
+    List<Negocios> mesas(Long idbeneficio, LocalDate fecha, LocalTime hora);
 }

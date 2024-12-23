@@ -1,6 +1,7 @@
 package bo.sddpi.reactivatic.modulos.ctrls;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -84,11 +85,13 @@ public class NegociosCtrl {
     }
 
     @GetMapping(value = "/{id}")
-    ResponseEntity<?> dato(@PathVariable Long id, @RequestParam(value = "beneficio") Integer beneficio) {
+    ResponseEntity<?> dato(@PathVariable Long id, @RequestParam(value = "beneficio", defaultValue = "0") String beneficio) {
         Negocios dato = null;
         Map<String, Object> mensajes = new HashMap<>();
+        Long idbeneficio = null;
         try {
-            dato = inegociosaod.dato(id, beneficio.longValue());
+            idbeneficio = Long.parseLong(beneficio);
+            dato = inegociosaod.dato(id, idbeneficio);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
@@ -135,6 +138,26 @@ public class NegociosCtrl {
             idempresa = Long.parseLong(empresa);
             
             datos = inegociosaod.horas(fecha, idempresa, idbeneficio);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Negocios>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping("/mesas")
+    ResponseEntity<?> mesas(@RequestParam(value = "hora") @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime hora,
+                            @RequestParam(value = "beneficio", defaultValue = "0") String beneficio,
+                            @RequestParam(value = "fecha") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        List<Negocios> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        Long idbeneficio = null;
+        
+        try {
+            idbeneficio = Long.parseLong(beneficio);
+            
+            datos = inegociosaod.mesas(idbeneficio, fecha, hora);
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
