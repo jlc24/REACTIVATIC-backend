@@ -29,7 +29,7 @@ Antes de comenzar, asegúrate de tener instalados los siguientes programas:
        git clone https://github.com/jlc24/REACTIVATIC-backend.git
        cd REACTIVATIC-backend
     ```
-2. Revisar y/o configurar el archivo **application.properties**
+2. Revisar y/o configurar el archivo **application.properties**, la ruta de la base de datos, usuario y contraseña.
     ```sh
        spring.datasource.url=jdbc:postgresql://localhost:5432/reactivaticdb
        spring.datasource.username=postgres
@@ -90,8 +90,11 @@ Antes de comenzar, asegúrate de tener instalados los siguientes programas:
     ```
     Para produccion:
     ```sh
-    mvn clean package
-    java -jar target/<nombre-del-archivo>.jar
+    mvn clean package -DskipTests
+    ```
+    Para ejecutar en Servidor:
+    ```sh
+    nohup java -jar <nombre-del-archivo>.jar &
     ```
 
 ##### Conexión al Backend
