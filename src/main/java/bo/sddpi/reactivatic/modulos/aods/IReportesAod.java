@@ -21,4 +21,40 @@ public interface IReportesAod {
 
     @Select("SELECT EXTRACT(YEAR FROM fechareg) AS entidad, COUNT(*) AS cantidad FROM empresas GROUP BY entidad ORDER BY entidad;")
     List<Reportes> empresasporgestion();
+
+    @Select("SELECT r.rubro AS entidad, COUNT(e.idempresa) AS cantidad " + 
+            "FROM empresas e " + 
+            "JOIN rubros r ON e.idrubro = r.idrubro " + 
+            "GROUP BY entidad " + 
+            "ORDER BY entidad;")
+    List<Reportes> empresasporrubro();
+    
+    @Select("SELECT m.municipio as entidad, COUNT(e.idempresa) AS cantidad " + 
+            "FROM empresas e " + 
+            "JOIN municipios m ON e.idmunicipio = m.idmunicipio " + 
+            "GROUP BY entidad " + 
+            "ORDER BY entidad;")
+    List<Reportes> empresaspormunicipio();
+
+    @Select("SELECT DISTINCT EXTRACT(YEAR FROM fechareg) AS gestion FROM empresas ORDER BY gestion;")
+    List<Reportes> gestion();
+
+    @Select("SELECT r.rubro as entidad, " + 
+            "COUNT(e.idempresa) AS cantidad, " + 
+            "EXTRACT(YEAR FROM e.fechareg) AS gestion " + 
+            "FROM empresas e " + 
+            "JOIN rubros r ON e.idrubro = r.idrubro " + 
+            "WHERE EXTRACT(YEAR FROM e.fechareg) = #{ano} " +
+            "GROUP BY entidad, gestion " + 
+            "ORDER BY gestion ASC, entidad;")
+    List<Reportes> empresasporrubrogestion(Integer ano);
+
+    @Select("SELECT r.rubro AS entidad, COUNT(DISTINCT e.idempresa) AS cantidad " +
+            "FROM productos prod " +
+            "JOIN empresas e ON prod.idempresa = e.idempresa " +
+            "JOIN rubros r ON e.idrubro = r.idrubro " +
+            "GROUP BY r.rubro " +
+            "ORDER BY r.rubro ASC;")
+    List<Reportes> empresasEnTienda();
+    
 }
