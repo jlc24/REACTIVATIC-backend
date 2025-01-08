@@ -328,4 +328,19 @@ public class ProductosCtrl {
         return new ResponseEntity<Resource>(archivo, cabecera, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/empresas/{id}")
+    ResponseEntity<?> datosproducto(@PathVariable Long id) {
+        List<Productos> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iProductosAod.productos(id);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        return new ResponseEntity<List<Productos>>(datos, HttpStatus.OK);
+    }
+
 }

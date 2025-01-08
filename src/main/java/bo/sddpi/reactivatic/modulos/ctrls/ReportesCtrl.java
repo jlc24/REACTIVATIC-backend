@@ -9,6 +9,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,6 +73,76 @@ public class ReportesCtrl {
         Map<String, Object> mensajes = new HashMap<>();
         try {
             datos = iReportesAod.empresasporgestion();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Reportes>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping("/empresasporrubro")
+    ResponseEntity<?> empresasporrubro(){
+        List<Reportes> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iReportesAod.empresasporrubro();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Reportes>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping("/empresaspormunicipio")
+    ResponseEntity<?> empresaspormunicipio(){
+        List<Reportes> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iReportesAod.empresaspormunicipio();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Reportes>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping("/gestion")
+    ResponseEntity<?> gestion(){
+        List<Reportes> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iReportesAod.gestion();
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Reportes>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping("/empresasporrubrogestion/{ano}")
+    ResponseEntity<?> empresasporrubrogestion(@PathVariable Integer ano){
+        List<Reportes> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iReportesAod.empresasporrubrogestion(ano);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Reportes>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping("/empresasentienda")
+    ResponseEntity<?> empresasentienda(){
+        List<Reportes> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            datos = iReportesAod.empresasEnTienda();
         } catch (DataAccessException e) {
             mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
             mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));

@@ -265,43 +265,35 @@ public class PlanillasRepImpl implements IPlanillasRep {
         String[] columnas = { "NRO", "APELLIDOS Y NOMBRES", "CARNET", "MUNICIPIO", "RUBRO", "CELULAR", "FIRMA" };
 
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-        Sheet sheet = workbook.createSheet("Planilla de Beneficios");
+            Sheet sheet = workbook.createSheet("Planilla de Beneficios");
 
-        // Crear el encabezado de las columnas
-        Row headerRow = sheet.createRow(0);
-        for (int i = 0; i < columnas.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(columnas[i]);
-            // Aplicar estilo opcional (negrita, alineación, etc.)
-            CellStyle headerStyle = workbook.createCellStyle();
-            //Font font = workbook.createFont();
-            //font.setBold(true);
-            //headerStyle.setFont(font);
-            cell.setCellStyle(headerStyle);
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < columnas.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columnas[i]);
+                CellStyle headerStyle = workbook.createCellStyle();
+                cell.setCellStyle(headerStyle);
+            }
+
+            int rowNum = 1;
+            for (Beneficiosempresas beneficio : datos) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(rowNum - 1); // NRO
+                row.createCell(1).setCellValue(beneficio.getEmpresa().getRepresentante().getPersona().getPrimerapellido() + " " + beneficio.getEmpresa().getRepresentante().getPersona().getSegundoapellido() + " " + beneficio.getEmpresa().getRepresentante().getPersona().getPrimernombre()); // APELLIDOS Y NOMBRES
+                row.createCell(2).setCellValue(beneficio.getEmpresa().getRepresentante().getPersona().getDip() != null ? beneficio.getEmpresa().getRepresentante().getPersona().getDip() : ""); // CARNET
+                row.createCell(3).setCellValue(beneficio.getEmpresa().getMunicipio().getMunicipio() != null ? beneficio.getEmpresa().getMunicipio().getMunicipio() : ""); // MUNICIPIO
+                row.createCell(4).setCellValue(beneficio.getEmpresa().getRubro().getRubro() != null ? beneficio.getEmpresa().getRubro().getRubro() : ""); // RUBRO
+                row.createCell(5).setCellValue(beneficio.getEmpresa().getCelular() != null ? beneficio.getEmpresa().getCelular() : ""); // CELULAR
+                row.createCell(6).setCellValue(""); // FIRMA vacía
+            }
+
+            for (int i = 0; i < columnas.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(bos);
+            return bos.toByteArray();
         }
-
-        // Crear las filas con los datos de la lista de 'Beneficiosempresas'
-        int rowNum = 1;
-        for (Beneficiosempresas beneficio : datos) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(rowNum - 1); // NRO
-            row.createCell(1).setCellValue(beneficio.getEmpresa().getRepresentante().getPersona().getPrimerapellido() + " " + beneficio.getEmpresa().getRepresentante().getPersona().getSegundoapellido() + " " + beneficio.getEmpresa().getRepresentante().getPersona().getPrimernombre()); // APELLIDOS Y NOMBRES
-            row.createCell(2).setCellValue(beneficio.getEmpresa().getRepresentante().getPersona().getDip() != null ? beneficio.getEmpresa().getRepresentante().getPersona().getDip() : ""); // CARNET
-            row.createCell(3).setCellValue(beneficio.getEmpresa().getMunicipio().getMunicipio() != null ? beneficio.getEmpresa().getMunicipio().getMunicipio() : ""); // MUNICIPIO
-            row.createCell(4).setCellValue(beneficio.getEmpresa().getRubro().getRubro() != null ? beneficio.getEmpresa().getRubro().getRubro() : ""); // RUBRO
-            row.createCell(5).setCellValue(beneficio.getEmpresa().getCelular() != null ? beneficio.getEmpresa().getCelular() : ""); // CELULAR
-            row.createCell(6).setCellValue(""); // FIRMA vacía
-        }
-
-        // Auto-ajustar el ancho de las columnas
-        for (int i = 0; i < columnas.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
-
-        // Escribir el archivo Excel en el ByteArrayOutputStream
-        workbook.write(bos);
-        return bos.toByteArray();
-    }
     }
 
     @Override

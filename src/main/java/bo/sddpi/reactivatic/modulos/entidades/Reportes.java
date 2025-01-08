@@ -12,5 +12,6 @@ public class Reportes implements Serializable{
     private Long id;
     private String entidad;
     private Integer cantidad;
+    private Integer gestion;
 
 }

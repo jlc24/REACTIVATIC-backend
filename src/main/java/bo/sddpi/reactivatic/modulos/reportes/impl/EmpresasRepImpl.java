@@ -23,6 +23,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import bo.sddpi.reactivatic.modulos.entidades.Beneficiosempresas;
 import bo.sddpi.reactivatic.modulos.entidades.Empresas;
 import bo.sddpi.reactivatic.modulos.reportes.IEmpresasRep;
 
@@ -289,6 +290,40 @@ public class EmpresasRepImpl implements IEmpresasRep {
             return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
+    public byte[] datosTiendaXLS(List<Empresas> datos) throws IOException{
+        String[] columnas = { "NRO", "EMPRESA", "APELLIDOS Y NOMBRES", "CARNET", "MUNICIPIO", "RUBRO" };
+
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Planilla de UP registradas en Tienda Virtual");
+
+            Row headerRow = sheet.createRow(0);
+            for (int i = 0; i < columnas.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columnas[i]);
+                CellStyle headerStyle = workbook.createCellStyle();
+                cell.setCellStyle(headerStyle);
+            }
+
+            int rowNum = 1;
+            for (Empresas empresa : datos) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(rowNum - 1); // NRO
+                row.createCell(1).setCellValue(empresa.getEmpresa());
+                row.createCell(2).setCellValue(empresa.getRepresentante().getPersona().getPrimerapellido() + " " + empresa.getRepresentante().getPersona().getSegundoapellido() + " " + empresa.getRepresentante().getPersona().getPrimernombre()); // APELLIDOS Y NOMBRES
+                row.createCell(3).setCellValue(empresa.getRepresentante().getPersona().getDip() != null ? empresa.getRepresentante().getPersona().getDip() : ""); // CARNET
+                row.createCell(4).setCellValue(empresa.getMunicipio().getMunicipio() != null ? empresa.getMunicipio().getMunicipio() : ""); // MUNICIPIO
+                row.createCell(5).setCellValue(empresa.getRubro().getRubro() != null ? empresa.getRubro().getRubro() : ""); // RUBRO
+            }
+
+            for (int i = 0; i < columnas.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(bos);
+            return bos.toByteArray();
+        }
     }
 
     @Override

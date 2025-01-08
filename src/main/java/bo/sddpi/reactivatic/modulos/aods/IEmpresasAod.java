@@ -119,6 +119,52 @@ public interface IEmpresasAod {
     })
     List<Empresas> obtenerEmpresasDinamico(Map<String, Object> parametros);
 
+    @Select("SELECT e.idempresa, e.empresa, e.idrepresentante, e.idmunicipio, e.idrubro, r.rubro " +
+            "FROM productos prod " +
+            "JOIN empresas e ON prod.idempresa = e.idempresa " +
+            "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
+            "JOIN personas p ON rep.idpersona = p.idpersona " +
+            "JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
+            "JOIN rubros r ON e.idrubro = r.idrubro " +
+            "WHERE CONCAT(e.empresa, ' ', r.rubro, ' ', m.municipio, ' ', p.primerNombre, ' ', p.primerApellido, ' ', p.segundoApellido, ' ', p.dip) " +
+            "ILIKE '%' || #{buscar} || '%' " +
+            "GROUP BY e.idempresa, e.empresa, e.idrepresentante, e.idmunicipio, e.idrubro, r.rubro " +
+            "ORDER BY r.rubro, e.empresa ASC " + 
+            "LIMIT #{cantidad} OFFSET #{pagina};")
+    @Results({
+        @Result(property = "representante", column = "idrepresentante", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRepresentantesAod.dato")),
+        @Result(property = "rubro", column = "idrubro", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRubrosAod.dato")),
+        @Result(property = "municipio", column = "idmunicipio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IMunicipiosAod.dato")),
+    })
+    List<Empresas> enTienda(String buscar, Integer pagina, Integer cantidad);
+
+    @Select("SELECT e.idempresa, e.empresa, e.idrepresentante, e.idmunicipio, e.idrubro, r.rubro " +
+            "FROM productos prod " +
+            "JOIN empresas e ON prod.idempresa = e.idempresa " +
+            "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
+            "JOIN personas p ON rep.idpersona = p.idpersona " +
+            "JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
+            "JOIN rubros r ON e.idrubro = r.idrubro " +
+            "GROUP BY e.idempresa, e.empresa, e.idrepresentante, e.idmunicipio, e.idrubro, r.rubro " +
+            "ORDER BY r.rubro, e.empresa ASC ")
+    @Results({
+        @Result(property = "representante", column = "idrepresentante", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRepresentantesAod.dato")),
+        @Result(property = "rubro", column = "idrubro", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IRubrosAod.dato")),
+        @Result(property = "municipio", column = "idmunicipio", one = @One(select = "bo.sddpi.reactivatic.modulos.aods.IMunicipiosAod.dato")),
+    })
+    List<Empresas> listaEnTienda();
+
+    @Select("SELECT COUNT(DISTINCT e.idempresa) " +
+            "FROM productos prod " +
+            "JOIN empresas e ON prod.idempresa = e.idempresa " +
+            "JOIN representantes rep ON e.idrepresentante = rep.idrepresentante " +
+            "JOIN personas p ON rep.idpersona = p.idpersona " +
+            "JOIN municipios m ON e.idmunicipio = m.idmunicipio " +
+            "JOIN rubros r ON e.idrubro = r.idrubro " +
+            "WHERE CONCAT(e.empresa, ' ', r.rubro, ' ', m.municipio, ' ', p.primerNombre, ' ', p.primerApellido, ' ', p.segundoApellido, ' ', p.dip) " +
+            "ILIKE '%' || #{buscar} || '%'")
+    Integer cantidadtienda(String buscar);
+
 }
 
 

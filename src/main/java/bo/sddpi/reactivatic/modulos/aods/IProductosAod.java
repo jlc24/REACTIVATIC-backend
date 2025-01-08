@@ -156,6 +156,16 @@ public interface IProductosAod {
     })
     List<Productos> productosmasvendidos();
 
+    @Select("SELECT p.*, " + 
+                "MIN(pr.precio) AS minprecio, " + 
+                "MAX(pr.precio) AS maxprecio " + 
+                "FROM productos p " + 
+                "LEFT JOIN precios pr ON p.idproducto = pr.idproducto " + 
+                "WHERE p.idempresa = #{idempresa} " + 
+                "GROUP BY p.idproducto " + 
+                "ORDER BY p.producto ASC")
+    List<Productos> productos(Long idempresa);
+
 }
 
 

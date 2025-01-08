@@ -2,7 +2,6 @@ package bo.sddpi.reactivatic.modulos.ctrls;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +28,8 @@ import com.itextpdf.text.DocumentException;
 import bo.sddpi.reactivatic.modulos.aods.IEmpresasAod;
 import bo.sddpi.reactivatic.modulos.entidades.Empresas;
 import bo.sddpi.reactivatic.modulos.reportes.IEmpresasRep;
+import bo.sddpi.reactivatic.modulos.reportes.impl.EmpresasRepImpl;
 import bo.sddpi.reactivatic.modulos.servicios.ISubirarchivosServ;
-
-
 
 @RestController
 @RequestMapping("/apirest/empresas")
@@ -45,6 +43,9 @@ public class EmpresasCtrl {
 
     @Autowired
     ISubirarchivosServ iSubirarchivosServ;
+
+    @Autowired
+    EmpresasRepImpl empresasRepImpl;
 
     @GetMapping
     ResponseEntity<?> datos(@RequestParam(value = "buscar", defaultValue = "") String buscar,
@@ -460,6 +461,59 @@ public class EmpresasCtrl {
             return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<byte[]>(data, HttpStatus.OK);
+    }
+
+    @GetMapping("/tienda")
+    ResponseEntity<?> enTienda(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                            @RequestParam(value = "pagina", defaultValue = "0") Integer pagina,
+                            @RequestParam(value = "cantidad", defaultValue = "10") Integer cantidad) {
+        List<Empresas> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        int nropagina = 0;
+        try {
+            if ((pagina-1)*cantidad<0) {
+                nropagina = 0;
+            } else {
+                nropagina = (pagina-1)*cantidad;
+            }
+            datos = iEmpresasAod.enTienda(buscar, nropagina, cantidad);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<List<Empresas>>(datos, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/cantidadtienda")
+    ResponseEntity<?> cantidadtienda(@RequestParam(value = "buscar", defaultValue = "") String buscar) {
+        Integer cantidad = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        try {
+            cantidad = iEmpresasAod.cantidadtienda(buscar);
+        } catch (DataAccessException e) {
+            mensajes.put("mensaje", "Error al realizar la consulta en la Base de Datos");
+            mensajes.put("error", e.getMessage().concat(":").concat(e.getMostSpecificCause().getMessage()));
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<Integer>(cantidad, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/datosTiendaXLS", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    ResponseEntity<?> planillaRegXLS() {
+        byte[] dato = null;
+        List<Empresas> datos = null;
+        Map<String, Object> mensajes = new HashMap<>();
+        
+        try {
+            datos = iEmpresasAod.listaEnTienda();
+            dato = empresasRepImpl.datosTiendaXLS(datos);
+            
+        } catch (Exception e) {
+            mensajes.put("mensaje", "Error al realizar el archivo Excel");
+            return new ResponseEntity<Map<String, Object>>(mensajes, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return new ResponseEntity<byte[]>(dato, HttpStatus.OK);
     }
     
 }
